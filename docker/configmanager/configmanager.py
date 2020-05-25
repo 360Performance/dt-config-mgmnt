@@ -444,7 +444,7 @@ def getConfigSettings(entitytypes, parameters):
         url = server + apiurl + query
         stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
         configtype = entitytype.__name__
-        logger.info("Getting Configs of type: {}".format(entitytype.__name__))
+        logger.info("Getting configs of type: {}".format(entitytype.__name__))
             
         try:
             response = requests.get(url, auth=(apiuser, apipwd))
@@ -454,19 +454,34 @@ def getConfigSettings(entitytypes, parameters):
                 t_id = tenant["tenantid"]
                 attrcheck = set()
                 try:
-                    for attr in tenant["values"]:
-                        #key = "::".join([c_id, t_id])
-                        key = "::".join([c_id, t_id, configtype, attr["name"]])
-                        #logger.info("Found: {}".format(key))
-                        if attr["name"] in stdConfigNames:
-                            #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
-                            configcache.setex(key,3600,attr["id"])
-                            attrcheck.add(attr["name"])
-                        else:
-                            configcache.setex(key,3600,attr["id"])
-                            logger.info("{} not in standard: {} {} : {}".format(configtype, key, attr["name"], attr["id"]))
+                    attrkey = None
+                    if "values" in tenant:
+                        attrkey = "values"
+                    if "dashboards" in tenant:
+                        attrkey = "dashboards"
+                    
+                    if attrkey:
+                        for attr in tenant[attrkey]:
+                            #key = "::".join([c_id, t_id])
+                            key = "::".join([c_id, t_id, configtype, attr["name"]])
+                            #logger.info("Found: {}".format(key))
+                            if "name" in attr and attr["name"] in stdConfigNames:
+                                #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
+                                configcache.setex(key,3600,attr["id"])
+                                attrcheck.add(attr["name"])
+                            else:
+                                configcache.setex(key,3600,attr["id"])
+                                logger.info("{} not in standard: {} : {}".format(configtype, key, attr["id"]))
+                    else:
+                        logger.info("{} is not a config entity returned in a value list, it's a setting type - comparison not implemented yet".format(configtype))
+                        #logger.info("JSON: {}".format(result))
+                        #ToDo: get all 1st level attributes not added by the consolidation API but by DT
+                        # iterate through those attributes and find id or namme attributes and if not then it's a setting (eg. dataPrivacy and not a config item)
+                        # for those that are setting types it might make sense to compare the settings to the default for match
                 except:
-                    logger.error("Problem getting Config Settings for Tenant {}::{}".format(c_id,t_id))
+                    logger.error("Problem getting config of type: {} for Tenant {}::{}".format(configtype,c_id,t_id))
+                    #logger.error("JSON: {}".format(result))
+                    logger.error("Error: {}".format(sys.exc_info()))
                     continue
                 
                 # check if all entities of the standard have been found        
@@ -833,7 +848,9 @@ def performConfig(parameters):
             putConfigEntities(stdConfig.getNotifications(),parameters)
 
 def getConfig(parameters):
-    configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
+    #configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
+    #configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
+    configtypes = [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
     getConfigSettings(configtypes, parameters)  
 
 def main(argv):

@@ -15,6 +15,7 @@ class ConfigEntity():
         self.name = kwargs.get("name")
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file",self.name)
+        self.dto = None
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
@@ -38,6 +39,7 @@ class TenantConfigEntity(ConfigEntity):
         self.name = kwargs.get("name")
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file",self.name)
+        self.dto = None
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
@@ -69,6 +71,7 @@ class TenantEntity(TenantConfigEntity):
         self.name = kwargs.get("name")
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file",self.name)
+        self.dto = None
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
@@ -90,6 +93,7 @@ class ClusterConfigEntity(ConfigEntity):
         self.name = kwargs.get("name")
         self.apipath = self.uri + "/TENANTID"
         self.file = kwargs.get("file",self.name)
+        self.dto = None
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
@@ -216,10 +220,16 @@ class applicationDetectionRules(TenantConfigEntity):
     uri = TenantConfigEntity.uri + entityuri
     
     def __str__(self):
-        return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
+        if self.dto:
+            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
+        else:
+            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,"no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern" )
     
     def __repr__(self):
-        return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
+        if self.dto:
+            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
+        else:
+            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,"no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern" )
     
     def setApplicationIdentifier(self,appid):
         self.dto["applicationIdentifier"] = appid
@@ -285,10 +295,17 @@ class dashboards(TenantConfigEntity):
     uri = TenantConfigEntity.uri + entityuri
 
     def __str__(self):
-        return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
+        if self.dto:
+            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
+        else:
+            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, "no title")
       
     def __repr__(self):
-        return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
+        if self.dto:
+            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
+        else:
+            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, "no title")
+
 
     def setName(self,name):
         self.dto["dashboardMetadata"]["name"] = name
