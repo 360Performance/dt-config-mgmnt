@@ -1,0 +1,481 @@
+default:
+  demUnitsAnnualQuota: 0
+  demUnitsQuota: 0
+  sessionStorageQuota: 2147483647
+
+tenants:
+  fr1:
+    adh-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    alf-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    arc-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    bmw-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    cen-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    cen-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    cfb-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    drm-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    elk-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ext-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    evy-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    fhr-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    fos-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    fsk-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    glj-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    gor-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    gyr-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    klg-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    kre-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    loc-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    maf-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    maf-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    mdc-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    mdc-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    mi2-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    msg-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    phl-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    pil-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    sam-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    sam-p2:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    sme-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    smm-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    tkn-p1:
+      demUnitsAnnualQuota: 200000
+      demUnitsQuota: 200000
+    unl-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    vms-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    vnx-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    wfa-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    wlk-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+  bo2:
+    pbo-p1:
+      demUnitsAnnualQuota: 6900000
+      demUnitsQuota: 690000
+    pbo-s2:
+      demUnitsAnnualQuota: 75000
+      demUnitsQuota: 75000
+    pbo-q2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    alk-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ama-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ara-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ari-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ben-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    blc-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    bls-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    bsa-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    che-p1:
+      demUnitsAnnualQuota: 200000
+      demUnitsQuota: 200000
+    cmx-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    cnv-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    cor-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    dym-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    edg-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    end-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    etn-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    gpa-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    har-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ita-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    lid-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    lin-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    lux-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    mab-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    mcm-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    mgl-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    nec-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    nvi-p1:
+      demUnitsAnnualQuota: 250000
+      demUnitsQuota: 250000
+    pdh-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    plh-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    ren-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    rok-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    sha-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    shi-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    smc-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    smk-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    smk-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    sor-p1:
+      demUnitsAnnualQuota: 250000
+      demUnitsQuota: 250000
+    spe-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    spg-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    spw-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    til-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    tum-p2:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    ust-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ust-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    vfc-p1:
+      demUnitsAnnualQuota: 250000
+      demUnitsQuota: 250000
+    whp-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    yan-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+  sy2:
+    faf-b2c-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+  ro1:
+    lul-b2c-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+  weu:
+    ccv2-cust-c0dnfts4n-albamanag1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cufqic9a3u-anheuserb1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c6cy-chevron1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c6cy-chevron1-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-caz6y6vn-bavarianv1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cgv8-beiersdor1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cq5h3gpf4-benlinkag1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cmgii8vaud-brakebros1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cj5w9mxky-brusselsa1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-ct44gdpff-busandser1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cemw2z-cobospa1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cg0cx-calidadpa1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cv4c9dq9b-daimaniag1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cgfxsjgx-draegerwe1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c4l653e4-durritser1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cuyu7qqhig-dutchflow1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cuyu7qqhig-dutchflow1-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cv299s-essaroilu1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c4nq-evonikind1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cffrbw6w-mtprodcus1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cuibb-gebrheine1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-csgwj3u5qm-indiskama2-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c0z0tb-jindalsta1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-clfyj5-jorisiden1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cbc6kqzcb6-kooperati1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cqyl18x-kymenlaak1-p3:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c731ust-leonardos1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c5cg8o59n-magenwirt1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cb7ya-novartisp2-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cywsi79vjh-parfumeri1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cjm1-pentlandg1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cmhfb2ylst-primarkli1-p1:
+      demUnitsAnnualQuota: 200000
+      demUnitsQuota: 200000
+    ccv2-cust-c4luqdg1s-puntromas1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cme22ws-rexeldeve1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c85a-schneider1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c70x1-stadtesse1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c7carf4al-theliossp1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cumfetag-thyssenkr1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-crb8yd-tibnorab1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cmkwu-toysrusib1-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cuw5g0co-triluxgro1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c4fm1cd-valorasch1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cdxt-mtprodcus3-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cmi4hiwf-wihurioy1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c3a8-yelllimit1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+  use:
+    ccv2-cust-crli0j5oy-alicorpsa1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cacl2-caseysret1-p1:
+      demUnitsAnnualQuota: 250000
+      demUnitsQuota: 250000
+    ccv2-cust-c013j-comercial1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-czj5d6fa-mtp2hybri1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-crcum8u1-excellige1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-crcum8u1-excellige1-p2:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-czn5fknwls-newenglan1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cteili-oneworldt1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cjf5-peugeotci1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c3eqct-provinceo1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c2yi-servicios1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c0fn96e-sonyinter1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-ca6i-thechemou1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-ch0tpqkj-westerndi1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+  aue:
+    ccv2-cust-cyc4jwb-devicetec1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c8uadjzv40-dksh1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-caybp6bc-jsev3-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-c1lv7iodag-mercury1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-clcpyq-metcash1-p1:
+      demUnitsAnnualQuota: 100000
+      demUnitsQuota: 100000
+    ccv2-cust-cxlvgrb-topgloves1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000
+    ccv2-cust-cuy8wj-umwtoyota1-p1:
+      demUnitsAnnualQuota: 25000
+      demUnitsQuota: 25000

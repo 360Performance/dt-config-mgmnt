@@ -1,0 +1,9 @@
+plugins:
+  custom.jmx.hybris.caches: True
+  custom.jmx.hybris.database: True
+  custom.jmx.hybris.cronjobs: True
+  custom.jmx.hybris.globalrequestprocessor: True
+  custom.jmx.hybris.servlet: True
+  custom.jmx.hybris.sessions: True
+  custom.jmx.hybris.taskengine: True
+  custom.jmx.OSFileDescriptors: True

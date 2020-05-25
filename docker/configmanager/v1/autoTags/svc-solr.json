@@ -1,0 +1,40 @@
+{
+    "name": "svc-solr",
+    "rules": [
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "SIMPLE_TECH",
+                        "value": {
+                            "type": "JETTY"
+                        }
+                    },
+                    "key": {
+                        "attribute": "SERVICE_TECHNOLOGY"
+                    }
+                },
+                {
+                    "comparisonInfo": {
+                        "caseSensitive": true,
+                        "negate": false,
+                        "operator": "CONTAINS",
+                        "type": "STRING",
+                        "value": "solr"
+                    },
+                    "key": {
+                        "attribute": "SERVICE_NAME"
+                    }
+                }
+            ],
+            "enabled": true,
+            "propagationTypes": [
+                "SERVICE_TO_PROCESS_GROUP_LIKE"
+            ],
+            "type": "SERVICE",
+            "valueFormat": null
+        }
+    ]
+}

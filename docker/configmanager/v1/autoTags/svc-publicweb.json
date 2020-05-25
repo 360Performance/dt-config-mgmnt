@@ -1,0 +1,51 @@
+{
+    "name": "svc-publicweb",
+    "rules": [
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "SIMPLE_TECH",
+                        "value": {
+                            "type": "APACHE_HTTP_SERVER"
+                        }
+                    },
+                    "key": {
+                        "attribute": "SERVICE_TECHNOLOGY"
+                    }
+                },
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "INTEGER",
+                        "value": 443
+                    },
+                    "key": {
+                        "attribute": "SERVICE_PORT"
+                    }
+                },
+                {
+                    "comparisonInfo": {
+                        "caseSensitive": true,
+                        "negate": true,
+                        "operator": "CONTAINS",
+                        "type": "STRING",
+                        "value": "hybrishosting.com"
+                    },
+                    "key": {
+                        "attribute": "SERVICE_NAME"
+                    }
+                }
+            ],
+            "enabled": true,
+            "propagationTypes": [
+                "SERVICE_TO_PROCESS_GROUP_LIKE"
+            ],
+            "type": "SERVICE",
+            "valueFormat": null
+        }
+    ]
+}

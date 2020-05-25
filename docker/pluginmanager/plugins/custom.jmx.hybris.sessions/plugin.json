@@ -1,0 +1,281 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.hybris.sessions",
+  "type": "JMX",
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "metricGroup": "custom.jmx.hybris.sessions",
+  "processTypes": [10, 12, 13, 16, 17, 18],
+  "configUI": {
+    "displayName": "Hybris Sessions"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "Hybris Sessions",
+        "title": "AdminCockpit",
+        "series": [
+          {
+            "key": "AdminCockpit_activeSessions",
+            "aggregation": "avg",
+            "displayname": "Active Sessions"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Sessions",
+        "title": "Management Console",
+        "series": [
+          {
+            "key": "ManagementConsole_activeSessions",
+            "aggregation": "avg",
+            "displayname": "Active Sessions"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Sessions",
+        "title": "AcceleratorServices",
+        "series": [
+          {
+            "key": "AcceleratorServices_activeSessions",
+            "aggregation": "avg",
+            "displayname": "Active Sessions"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Sessions",
+        "title": "BackOffice",
+        "series": [
+          {
+            "key": "BackOffice_activeSessions",
+            "aggregation": "avg",
+            "displayname": "Active Sessions"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Sessions",
+        "title": "Medias",
+        "series": [
+          {
+            "key": "Medias_activeSessions",
+            "aggregation": "avg",
+            "displayname": "Active Sessions"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Sessions",
+        "title": "ReportCockpit",
+        "series": [
+          {
+            "key": "ReportCockpit_activeSessions",
+            "aggregation": "avg",
+            "displayname": "ActiveSessions"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Sessions",
+        "title": "Storefront",
+        "series": [
+          {
+            "key": "Storefront_activeSessions",
+            "aggregation": "avg",
+            "displayname": "Active Sessions"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Sessions",
+        "title": "VirtualJDBC",
+        "series": [
+          {
+            "key": "VirtualJDBC_activeSessions",
+            "aggregation": "avg",
+            "displayname": "Active Sessions"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "AdminCockpit_activeSessions",
+        "unit": "Count",
+        "displayname": "AdminCockpit ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/admincockpit"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "ManagementConsole_activeSessions",
+        "unit": "Count",
+        "displayname": "Management Console ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/hmc"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "AcceleratorServices_activeSessions",
+        "unit": "Count",
+        "displayname": "AcceleratorServices ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/acceleratorservices"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "BackOffice_activeSessions",
+        "unit": "Count",
+        "displayname": "BackOffice ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/backoffice"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Medias_activeSessions",
+        "unit": "Count",
+        "displayname": "Medias ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/medias"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "ReportCockpit_activeSessions",
+        "unit": "Count",
+        "displayname": "ReportCockpit ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/reportcockpit"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Storefront_activeSessions",
+        "unit": "Count",
+        "displayname": "Storefront ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "VirtualJDBC_activeSessions",
+        "unit": "Count",
+        "displayname": "VirtualJDBC ActiveSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager",
+          "context": "/virtualjdbc"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    }
+  ]
+}

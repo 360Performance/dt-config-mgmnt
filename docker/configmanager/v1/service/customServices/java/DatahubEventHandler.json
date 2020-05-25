@@ -1,0 +1,27 @@
+{
+    "enabled": true,
+    "name": "DataHubEventHandler",
+    "processGroups": [],
+    "queueEntryPoint": false,
+    "queueEntryPointType": null,
+    "rules": [
+        {
+            "annotations": [],
+            "className": "com.hybris.datahub.api.event.DataHubEventListener",
+            "enabled": true,
+            "fileName": "",
+            "id": "8ce9e02e-9960-41f0-9aff-9ac4f1656985",
+            "matcher": "EQUALS",
+            "methodRules": [
+                {
+                    "argumentTypes": [
+                        "com.hybris.datahub.api.event.Event"
+                    ],
+                    "id": "d6dc3619-9b94-4d43-9323-b3e389a99a28",
+                    "methodName": "handleEvent",
+                    "returnType": "void"
+                }
+            ]
+        }
+    ]
+}

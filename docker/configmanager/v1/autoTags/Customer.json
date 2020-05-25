@@ -1,0 +1,50 @@
+{
+    "name": "Customer",
+    "rules": [
+        {
+            "type": "HOST",
+            "enabled": true,
+            "valueFormat": "{HostGroup:Name/([^-]++)-}",
+            "propagationTypes": [
+                "HOST_TO_PROCESS_GROUP_INSTANCE"
+            ],
+            "conditions": [
+                {
+                    "key": {
+                        "attribute": "HOST_GROUP_NAME"
+                    },
+                    "comparisonInfo": {
+                        "type": "STRING",
+                        "operator": "CONTAINS",
+                        "value": "-",
+                        "negate": false,
+                        "caseSensitive": true
+                    }
+                }
+            ]
+        },
+        {
+            "type": "SERVICE",
+            "enabled": true,
+            "valueFormat": "{HostGroup:Name/([^-]++)-}",
+            "propagationTypes": [
+                "SERVICE_TO_PROCESS_GROUP_LIKE",
+                "SERVICE_TO_HOST_LIKE"
+            ],
+            "conditions": [
+                {
+                    "key": {
+                        "attribute": "HOST_GROUP_NAME"
+                    },
+                    "comparisonInfo": {
+                        "type": "STRING",
+                        "operator": "CONTAINS",
+                        "value": "-",
+                        "negate": false,
+                        "caseSensitive": true
+                    }
+                }
+            ]
+        }
+    ]
+}

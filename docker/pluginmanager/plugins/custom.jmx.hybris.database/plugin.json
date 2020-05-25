@@ -1,0 +1,202 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.hybris.database",
+  "type": "JMX",
+  "metricGroup": "custom.jmx.hybris.database",
+  "processTypes": [
+    10,
+    12,
+    13,
+    16,
+    17,
+    18
+  ],
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "configUI": {
+    "displayName": "Hybris DB Connection Pool"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "Hybris DB Connection Pool",
+        "title": "Pool DB Connections",
+        "series": [
+          {
+            "key": "metric_Active",
+            "aggregation": "avg",
+            "displayname": "Active",
+            "color" : "rgba(125,197,64,0.4)",
+            "seriestype" : "bar"
+          },
+          {
+            "key": "metric_MaxInUse",
+            "aggregation": "avg",
+            "displayname": "MaxInUse"
+          },
+          {
+            "key": "metric_NumInUse",
+            "aggregation": "avg",
+            "displayname": "NumInUse"
+          }
+        ]
+      },
+      {
+        "group": "Hybris DB Connection Pool",
+        "title": "Physical DB Connections",
+        "series": [
+          {
+            "key": "metric_MaxAllowedPhysicalOpen",
+            "aggregation": "avg",
+            "displayname": "MaxAllowedPhysicalOpen",
+            "color" : "rgba(220,23,42,0.4)",
+            "seriestype" : "line"
+          },
+          {
+            "key": "metric_MaxPhysicalOpen",
+            "aggregation": "avg",
+            "displayname": "MaxPhysicalOpen"
+          },
+          {
+            "key": "metric_NumPhysicalOpen",
+            "aggregation": "avg",
+            "displayname": "NumPhysicalOpen"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "metric_MaxAllowedPhysicalOpen",
+        "unit": "Count",
+        "displayname": "MaxAllowedPhysicalOpen",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "datasource": "DataSources",
+          "tenantscope": "Master Tenant"
+        },
+        "attribute": "MaxAllowedPhysicalOpen",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_MaxInUse",
+        "unit": "Count",
+        "displayname": "MaxInUse",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "datasource": "DataSources",
+          "tenantscope": "Master Tenant"
+        },
+        "attribute": "MaxInUse",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_Active",
+        "unit": "Count",
+        "displayname": "Active",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "datasource": "DataSources",
+          "tenantscope": "Master Tenant"
+        },
+        "attribute": "Active",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_MaxPhysicalOpen",
+        "unit": "Count",
+        "displayname": "MaxPhysicalOpen",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "datasource": "DataSources",
+          "tenantscope": "Master Tenant"
+        },
+        "attribute": "MaxPhysicalOpen",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_NumInUse",
+        "unit": "Count",
+        "displayname": "NumInUse",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "datasource": "DataSources",
+          "tenantscope": "Master Tenant"
+        },
+        "attribute": "NumInUse",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_NumPhysicalOpen",
+        "unit": "Count",
+        "displayname": "NumPhysicalOpen",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "datasource": "DataSources",
+          "tenantscope": "Master Tenant"
+        },
+        "attribute": "NumPhysicalOpen",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "version": "1.1514916551",
+  "name": "custom.jmx.CreatedPlugin_yManager1514916551135",
+  "type": "JMX",
+  "processTypes": [
+    10,
+    12,
+    13,
+    16,
+    17,
+    18
+  ],
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "configUI": {
+    "displayName": "yManager"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "yManager metrics",
+        "title": "Manager activeSessions",
+        "series": [
+          {
+            "key": "metric_activeSessions_1514915990895",
+            "aggregation": "sum",
+            "displayname": "Manager activeSessions"
+          }
+        ]
+      },
+      {
+        "group": "yManager metrics",
+        "title": "Manager duplicates",
+        "series": [
+          {
+            "key": "metric_duplicates_1514916007534",
+            "aggregation": "sum",
+            "displayname": "Manager duplicates"
+          }
+        ]
+      },
+      {
+        "group": "yManager metrics",
+        "title": "Manager expiredSessions",
+        "series": [
+          {
+            "key": "metric_expiredSessions_1514916029245",
+            "aggregation": "sum",
+            "displayname": "Manager expiredSessions"
+          }
+        ]
+      },
+      {
+        "group": "yManager metrics",
+        "title": "Manager rejectedSessions",
+        "series": [
+          {
+            "key": "metric_rejectedSessions_1514916053658",
+            "aggregation": "sum",
+            "displayname": "Manager rejectedSessions"
+          }
+        ]
+      },
+      {
+        "group": "yManager metrics",
+        "title": "Manager sessionCounter",
+        "series": [
+          {
+            "key": "metric_sessionCounter_1514916078110",
+            "aggregation": "sum",
+            "displayname": "Manager sessionCounter"
+          }
+        ]
+      },
+      {
+        "group": "yManager metrics",
+        "title": "Manager sessionAverageAliveTime (ms)",
+        "series": [
+          {
+            "key": "metric_sessionAverageAliveTime_1514916393809",
+            "aggregation": "avg",
+            "displayname": "Manager sessionAverageAliveTime (ms)"
+          }
+        ]
+      },
+      {
+        "group": "yManager metrics",
+        "title": "Manager processingTime (ms) sum",
+        "series": [
+          {
+            "key": "metric_processingTime_1514916401231",
+            "aggregation": "sum",
+            "displayname": "Manager processingTime (ms) sum"
+          }
+        ]
+      },
+      {
+        "group": "yManager metrics",
+        "title": "Manager sessionMaxAliveTime (ms)",
+        "series": [
+          {
+            "key": "metric_sessionMaxAliveTime_1514916497516",
+            "aggregation": "max",
+            "displayname": "Manager sessionMaxAliveTime (ms)"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "metric_activeSessions_1514915990895",
+        "unit": "Count",
+        "displayname": "Manager activeSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "activeSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_duplicates_1514916007534",
+        "unit": "Count",
+        "displayname": "Manager duplicates",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "duplicates",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_expiredSessions_1514916029245",
+        "unit": "Count",
+        "displayname": "Manager expiredSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "expiredSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_rejectedSessions_1514916053658",
+        "unit": "Count",
+        "displayname": "Manager rejectedSessions",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "rejectedSessions",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_sessionCounter_1514916078110",
+        "unit": "Count",
+        "displayname": "Manager sessionCounter",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "sessionCounter",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_sessionAverageAliveTime_1514916393809",
+        "unit": "MilliSecond",
+        "displayname": "Manager sessionAverageAliveTime (ms)",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "sessionAverageAliveTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_processingTime_1514916401231",
+        "unit": "MilliSecond",
+        "displayname": "Manager processingTime (ms) sum",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "processingTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_sessionMaxAliveTime_1514916497516",
+        "unit": "MilliSecond",
+        "displayname": "Manager sessionMaxAliveTime (ms)",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "Manager"
+        },
+        "attribute": "sessionMaxAliveTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "max"
+      }
+    }
+  ]
+}

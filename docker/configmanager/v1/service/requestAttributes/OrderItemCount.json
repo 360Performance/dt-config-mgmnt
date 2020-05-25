@@ -1,0 +1,37 @@
+{
+  "name": "OrderItemCount",
+  "enabled": true,
+  "dataType": "INTEGER",
+  "dataSources": [
+    {
+      "enabled": true,
+      "source": "METHOD_PARAM",
+      "technology": "JAVA",
+      "valueProcessing": {
+        "splitAt": "",
+        "trim": false
+      },
+      "methods": [
+        {
+          "method": {
+            "visibility": "PROTECTED",
+            "modifiers": [],
+            "className": "de.hybris.platform.acceleratorfacades.order.impl.DefaultAcceleratorCheckoutFacade",
+            "methodName": "placeOrder",
+            "argumentTypes": [
+              "de.hybris.platform.core.model.order.CartModel"
+            ],
+            "returnType": "de.hybris.platform.core.model.order.OrderModel"
+          },
+          "capture": "ARGUMENT",
+          "argumentIndex": 0,
+          "deepObjectAccess": ".getEntries().size()"
+        }
+      ]
+    }
+  ],
+  "normalization": "ORIGINAL",
+  "aggregation": "LAST",
+  "confidential": false,
+  "skipPersonalDataMasking": true
+}

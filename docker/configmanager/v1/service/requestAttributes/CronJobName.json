@@ -1,0 +1,62 @@
+{
+  "name": "CronJobName",
+  "enabled": true,
+  "dataType": "STRING",
+  "dataSources": [
+  	{
+		"enabled": true,
+		"methods": [
+		    {
+		        "capture": "THIS",
+		        "deepObjectAccess": ".toString()",
+		        "method": {
+		            "argumentTypes": [
+		                "de.hybris.platform.jalo.enumeration.EnumerationValue"
+		            ],
+		            "className": "de.hybris.platform.cronjob.jalo.CronJob",
+		            "methodName": "setResult",
+		            "modifiers": [],
+		            "returnType": "void",
+		            "visibility": "PUBLIC"
+		        }
+		    }
+		],
+		"source": "METHOD_PARAM",
+		"technology": "JAVA",
+		"valueProcessing": {
+		    "splitAt": "",
+		    "trim": false
+		}
+    },
+    {
+	  "enabled": true,
+	  "source": "METHOD_PARAM",
+	  "technology":"JAVA",
+	  "valueProcessing": {
+	    "splitAt": "",
+	    "trim": false
+	  },
+	  "methods": [
+	    {
+	      "method": {
+	        "visibility": "PROTECTED",
+	        "modifiers": [],
+	        "className": "de.hybris.platform.servicelayer.internal.jalo.ServicelayerJob",
+	        "methodName": "performCronJob",
+	        "argumentTypes": [
+	          "de.hybris.platform.cronjob.jalo.CronJob"
+	        ],
+	        "returnType": "de.hybris.platform.cronjob.jalo.CronJob$CronJobResult"
+	      },
+	      "capture": "ARGUMENT",
+	      "argumentIndex": 1,
+	      "deepObjectAccess": ".toString()"
+	    }
+	  ]
+	}
+  ],
+  "normalization": "ORIGINAL",
+  "aggregation": "FIRST",
+  "confidential": false,
+  "skipPersonalDataMasking": true
+}

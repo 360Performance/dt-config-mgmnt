@@ -1,0 +1,751 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.hybris.caches",
+  "type": "JMX",
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "metricGroup": "custom.jmx.hybris.caches",
+  "processTypes": [10, 12, 13, 16, 17, 18],
+  "configUI" : {
+    "displayName": "Hybris Caches"
+  },
+  "ui": {
+    "keycharts": [
+      {
+        "group": "Hybris Caches",
+        "title": "Main Cache",
+        "series": [
+          {
+            "key": "Main_MaximumCacheSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "Main_CurrentCacheSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Flexible Query Cache",
+        "series": [
+          {
+            "key": "FlexibleQuery_MaxSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "FlexibleQuery_CurrentSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Entity Cache",
+        "series": [
+          {
+            "key": "EntityRegion_MaximumCacheSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "EntityRegion_CurrentCacheSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Query Region Cache",
+        "series": [
+          {
+            "key": "QueryRegion_MaximumCacheSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "QueryRegion_CurrentCacheSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "group": "Hybris Caches",
+        "title": "Main Cache",
+        "series": [
+          {
+            "key": "Main_MaximumCacheSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "Main_CurrentCacheSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Flexible Query Cache",
+        "series": [
+          {
+            "key": "FlexibleQuery_MaxSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "FlexibleQuery_CurrentSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Entity Region Cache",
+        "series": [
+          {
+            "key": "EntityRegion_MaximumCacheSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "EntityRegion_CurrentCacheSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Query Region Cache",
+        "series": [
+          {
+            "key": "QueryRegion_MaximumCacheSize",
+            "displayname": "Maximum Cache Size",
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "QueryRegion_CurrentCacheSize",
+            "displayname": "Current Cache Size",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Entity Region Cache Hits",
+        "series": [
+          {
+            "key": "EntityRegion_HitRatio",
+            "displayname": "Hit Ratio",
+            "rightaxis" : true,
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "EntityRegion_HitCount",
+            "displayname": "Hit Count",
+            "seriestype": "bar"
+          } 
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Query Region Cache Hits",
+        "series": [
+          {
+            "key": "QueryRegion_HitRatio",
+            "displayname": "Hit Ratio",
+            "rightaxis" : true,
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "QueryRegion_HitCount",
+            "displayname": "Hit Count",
+            "seriestype": "bar"
+          } 
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Entity Region Cache Fill/Evictions",
+        "series": [
+          {
+            "key": "EntityRegion_CacheFillRatio",
+            "displayname": "Fill Ratio",
+            "rightaxis" : true,
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "EntityRegion_EvictionCount",
+            "displayname": "Eviction Count",
+            "seriestype": "bar"
+          } 
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Query Region Cache Fill/Evictions",
+        "series": [
+          {
+            "key": "QueryRegion_CacheFillRatio",
+            "displayname": "Fill Ratio",
+            "rightaxis" : true,
+            "color": "rgba(220,23,42,0.4)",
+            "seriestype": "line"
+          },
+          {
+            "key": "QueryRegion_EvictionCount",
+            "displayname": "Eviction Count",
+            "seriestype": "bar"
+          } 
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Entity Region Cache Fetch/Invalidation",
+        "series": [
+          {
+            "key": "EntityRegion_InvalidationCount",
+            "displayname": "Invalidation Count",
+            "color": "rgba(220,23,42,0.7)",
+            "seriestype": "bar",
+            "mergeaggregation" : "max"
+          },
+          {
+            "key": "EntityRegion_FetchCount",
+            "displayname": "Fetch Count",
+            "rightaxis" : true,
+            "seriestype": "bar",
+            "mergeaggregation" : "max"
+          } 
+        ]
+      },
+      {
+        "group": "Hybris Caches",
+        "title": "Query Region Cache Fetch/Invalidation",
+        "series": [
+          {
+            "key": "QueryRegion_InvalidationCount",
+            "displayname": "Invalidation Count",
+            "color": "rgba(220,23,42,0.7)",
+            "seriestype": "bar",
+            "mergeaggregation" : "max"
+          },
+          {
+            "key": "QueryRegion_FetchCount",
+            "displayname": "Fetch Count",
+            "rightaxis" : true,
+            "seriestype": "bar",
+            "mergeaggregation" : "max"
+          } 
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "Main_CurrentCacheSize",
+        "unit": "Count",
+        "displayname": "Main CurrentCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "main": "Cache Main",
+          "tenantscope": "Master Tenant"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "CurrentCacheSize",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Main_MaximumCacheSize",
+        "unit": "Count",
+        "displayname": "Main MaximumCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "main": "Cache Main",
+          "tenantscope": "Master Tenant"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "MaximumCacheSize",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_CacheFillRatio",
+        "unit": "Percent",
+        "displayname": "EntityRegion CacheFillRatio",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "attribute": "CacheFillRatio",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_CurrentCacheSize",
+        "unit": "Count",
+        "displayname": "EntityRegion CurrentCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "attribute": "CurrentCacheSize",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_EvictionCount",
+        "unit": "Count",
+        "displayname": "EntityRegion EvictionCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "attribute": "EvictionCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_HitCount",
+        "unit": "Count",
+        "displayname": "EntityRegion HitCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "attribute": "HitCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_HitRatio",
+        "unit": "Percent",
+        "displayname": "EntityRegion HitRatio",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "attribute": "HitRatio",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_MaximumCacheSize",
+        "unit": "Count",
+        "displayname": "EntityRegion MaximumCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "attribute": "MaximumCacheSize",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_FetchCount",
+        "unit": "Count",
+        "displayname": "EntityRegion FetchCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "FetchCount",
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_MissCount",
+        "unit": "Count",
+        "displayname": "EntityRegion MissCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "MissCount",
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "EntityRegion_InvalidationCount",
+        "unit": "Count",
+        "displayname": "EntityRegion InvalidationCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Entity Region Cache"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "InvalidationCount",
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "FlexibleQuery_CurrentSize",
+        "unit": "Count",
+        "displayname": "FlexibleQuery CurrentCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "fq": "Cache Flexible Query",
+          "tenantscope": "Master Tenant"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "CurrentSize",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "FlexibleQuery_MaxSize",
+        "unit": "Count",
+        "displayname": "FlexibleQuery MaximumCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "fq": "Cache Flexible Query",
+          "tenantscope": "Master Tenant"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "MaxSize",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_CacheFillRatio",
+        "unit": "Percent",
+        "displayname": "QueryRegion CacheFillRatio",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "CacheFillRatio",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_CurrentCacheSize",
+        "unit": "Count",
+        "displayname": "QueryRegion CurrentCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "CurrentCacheSize",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_EvictionCount",
+        "unit": "Count",
+        "displayname": "QueryRegion EvictionCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "EvictionCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_HitCount",
+        "unit": "Count",
+        "displayname": "QueryRegion HitCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "HitCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_HitRatio",
+        "unit": "Percent",
+        "displayname": "QueryRegion HitRatio",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "HitRatio",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_MaximumCacheSize",
+        "unit": "Count",
+        "displayname": "QueryRegion MaximumCacheSize",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "MaximumCacheSize",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_FetchCount",
+        "unit": "Count",
+        "displayname": "QueryRegion FetchCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "FetchCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_MissCount",
+        "unit": "Count",
+        "displayname": "QueryRegion MissCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "MissCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "QueryRegion_InvalidationCount",
+        "unit": "Count",
+        "displayname": "QueryRegion InvalidationCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "tenantscope": "Master Tenant",
+          "region": "Query Region Cache"
+        },
+        "attribute": "InvalidationCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    }
+  ]
+}

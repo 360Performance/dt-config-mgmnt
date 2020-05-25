@@ -1,0 +1,37 @@
+{
+    "aggregation": "FIRST",
+    "confidential": false,
+    "dataSources": [
+        {
+            "enabled": true,
+            "methods": [
+                {
+                    "argumentIndex": 1,
+                    "capture": "ARGUMENT",
+                    "deepObjectAccess": ".getBilling().getGmv()",
+                    "method": {
+                        "argumentTypes": [
+                            "de.hybris.platform.ordermetrics.data.OrderRevenueMetricData"
+                        ],
+                        "className": "de.hybris.platform.ordermetrics.service.impl.DefaultOrderMetricsService",
+                        "methodName": "processData",
+                        "modifiers": [],
+                        "returnType": "void",
+                        "visibility": "PUBLIC"
+                    }
+                }
+            ],
+            "source": "METHOD_PARAM",
+            "technology": "JAVA",
+            "valueProcessing": {
+                "splitAt": "",
+                "trim": false
+            }
+        }
+    ],
+    "dataType": "DOUBLE",
+    "enabled": true,
+    "name": "OrderMetricsGMV",
+    "normalization": "ORIGINAL",
+    "skipPersonalDataMasking": true
+}

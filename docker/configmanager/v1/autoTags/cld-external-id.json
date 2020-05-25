@@ -1,0 +1,47 @@
+{
+    "name": "cld-external-id",
+    "rules": [
+        {
+            "type": "HOST",
+            "enabled": true,
+            "valueFormat": "{Host:Environment:cld-external-id}",
+            "propagationTypes": [
+                "HOST_TO_PROCESS_GROUP_INSTANCE"
+            ],
+            "conditions": [
+                {
+                    "key": {
+                        "attribute": "HOST_NAME"
+                    },
+                    "comparisonInfo": {
+                        "type": "STRING",
+                        "operator": "CONTAINS",
+                        "value": "-",
+                        "negate": false,
+                        "caseSensitive": true
+                    }
+                }
+            ]
+        },
+        {
+            "type": "SERVICE",
+            "enabled": true,
+            "valueFormat": "{Host:Environment:cld-external-id}",
+            "propagationTypes": [],
+            "conditions": [
+                {
+                    "key": {
+                        "attribute": "HOST_NAME"
+                    },
+                    "comparisonInfo": {
+                        "type": "STRING",
+                        "operator": "CONTAINS",
+                        "value": "-",
+                        "negate": false,
+                        "caseSensitive": true
+                    }
+                }
+            ]
+        }
+    ]
+}

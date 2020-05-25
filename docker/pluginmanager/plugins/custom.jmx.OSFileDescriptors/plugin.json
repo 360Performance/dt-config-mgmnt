@@ -1,0 +1,82 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.OSFileDescriptors",
+  "type": "JMX",
+  "metricGroup": "custom.jmx.OSFileDescriptors",
+  "processTypes": [
+    10,
+    12,
+    13,
+    16,
+    17,
+    18
+  ],
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "configUI": {
+    "displayName": "OS FileDescriptors"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "OS FileDescriptors",
+        "title": "FileDescriptors",
+        "series": [
+          {
+            "key": "metric_OpenFileDescriptorCount",
+            "aggregation": "avg",
+            "displayname": "OpenFileDescriptors"
+          },
+          {
+            "key": "metric_MaxFileDescriptorCount",
+            "aggregation": "max",
+            "displayname": "MaxFileDescriptors"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "metric_OpenFileDescriptorCount",
+        "unit": "Count",
+        "displayname": "OpenFileDescriptors",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "java.lang",
+        "keyProperties": {
+          "type": "OperatingSystem"
+        },
+        "attribute": "OpenFileDescriptorCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "AVG"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_MaxFileDescriptorCount",
+        "unit": "Count",
+        "displayname": "MaxFileDescriptors",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "java.lang",
+        "keyProperties": {
+          "type": "OperatingSystem"
+        },
+        "attribute": "MaxFileDescriptorCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    }
+  ]
+}

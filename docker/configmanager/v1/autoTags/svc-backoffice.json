@@ -1,0 +1,38 @@
+{
+    "name": "svc-backoffice",
+    "rules": [
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "SIMPLE_TECH",
+                        "value": {
+                            "type": "APACHE_TOMCAT"
+                        }
+                    },
+                    "key": {
+                        "attribute": "SERVICE_TECHNOLOGY"
+                    }
+                },
+                {
+                    "comparisonInfo": {
+                        "caseSensitive": true,
+                        "negate": false,
+                        "operator": "CONTAINS",
+                        "type": "STRING",
+                        "value": "backoffice"
+                    },
+                    "key": {
+                        "attribute": "SERVICE_NAME"
+                    }
+                }
+            ],
+            "enabled": true,
+            "propagationTypes": [],
+            "type": "SERVICE",
+            "valueFormat": null
+        }
+    ]
+}

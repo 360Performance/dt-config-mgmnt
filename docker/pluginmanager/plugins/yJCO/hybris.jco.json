@@ -1,0 +1,116 @@
+{
+  "version": "0.5",
+  "name": "custom.jmx.hybris.jco",
+  "type": "JMX",
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "processTypes": [10, 12, 13, 16, 17, 18],
+    "configUI" : {
+        "displayName": "SAP JCo Connections -local"
+    },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "totalCount",
+        "unit": "Count",
+        "displayname": "Total number of JCo connections",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "root": "SAP Integration",
+          "jcoconnections": "JCo Connections - local",
+          "tenantscope": "Master Tenant"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "totalCount",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "AVG"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "poolLimitReachedCount",
+        "unit": "Count",
+        "displayname": "Number of JCo connection pools that have reached their pool limit maintained in the RFC destination",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "root": "SAP Integration",
+          "jcoconnections": "JCo Connections - local",
+          "tenantscope": "Master Tenant"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "poolLimitReachedCount",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "AVG"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "longRunnerCount",
+        "unit": "Count",
+        "displayname": "Total number of JCo connections where their lifetime exceeds a certain threshold (default: session timeout)",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "root": "SAP Integration",
+          "jcoconnections": "JCo Connections - local",
+          "tenantscope": "Master Tenant"
+        },
+        "allowAdditionalKeys": false,
+        "attribute": "longRunnerCount",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "AVG"
+      }
+    }
+  ],
+    "keymetrics" : [
+        {
+            "key" : "totalCount",
+            "aggregation" : "max",
+            "mergeaggregation" : "sum",
+            "displayname" : "Total number of JCo connections"
+        }
+    ],
+    "ui": {
+      "keycharts": [
+      {
+        "group": "SAP JCO connections statistics [https://help.hybris.com/6.6.0/hcd/8c4c8fb68669101498abeb351b4a7f5e.html]",
+        "title": "Connections",
+        "series": [
+         {
+                "key": "totalCount",
+                "displayname": "Total number of JCo connections",
+                "color": "rgba(101,152,186,0.4)",
+                "seriestype": "line"
+         },
+        {
+                "key": "poolLimitReachedCount",
+                "displayname": "Current physical connections",
+                "seriestype": "line",
+                "color" : "#bdc9ff"
+        },
+         {
+                "key": "longRunnerCount",
+                "displayname": "Total number of JCo connections where their lifetime exceeds a certain threshold (default: session timeout)",
+                "seriestype": "line"
+         }
+         ]
+         }
+      ]
+    }
+}

@@ -1,0 +1,87 @@
+{
+  "version": "1.1514919226",
+  "name": "custom.jmx.CreatedPlugin_yJSPMonitor1514919225193",
+  "type": "JMX",
+  "processTypes": [
+    10,
+    12,
+    13,
+    16,
+    17,
+    18
+  ],
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "configUI": {
+    "displayName": "yJSPMonitor"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "yJSPMonitor metrics",
+        "title": "JSPMonitor jspCount",
+        "series": [
+          {
+            "key": "metric_jspCount_1514919178622",
+            "aggregation": "sum",
+            "displayname": "JSPMonitor jspCount"
+          }
+        ]
+      },
+      {
+        "group": "yJSPMonitor metrics",
+        "title": "JSPMonitor jspReloadCount",
+        "series": [
+          {
+            "key": "metric_jspReloadCount_1514919450524",
+            "aggregation": "sum",
+            "displayname": "JSPMonitor jspReloadCount"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "metric_jspCount_1514919178622",
+        "unit": "Count",
+        "displayname": "JSPMonitor jspCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "JspMonitor"
+        },
+        "attribute": "jspCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "metric_jspReloadCount_1514919450524",
+        "unit": "Count",
+        "displayname": "JSPMonitor jspReloadCount",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "JspMonitor"
+        },
+        "attribute": "jspReloadCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.hybris.taskengine",
+  "type": "JMX",
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "metricGroup": "custom.jmx.hybris.taskengine",
+  "processTypes": [10, 12, 13, 16, 17, 18],
+  "configUI": {
+    "displayName": "Hybris TaskEngine"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "Hybris TaskEngine",
+        "title": "QueueSize",
+        "series": [
+          {
+            "key": "TaskEngine_queueSize",
+            "aggregation": "avg",
+            "displayname": "Queue Size"
+          }
+        ]
+      },
+      {
+        "group": "Hybris TaskEngine",
+        "title": "ExecutionTime",
+        "series": [
+          {
+            "key": "executionTime_50thPercentile",
+            "aggregation": "avg",
+            "displayname": "50th Percentile"
+          },
+          {
+            "key": "executionTime_75thPercentile",
+            "aggregation": "avg",
+            "displayname": "75th Percentile"
+          },
+          {
+            "key": "executionTime_99thPercentile",
+            "aggregation": "avg",
+            "displayname": "99th Percentile"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "TaskEngine_queueSize",
+        "unit": "Count",
+        "displayname": "Queue Size",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris-metrics",
+        "keyProperties": {
+          "name": "queue.size",
+          "tenant": "master",
+          "extension": "processing",
+          "module": "taskEngine"
+        },
+        "attribute": "Count",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "executionTime_50thPercentile",
+        "unit": "MilliSecond",
+        "displayname": "50th Percentile",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris-metrics",
+        "keyProperties": {
+          "tenant": "master",
+          "extension": "processing",
+          "module": "taskEngine",
+          "name": "execution.time"
+        },
+        "attribute": "50thPercentile",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "executionTime_75thPercentile",
+        "unit": "MilliSecond",
+        "displayname": "75th Percentile",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris-metrics",
+        "keyProperties": {
+          "tenant": "master",
+          "extension": "processing",
+          "module": "taskEngine",
+          "name": "execution.time"
+        },
+        "attribute": "75thPercentile",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "executionTime_99thPercentile",
+        "unit": "MilliSecond",
+        "displayname": "99th Percentile",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris-metrics",
+        "keyProperties": {
+          "tenant": "master",
+          "extension": "processing",
+          "module": "taskEngine",
+          "name": "execution.time"
+        },
+        "attribute": "99thPercentile",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.hybris.cronjobs",
+  "type": "JMX",
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "metricGroup": "custom.jmx.hybris.cronjobs",
+  "processTypes": [10, 12, 13, 16, 17, 18],
+  "configUI" : {
+      "displayName": "Hybris CronJobs"
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "RunningCronJobs",
+        "unit": "Count",
+        "displayname": "Running CronJobs (global)",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "hybris",
+        "keyProperties": {
+          "cronjob": "CronJobs",
+          "tenantscope": "Master Tenant"
+        },
+        "attributePath": "size()",
+        "allowAdditionalKeys": false,
+        "attribute": "RunningCronJobs",
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "MAX"
+      }
+    }
+  ],
+    "keymetrics" : [
+        {
+            "key" : "RunningCronJobs",
+            "aggregation" : "AVG",
+            "mergeaggregation" : "SUM",
+            "displayname" : "Running CronJobs (global)"
+        }
+    ],
+    "ui": {
+      "keycharts": [
+      {
+        "group": "Hybris CronJobs",
+        "title": "Hybris CronJobs",
+        "series": [
+          {
+                  "key": "RunningCronJobs",
+                  "displayname": "Running CronJobs (global)",
+                  "color": "rgba(101,152,186,0.9)",
+                  "seriestype": "bar"
+          }
+         ]
+         }
+      ]
+    }
+}

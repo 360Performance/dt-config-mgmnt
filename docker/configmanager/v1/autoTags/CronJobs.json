@@ -1,0 +1,39 @@
+{
+    "name": "CronJobs",
+    "rules": [
+        {
+            "type": "SERVICE",
+            "enabled": true,
+            "valueFormat": null,
+            "propagationTypes": [
+                "SERVICE_TO_PROCESS_GROUP_LIKE",
+                "SERVICE_TO_HOST_LIKE"
+            ],
+            "conditions": [
+                {
+                    "key": {
+                        "attribute": "SERVICE_TYPE"
+                    },
+                    "comparisonInfo": {
+                        "type": "SERVICE_TYPE",
+                        "operator": "EQUALS",
+                        "value": "CUSTOM_SERVICE",
+                        "negate": false
+                    }
+                },
+                {
+                    "key": {
+                        "attribute": "PROCESS_GROUP_DETECTED_NAME"
+                    },
+                    "comparisonInfo": {
+                        "type": "STRING",
+                        "operator": "CONTAINS",
+                        "value": "-",
+                        "negate": false,
+                        "caseSensitive": true
+                    }
+                }
+            ]
+        }
+    ]
+}

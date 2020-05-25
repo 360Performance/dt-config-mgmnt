@@ -1,0 +1,17 @@
+{
+  "id": "ffff0001-0a0a-0b0b-0c0c-000000000001",
+  "enabled": true,
+  "namingPattern": "{RequestAttribute:PageController}",
+  "conditions": [
+    {
+      "attribute": "SERVICE_REQUEST_ATTRIBUTE",
+      "comparisonInfo": {
+        "type": "STRING_REQUEST_ATTRIBUTE",
+        "comparison": "EXISTS",
+        "requestAttribute": "PageController",
+        "negate": false,
+        "caseSensitive": false
+      }
+    }
+  ]
+}

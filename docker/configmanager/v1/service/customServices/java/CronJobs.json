@@ -1,0 +1,39 @@
+{
+    "name": "CronJobs",
+    "enabled": true,
+    "rules": [
+        {
+            "id": "bbbb0001-0a0a-0b0b-0c0c-010000000001",
+            "enabled": true,
+            "fileName": "",
+            "className": "de.hybris.platform.servicelayer.internal.jalo.ServicelayerJob",
+            "matcher": "EQUALS",
+            "methodRules": [
+                {
+                    "id": "bbbb0001-0a0a-0b0b-0c0c-000100000001",
+                    "methodName": "performCronJob",
+                    "argumentTypes": [],
+                    "returnType": "void"
+                }
+            ],
+            "annotations": []
+        },
+        {
+            "id": "bbbb0001-0a0a-0b0b-0c0c-010000000002",
+            "enabled": true,
+            "fileName": "",
+            "className": "de.hybris.platform.cronjob.jalo.CronJob",
+            "matcher": "EQUALS",
+            "methodRules": [
+                {
+                    "id": "bbbb0001-0a0a-0b0b-0c0c-000100000002",
+                    "methodName": "setResult",
+                    "returnType": "void"
+                }
+            ],
+            "annotations": []
+        }
+    ],
+    "queueEntryPoint": false,
+    "processGroups": []
+}

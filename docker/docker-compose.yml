@@ -1,0 +1,96 @@
+version: "3.5"
+services:
+  configmanager:
+    image: hyperf/configmanager:1.0
+    build: 
+     context: ./configmanager
+    container_name: "configmanager"
+    environment:
+      - "PYTHONUNBUFFERED=1"
+      - "DT_API_USER=${API_USER}"
+      - "DT_API_PWD=${API_PWD}"
+    volumes:
+      - $PWD/dtconfig:/dtconfig
+      - $PWD/configmanager/v1:/v1
+      - $PWD/configmanager/defaultapplication:/defaultapplication
+      - $PWD/configmanager/tenantquota:/tenantquota
+      - $PWD/configmanager/definitions:/definitions
+    networks: 
+      - confignet
+    restart: "no"
+    logging:
+      options:
+        max-size: 50m
+  
+  licensemanager:
+    image: hyperf/licensemanager:1.0
+    build: 
+     context: ./licensemanager
+    container_name: "licensemanager"
+    environment:
+      - "PYTHONUNBUFFERED=1"
+      - "DT_API_USER=${API_USER}"
+      - "DT_API_PWD=${API_PWD}"
+    volumes:
+      - $PWD/dtconfig:/dtconfig
+      - $PWD/licensemanager/tenantquota:/tenantquota
+    networks: 
+      - confignet
+    restart: "no"
+    logging:
+      options:
+        max-size: 50m
+
+  pluginmanager:
+    image: hyperf/pluginmanager:1.0
+    build: 
+     context: ./pluginmanager
+    container_name: "pluginmanager"
+    environment:
+      - "PYTHONUNBUFFERED=1"
+      - "DT_API_USER=${API_USER}"
+      - "DT_API_PWD=${API_PWD}"
+    volumes:
+      - $PWD/dtconfig:/dtconfig
+      - $PWD/pluginmanager/plugins:/plugins
+    networks: 
+      - confignet
+    restart: "no"
+    logging:
+      options:
+        max-size: 50m
+           
+  configcache:
+    image: hyperf/configcache:1.0
+    container_name: configcache
+    build:
+      context: ./configcache
+    networks:
+      - confignet
+    logging:
+      options:
+        max-size: 50m
+  
+  configcontroller:
+    image: hyperf/configcontroller:1.0
+    build: 
+     context: ./configcontroller
+    container_name: "configcontroller"
+    environment:
+      - "PYTHONUNBUFFERED=1"
+    volumes:
+      - $PWD/dtconfig:/dtconfig
+      - $PWD/configcontroller/tenants.csv:/tenants.csv
+    networks: 
+      - confignet
+    restart: "no"
+    logging:
+      options:
+        max-size: 50m
+
+networks:
+   confignet:
+     name: dt_api_config
+     driver: bridge
+
+

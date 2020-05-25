@@ -1,0 +1,60 @@
+{
+    "name": "owner",
+    "rules": [
+        {
+            "type": "SERVICE",
+            "enabled": true,
+            "valueFormat": "{Host:Environment:owner}",
+            "propagationTypes": [
+                "SERVICE_TO_PROCESS_GROUP_LIKE",
+                "SERVICE_TO_HOST_LIKE"
+            ],
+            "conditions": [
+                {
+                    "key": {
+                        "attribute": "HOST_CUSTOM_METADATA",
+                        "dynamicKey": {
+                            "source": "ENVIRONMENT",
+                            "key": "owner"
+                        },
+                        "type": "HOST_CUSTOM_METADATA_KEY"
+                    },
+                    "comparisonInfo": {
+                        "type": "STRING",
+                        "operator": "REGEX_MATCHES",
+                        "value": ".",
+                        "negate": false,
+                        "caseSensitive": true
+                    }
+                }
+            ]
+        },
+        {
+            "type": "HOST",
+            "enabled": true,
+            "valueFormat": "{Host:Environment:owner}",
+            "propagationTypes": [
+                "HOST_TO_PROCESS_GROUP_INSTANCE"
+            ],
+            "conditions": [
+                {
+                    "key": {
+                        "attribute": "HOST_CUSTOM_METADATA",
+                        "dynamicKey": {
+                            "source": "ENVIRONMENT",
+                            "key": "owner"
+                        },
+                        "type": "HOST_CUSTOM_METADATA_KEY"
+                    },
+                    "comparisonInfo": {
+                        "type": "STRING",
+                        "operator": "REGEX_MATCHES",
+                        "value": ".",
+                        "negate": false,
+                        "caseSensitive": true
+                    }
+                }
+            ]
+        }
+    ]
+}

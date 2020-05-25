@@ -1,0 +1,40 @@
+{
+  "name": "PageController",
+  "enabled": true,
+  "dataType": "STRING",
+  "dataSources": [
+    {
+      "enabled": true,
+      "source": "METHOD_PARAM",
+      "technology":"JAVA",
+      "valueProcessing": {
+        "splitAt": "",
+        "trim": false,
+        "extractSubstring": {
+          "position": "BEFORE",
+          "delimiter": "Controller"
+        }
+      },
+      "methods": [
+        {
+          "method": {
+            "visibility": "PUBLIC",
+            "modifiers": [],
+            "className": "de.hybris.platform.acceleratorstorefrontcommons.controllers.AbstractController",
+            "methodName": "addRequestToModel",
+            "argumentTypes": [
+              "javax.servlet.http.HttpServletRequest"
+            ],
+            "returnType": "javax.servlet.http.HttpServletRequest"
+          },
+          "capture": "THIS",
+          "deepObjectAccess": ".getClass().getSimpleName()"
+        }
+      ]
+    }
+  ],
+  "normalization": "ORIGINAL",
+  "aggregation": "FIRST",
+  "confidential": false,
+  "skipPersonalDataMasking": true
+}

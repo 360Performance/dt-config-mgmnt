@@ -1,0 +1,63 @@
+{
+    "anomalyDetection": {
+        "loadingTimeThresholds": {
+            "enabled": false,
+            "thresholds": []
+        },
+        "outageHandling": {
+            "globalOutage": true,
+            "localOutage": false,
+            "localOutagePolicy": {
+                "affectedLocations": 1,
+                "consecutiveRuns": 3
+            }
+        }
+    },
+    "automaticallyAssignedApps": [],
+    "createdFrom": "GUI",
+    "enabled": true,
+    "entityId": "SYNTHETIC_TEST-0000000000000000",
+    "events": [
+        {
+            "entityId": "SYNTHETIC_TEST_STEP-0000000000000000",
+            "name": "Loading of Homepage",
+            "sequenceNumber": 1
+        }
+    ],
+    "frequencyMin": 15,
+    "keyPerformanceMetrics": {
+        "loadActionKpm": "VISUALLY_COMPLETE",
+        "xhrActionKpm": "VISUALLY_COMPLETE"
+    },
+    "locations": [
+        "GEOLOCATION-9999453BE4BDB3CD",
+        "GEOLOCATION-45AB48D9D6925ECC",
+        "GEOLOCATION-BFBE4475785D7DB7",
+        "GEOLOCATION-490B6966420E218F"
+    ],
+    "managementZones": [],
+    "manuallyAssignedApps": [],
+    "name": "synthetic monitor",
+    "script": {
+        "configuration": {
+            "device": {
+                "deviceName": "Desktop",
+                "orientation": "landscape"
+            }
+        },
+        "events": [
+            {
+                "description": "Loading of Homepage",
+                "type": "navigate",
+                "url": "http://www.americasbest.com",
+                "wait": {
+                    "waitFor": "page_complete"
+                }
+            }
+        ],
+        "type": "availability",
+        "version": "1.0"
+    },
+    "tags": [],
+    "type": "BROWSER"
+}

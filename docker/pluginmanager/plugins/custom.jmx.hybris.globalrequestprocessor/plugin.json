@@ -1,0 +1,200 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.hybris.globalrequestprocessor",
+  "type": "JMX",
+  "processTypes": [10, 12, 13, 16, 17, 18],
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "metricGroup": "custom.jmx.hybris.globalrequestprocessor",
+  "configUI": {
+    "displayName": "Hybris GlobalRequestProcessor"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "Hybris Global Request Processor",
+        "title": "Bytes Sent/Received",
+        "series": [
+          {
+            "key": "GlobalRequestProcessor_bytesReceived",
+            "aggregation": "avg",
+            "displayname": "Bytes Received"
+          },
+          {
+            "key": "GlobalRequestProcessor_bytesSent",
+            "aggregation": "avg",
+            "displayname": "Bytes Sent"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Global Request Processor",
+        "title": "Request/Error Count",
+        "series": [
+          {
+            "key": "GlobalRequestProcessor_requestCount",
+            "aggregation": "sum",
+            "displayname": "Request Count",
+            "seriestype" : "bar"
+          },
+          {
+            "key": "GlobalRequestProcessor_errorCount",
+            "aggregation": "sum",
+            "displayname": "Error Count",
+            "color" : "rgba(220,23,42,0.75)",
+            "seriestype" : "bar"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Global Request Processor",
+        "title": "Max Time",
+        "series": [
+          {
+            "key": "GlobalRequestProcessor_maxTime",
+            "aggregation": "max",
+            "displayname": "Max Time"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Global Request Processor",
+        "title": "Processing Time",
+        "series": [
+          {
+            "key": "GlobalRequestProcessor_processingTime",
+            "aggregation": "avg",
+            "displayname": "Processing Time"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "GlobalRequestProcessor_bytesReceived",
+        "unit": "Byte",
+        "displayname": "Bytes Received",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "GlobalRequestProcessor"
+        },
+        "attribute": "bytesReceived",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "GlobalRequestProcessor_bytesSent",
+        "unit": "Byte",
+        "displayname": "Bytes Sent",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "GlobalRequestProcessor"
+        },
+        "attribute": "bytesSent",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "GlobalRequestProcessor_errorCount",
+        "unit": "Count",
+        "displayname": "Error Count",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "GlobalRequestProcessor"
+        },
+        "attribute": "errorCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "GlobalRequestProcessor_maxTime",
+        "unit": "MilliSecond",
+        "displayname": "MaxTime (ms)",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "GlobalRequestProcessor"
+        },
+        "attribute": "maxTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "max"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "GlobalRequestProcessor_processingTime",
+        "unit": "MilliSecond",
+        "displayname": "ProcessingTime (ms)",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "GlobalRequestProcessor"
+        },
+        "attribute": "processingTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "GlobalRequestProcessor_requestCount",
+        "unit": "Count",
+        "displayname": "Request Count",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "type": "GlobalRequestProcessor"
+        },
+        "attribute": "requestCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    }
+  ]
+}

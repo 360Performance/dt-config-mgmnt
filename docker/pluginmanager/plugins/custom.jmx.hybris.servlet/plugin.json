@@ -1,0 +1,206 @@
+{
+  "version": "2.0",
+  "name": "custom.jmx.hybris.servlet",
+  "type": "JMX",
+  "processTypes": [10, 12, 13, 16, 17, 18],
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "metricGroup": "custom.jmx.hybris.servlet",
+  "configUI": {
+    "displayName": "Hybris Servlet"
+  },
+  "ui": {
+    "charts": [
+      {
+        "group": "Hybris Servlet",
+        "title": "Request/Error Count",
+        "series": [
+          {
+            "key": "Servlet_requestCount",
+            "aggregation": "sum",
+            "displayname": "Request Count",
+            "seriestype" : "bar"
+          },
+          {
+            "key": "Servlet_errorCount",
+            "aggregation": "sum",
+            "displayname": "Error Count",
+            "color" : "rgba(220,23,42,0.75)",
+            "seriestype" : "bar"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Servlet",
+        "title": "Processing Time",
+        "series": [
+          {
+            "key": "Servlet_processingTime",
+            "aggregation": "avg",
+            "displayname": "Processing Time"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Servlet",
+        "title": "Load Time",
+        "series": [
+          {
+            "key": "Servlet_loadTime",
+            "aggregation": "sum",
+            "displayname": "Load Time"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Servlet",
+        "title": "Max Time",
+        "series": [
+          {
+            "key": "Servlet_maxTime",
+            "aggregation": "avg",
+            "displayname": "Max Time"
+          }
+        ]
+      },
+      {
+        "group": "Hybris Servlet",
+        "title": "Min Time",
+        "series": [
+          {
+            "key": "Servlet_minTime",
+            "aggregation": "avg",
+            "displayname": "Min Time"
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "Servlet_errorCount",
+        "unit": "Count",
+        "displayname": "Error Count",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "j2eeType": "Servlet"
+        },
+        "attribute": "errorCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Servlet_loadTime",
+        "unit": "MilliSecond",
+        "displayname": "Load Time",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "j2eeType": "Servlet"
+        },
+        "attribute": "loadTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Servlet_maxTime",
+        "unit": "MilliSecond",
+        "displayname": "Max Time",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "j2eeType": "Servlet"
+        },
+        "attribute": "maxTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": false,
+        "calculateRate": false,
+        "aggregation": "max"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Servlet_minTime",
+        "unit": "MilliSecond",
+        "displayname": "Min Time",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "j2eeType": "Servlet"
+        },
+        "attribute": "minTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Servlet_processingTime",
+        "unit": "MilliSecond",
+        "displayname": "Processing Time",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "j2eeType": "Servlet"
+        },
+        "attribute": "processingTime",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "avg"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "Servlet_requestCount",
+        "unit": "Count",
+        "displayname": "Request Count",
+        "dimensions": [
+          "rx_pid"
+        ]
+      },
+      "source": {
+        "domain": "Catalina",
+        "keyProperties": {
+          "j2eeType": "Servlet"
+        },
+        "attribute": "requestCount",
+        "allowAdditionalKeys": true,
+        "calculateDelta": true,
+        "calculateRate": false,
+        "aggregation": "sum"
+      }
+    }
+  ]
+}
