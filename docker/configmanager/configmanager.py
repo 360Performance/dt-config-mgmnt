@@ -469,7 +469,7 @@ def getConfigSettings(entitytypes, parameters):
                     logger.error("Problem getting Config Settings for Tenant {}::{}".format(c_id,t_id))
                     continue
                 
-                # check if all requestAttributes of the standard have been found        
+                # check if all entities of the standard have been found        
                 if len(attrcheck) != len(stdConfigNames):
                     missing = set(set(stdConfigNames) - attrcheck)
                     logger.info("Missing {} on {} {}".format(configtype,"::".join([c_id, t_id]),missing))
@@ -649,23 +649,26 @@ def postConfigEntities(entities,parameters):
             logger.error("Problem putting {}: {}".format(configtype,sys.exc_info()))
 
 def getControlSettings():
+
     stdSettings = {
-        "requestAttributes": True,
+        "servicerequestAttributes": True,
+        "servicerequestNaming": True,
         "autoTags": True,
-        "customServices": True,
-        "calculatedMetrics": True,
-        "requestNaming": True,
-        "dataPrivacy": True,
+        "customServicesjava": True,
+        "calculatedMetricsservice": True,
         "anomalyDetectionapplications": True,
         "anomalyDetectionservices": True,
-        "applications": False,
-        "syntheticMonitors": False,
-        "applicationDashboards": False,
-        "dashboards": True,
+        "applicationsweb": False,
+        "applicationDetectionRules": False,
         "alertingProfiles": False,
         "notifications": False,
+        "dataPrivacy": True, 
+        "dashboards": True,
+        "syntheticMonitors": False,
+        "applicationDashboards": False,
         "dryrun": True
     }
+
     ctrlsettings = {}
     try:
         if configcache.exists("config") == 1:
@@ -682,10 +685,10 @@ def performConfig(parameters):
     config = getControlSettings()
     logger.info("Applying Configuration Types: {}".format(config))
 
-    if config["requestAttributes"]:
+    if config["servicerequestAttributes"]:
         logger.info("++++++++ REQUEST ATTRIBUTES ++++++++")
         if config["dryrun"]:
-            logger.info("Dryrun: requestAttributes")
+            logger.info("Dryrun: servicerequestAttributes")
         else:
             # requestAttributes
             #purgeConfigEntities([ConfigTypes.servicerequestAttributes], parameters)
@@ -703,30 +706,30 @@ def performConfig(parameters):
             updateOrCreateConfigEntities(stdConfig.getAutoTags(),parameters)
             putConfigEntities(stdConfig.getAutoTags(),parameters)
     
-    if config["customServices"]:
+    if config["customServicesjava"]:
         logger.info("++++++++ CUSTOM SERVICES ++++++++")
         if config["dryrun"]:
-            logger.info("Dryrun: customServices")
+            logger.info("Dryrun: customServicesjava")
         else:
             # customServices
             #purgeConfigEntities([ConfigTypes.customServicesjava], parameters)
             updateOrCreateConfigEntities(stdConfig.getCustomJavaServices(),parameters)
             putConfigEntities(stdConfig.getCustomJavaServices(),parameters)
     
-    if config["requestNaming"]:
+    if config["servicerequestNaming"]:
         logger.info("++++++++ REQUEST NAMING ++++++++")
         if config["dryrun"]:
-            logger.info("Dryrun: requestNaming")
+            logger.info("Dryrun: servicerequestNaming")
         else:
             # requestNaming
             #purgeConfigEntities([ConfigTypes.servicerequestNaming], parameters)
             updateOrCreateConfigEntities(stdConfig.getRequestNamings(),parameters)
             putConfigEntities(stdConfig.getRequestNamings(),parameters)
 
-    if config["calculatedMetrics"]:
+    if config["calculatedMetricsservice"]:
         logger.info("++++++++ CUSTOM METRICS ++++++++")
         if config["dryrun"]:
-            logger.info("Dryrun: calculatedMetrics")
+            logger.info("Dryrun: calculatedMetricsservice")
         else:
             # customMetrics
             #purgeConfigEntities([ConfigTypes.customMetricservice], parameters, True)
@@ -761,14 +764,14 @@ def performConfig(parameters):
             putConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters)
 
     
-    if config["applications"]:
+    if config["applicationsweb"]:
         logger.info("++++++++ APPLICATIONS ++++++++")
         # applications
         getServices(parameters)
         getApplications(parameters)
         apps = createAppConfigEntitiesFromServices()
         if config["dryrun"]:
-            logger.info("Dryrun: applications")
+            logger.info("Dryrun: applicationsweb")
         else:
             putApplicationConfigs(apps)
         
@@ -790,7 +793,7 @@ def performConfig(parameters):
         logger.info("++++++++ APPLICATION DASHBOARDS ++++++++")
         # application dashboards
         # these dashboards are created per application dynamically
-        if not config["applications"]:
+        if not config["applicationsweb"]:
             getServices(parameters)
             getApplications(parameters)
             apps = createAppConfigEntitiesFromServices()
@@ -840,13 +843,17 @@ def main(argv):
     cfgcontrol = configcache.pubsub()
     cfgcontrol.subscribe('configcontrol')
 
+    #list all known config entity types we are aware of
+    logger.info("Able to manage these configuration entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]))
+    logger.info("Able to manage these entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()]))
+
     while True:
         message = cfgcontrol.get_message()
         if message:
             command = message['data']
             #logger.info("Received Command: {}".format(command))
             if command == 'START_CONFIG':
-                logger.info("========== STARTING CONFIG RUN ==========")
+                logger.info("========== STARTING CONFIG PUSH ==========")
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
@@ -865,7 +872,10 @@ def main(argv):
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
             
-                logger.info("========== FINISHED CONFIG RUN ==========")
+                logger.info("========== FINISHED CONFIG PUSH ==========")
+
+            if command == 'DUMP_CONFIG':
+                logger.info("========== STARTING CONFIG PULL ==========")
             
         time.sleep(5)
 

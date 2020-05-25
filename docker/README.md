@@ -85,7 +85,7 @@ docker exec -it configcache redis-cli
 
 Control the config configuration to enable disable certain settings:
 ```
- 127.0.0.1:6379>  set config "{\"requestAttributes\": true, \"autoTags\": true, \"customServices\": true, \"customMetrics\": true, \"requestNaming\": true, \"dataPrivacy\": false, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"applications\": false, \"syntheticMonitors\": false, \"applicationDashboards\": false, \"dashboards\": true, \"alertingProfiles\": false, \"notifications\": false, \"dryrun\": false}"
+ 127.0.0.1:6379>  set config "{\"servicerequestAttributes\": true, \"autoTags\": true, \"customServicesjava\": true, \"calculatedMetricsservice\": true, \"servicerequestNaming\": true, \"dataPrivacy\": false, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"applications\": false, \"syntheticMonitors\": false, \"applicationDashboards\": false, \"dashboards\": true, \"alertingProfiles\": false, \"notifications\": false, \"dryrun\": false}"
 ```
 Set the configuration parameters for applying the configuration:
 e.g. to push the configuration to tenant edg-p1 on cluster bo2 only set:
