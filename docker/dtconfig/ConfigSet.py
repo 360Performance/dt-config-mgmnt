@@ -84,10 +84,16 @@ class DTEnvironmentConfig:
                 
         return filtered
     
-    def getConfigEntityByName(selfself, name):
+    def getConfigEntityByName(self, name):
         # not very clean but assuming that the list of entities is not huge this is ok
         for entity in self.entities:
             if entity.name == name:
+                return entity
+
+    def getConfigEntityByID(self, id):
+        # not very clean but assuming that the list of entities is not huge this is ok
+        for entity in self.entities:
+            if entity.id == id:
                 return entity
     
     def getRequestAttributes(self):

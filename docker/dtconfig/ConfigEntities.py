@@ -15,7 +15,7 @@ class ConfigEntity():
         self.name = kwargs.get("name")
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file",self.name)
-        self.dto = None
+        self.dto = kwargs.get("dto",None)
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
@@ -29,6 +29,23 @@ class ConfigEntity():
                 return dto
         except:
             logger.error("Can't load DTO from (): {}, trying file parameter".format(path,sys.exc_info()))
+
+    # helper function to allow comparison of dto representation of a config entity with another
+    def ordered(self):
+        if isinstance(self.dto, dict):
+            return sorted((k, ordered(v)) for k, v in self.dto.items())
+        if isinstance(self.dto, list):
+            return sorted(ordered(x) for x in self.dto)
+        else:
+            return self.dto
+
+    # comparison of this entities DTO vs another entity's (same type) DTO
+    def __eq__(self, other): 
+        if not isinstance(other, type(self)):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+
+        return self.ordered() == other.ordered()
             
 
 class TenantConfigEntity(ConfigEntity):
@@ -39,10 +56,13 @@ class TenantConfigEntity(ConfigEntity):
         self.name = kwargs.get("name")
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file",self.name)
-        self.dto = None
+        self.dto = kwargs.get("dto",None)
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
+
+        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
+        self.dto = self.stripDTOMetaData(self.dto)
 
     def __str__(self):
         return "ConfigEntity: {} [name: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
@@ -53,6 +73,17 @@ class TenantConfigEntity(ConfigEntity):
     def setID(self,id):
         self.id = id
         self.apipath = self.uri+"/"+self.id
+
+    def stripDTOMetaData(self,dto):
+        if dto is None:
+            logger.error("Why is DTO none?")
+            return
+        newdto = dto.copy()
+        for attr in dto:
+            if attr in ['clusterid','clusterhost','tenantid','metadata','responsecode']:
+                logger.warning("Strip attribute {} from configtype {}, maybe cleanup your JSON definition to remove this warning".format(attr,self.__class__.__name__))
+                newdto.pop(attr,None)
+        return newdto
 
     # returns the (GET) URI that would return all entities of this config type
     def getEntityListURI(self):
@@ -71,10 +102,13 @@ class TenantEntity(TenantConfigEntity):
         self.name = kwargs.get("name")
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file",self.name)
-        self.dto = None
+        self.dto = kwargs.get("dto",None)
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
+
+        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
+        self.stripDTOMetaData(self.dto)
 
     def __str__(self):
         return "TenantEntity: {} [name: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
@@ -93,10 +127,13 @@ class ClusterConfigEntity(ConfigEntity):
         self.name = kwargs.get("name")
         self.apipath = self.uri + "/TENANTID"
         self.file = kwargs.get("file",self.name)
-        self.dto = None
+        self.dto = kwargs.get("dto",None)
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
+
+        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
+        self.stripDTOMetaData(self.dto)
 
 class license(ClusterConfigEntity):
     entityuri = "/license"

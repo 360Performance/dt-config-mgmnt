@@ -473,8 +473,10 @@ def getConfigSettings(entitytypes, parameters):
                                 configcache.setex(key,3600,attr["id"])
                                 logger.info("{} not in standard: {} : {}".format(configtype, key, attr["id"]))
                     else:
-                        logger.info("{} is not a config entity returned in a value list, it's a setting type - comparison not implemented yet".format(configtype))
-                        #logger.info("JSON: {}".format(result))
+                        logger.info("{} type is not a config type which returns a list of entities, it's a setting type - comparison not implemented yet".format(configtype))
+                        logger.debug("JSON: {}".format(tenant))
+                        centity = entitytype(id="",name="",dto=tenant)
+                        logger.info(centity.dto)
                         #ToDo: get all 1st level attributes not added by the consolidation API but by DT
                         # iterate through those attributes and find id or namme attributes and if not then it's a setting (eg. dataPrivacy and not a config item)
                         # for those that are setting types it might make sense to compare the settings to the default for match
