@@ -445,57 +445,66 @@ def getConfigSettings(entitytypes, parameters):
         stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
         configtype = entitytype.__name__
         logger.info("Getting configs of type: {}".format(entitytype.__name__))
-            
-        try:
-            response = requests.get(url, auth=(apiuser, apipwd))
-            result = response.json()
-            for tenant in result:
-                c_id = tenant["clusterid"]
-                t_id = tenant["tenantid"]
-                attrcheck = set()
-                try:
-                    attrkey = None
-                    if "values" in tenant:
-                        attrkey = "values"
-                    if "dashboards" in tenant:
-                        attrkey = "dashboards"
+
+        # we only check configtypes for which we have some entities defined
+        if len(stdConfigNames) > 0:
+            try:
+                response = requests.get(url, auth=(apiuser, apipwd))
+                result = response.json()
+                for tenant in result:
+                    c_id = tenant["clusterid"]
+                    t_id = tenant["tenantid"]
+                    attrcheck = set()
+                    try:
+                        attrkey = None
+                        if "values" in tenant:
+                            attrkey = "values"
+                        if "dashboards" in tenant:
+                            attrkey = "dashboards"
+                        
+                        if attrkey and not issubclass(entitytype,ConfigTypes.TenantSetting):
+                            for attr in tenant[attrkey]:
+                                #key = "::".join([c_id, t_id])
+                                key = "::".join([c_id, t_id, configtype, attr["name"]])
+                                #logger.info("Found: {}".format(key))
+                                if "name" in attr and attr["name"] in stdConfigNames:
+                                    #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
+
+                                    # we are not getting the details of every config entity (that would be too much - only the list of config entities) so we do not perform a by-entity comparison
+                                    # in theory we could now fetch the details by ID and then compare ... maybe later
+                                    configcache.setex(key,3600,attr["id"])
+                                    attrcheck.add(attr["name"])
+                                else:
+                                    configcache.setex(key,3600,attr["id"])
+                                    logger.info("{} entities not in standard: {} : {}".format(configtype, key, attr["id"]))
+                        elif issubclass(entitytype,ConfigTypes.TenantSetting):
+                            #logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
+                            #logger.info("{}: {}".format(entitytype.__name__,tenant))
+                            centity = entitytype(dto=tenant)
+                            #logger.info(centity.dto)
+                            stdEntity = stdConfig.getConfigEntityByName(configtype)
+                            #logger.info(stdEntity.dto)
+                            match = centity == stdEntity
+                            logger.info("{} settings do match with standard: {}".format(configtype, match))
+                            if match:
+                                attrcheck.add(configtype)
+                            #ToDo: get all 1st level attributes not added by the consolidation API but by DT
+                            # iterate through those attributes and find id or namme attributes and if not then it's a setting (eg. dataPrivacy and not a config item)
+                            # for those that are setting types it might make sense to compare the settings to the default for match
+                    except:
+                        logger.error("Problem getting config of type: {} for Tenant {}::{}".format(configtype,c_id,t_id))
+                        continue
                     
-                    if attrkey:
-                        for attr in tenant[attrkey]:
-                            #key = "::".join([c_id, t_id])
-                            key = "::".join([c_id, t_id, configtype, attr["name"]])
-                            #logger.info("Found: {}".format(key))
-                            if "name" in attr and attr["name"] in stdConfigNames:
-                                #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
-                                configcache.setex(key,3600,attr["id"])
-                                attrcheck.add(attr["name"])
-                            else:
-                                configcache.setex(key,3600,attr["id"])
-                                logger.info("{} not in standard: {} : {}".format(configtype, key, attr["id"]))
-                    else:
-                        logger.info("{} type is not a config type which returns a list of entities, it's a setting type - comparison not implemented yet".format(configtype))
-                        logger.debug("JSON: {}".format(tenant))
-                        centity = entitytype(id="",name="",dto=tenant)
-                        logger.info(centity.dto)
-                        #ToDo: get all 1st level attributes not added by the consolidation API but by DT
-                        # iterate through those attributes and find id or namme attributes and if not then it's a setting (eg. dataPrivacy and not a config item)
-                        # for those that are setting types it might make sense to compare the settings to the default for match
-                except:
-                    logger.error("Problem getting config of type: {} for Tenant {}::{}".format(configtype,c_id,t_id))
-                    #logger.error("JSON: {}".format(result))
-                    logger.error("Error: {}".format(sys.exc_info()))
-                    continue
+                    # check if all entities of the standard have been found        
+                    if len(attrcheck) != len(stdConfigNames):
+                        missing = set(set(stdConfigNames) - attrcheck)
+                        logger.warning("Missing entities or different setting for {} on {}: {}".format(configtype,"::".join([c_id, t_id]),missing))
+                        for attr in missing:
+                            key = "::".join([c_id, t_id, configtype, attr])
+                            configcache.setex(key,3600,"missing")
                 
-                # check if all entities of the standard have been found        
-                if len(attrcheck) != len(stdConfigNames):
-                    missing = set(set(stdConfigNames) - attrcheck)
-                    logger.info("Missing {} on {} {}".format(configtype,"::".join([c_id, t_id]),missing))
-                    for attr in missing:
-                        key = "::".join([c_id, t_id, configtype, attr])
-                        configcache.setex(key,3600,"missing")
-               
-        except:
-            logger.error("Problem Getting Config Settings: {}".format(sys.exc_info()))
+            except:
+                logger.error("Problem Getting Config Settings: {}".format(sys.exc_info()))
 
 
 '''
@@ -852,7 +861,8 @@ def performConfig(parameters):
 def getConfig(parameters):
     #configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
     #configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
-    configtypes = [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
+    configtypes = [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]
+    configtypes = configtypes + [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantSetting.__subclasses__()]
     getConfigSettings(configtypes, parameters)  
 
 def main(argv):
@@ -863,7 +873,8 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     #list all known config entity types we are aware of
-    logger.info("Able to manage these configuration entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]))
+    logger.info("Able to manage these tenant configuration entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]))
+    logger.info("Able to manage these tenant configuration settings of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()]))
     logger.info("Able to manage these entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()]))
 
     while True:

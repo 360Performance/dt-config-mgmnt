@@ -72,7 +72,10 @@ class DTEnvironmentConfig:
         filtered = []
         for entity in self.entities:
             if isinstance(entity, etype):
-                filtered.append(entity.name)
+                if hasattr(entity,"name"):
+                    filtered.append(entity.name)
+                else:
+                    filtered.append(entity.__class__.__name__)
                 
         return filtered
     
@@ -80,20 +83,23 @@ class DTEnvironmentConfig:
         filtered = []
         for entity in self.entities:
             if isinstance(entity, etype):
-                filtered.append(entity.id)
+                if hasattr(entity,"id"):
+                    filtered.append(entity.id)
+                else:
+                    filtered.append(entity.__class__.__name__)
                 
         return filtered
     
     def getConfigEntityByName(self, name):
         # not very clean but assuming that the list of entities is not huge this is ok
         for entity in self.entities:
-            if entity.name == name:
+            if entity.__class__.__name__ == name or (hasattr(entity,"name") and entity.name == name):
                 return entity
 
     def getConfigEntityByID(self, id):
         # not very clean but assuming that the list of entities is not huge this is ok
         for entity in self.entities:
-            if entity.id == id:
+            if entity.__class__.__name__ == id or (hasattr(entity,"id") and entity.id == id):
                 return entity
     
     def getRequestAttributes(self):

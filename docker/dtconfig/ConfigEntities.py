@@ -31,22 +31,20 @@ class ConfigEntity():
             logger.error("Can't load DTO from (): {}, trying file parameter".format(path,sys.exc_info()))
 
     # helper function to allow comparison of dto representation of a config entity with another
-    def ordered(self):
-        if isinstance(self.dto, dict):
-            return sorted((k, ordered(v)) for k, v in self.dto.items())
-        if isinstance(self.dto, list):
-            return sorted(ordered(x) for x in self.dto)
+    def ordered(self,obj):
+        if isinstance(obj, dict):
+            return sorted((k, self.ordered(v)) for k, v in obj.items())
+        if isinstance(obj, list):
+            return sorted(self.ordered(x) for x in obj)
         else:
-            return self.dto
+            return obj
 
     # comparison of this entities DTO vs another entity's (same type) DTO
     def __eq__(self, other): 
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
             return NotImplemented
-
-        return self.ordered() == other.ordered()
-            
+        return (self.ordered(self.dto) == other.ordered(other.dto))
 
 class TenantConfigEntity(ConfigEntity):
     uri = "/e/TENANTID/api/config/v1"
@@ -65,10 +63,10 @@ class TenantConfigEntity(ConfigEntity):
         self.dto = self.stripDTOMetaData(self.dto)
 
     def __str__(self):
-        return "ConfigEntity: {} [name: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
+        return "{}: {} [name: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
     
     def __repr__(self):
-        return "ConfigEntity: {} [name: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
+        return "{}: {} [name: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
 
     def setID(self,id):
         self.id = id
@@ -81,7 +79,7 @@ class TenantConfigEntity(ConfigEntity):
         newdto = dto.copy()
         for attr in dto:
             if attr in ['clusterid','clusterhost','tenantid','metadata','responsecode']:
-                logger.warning("Strip attribute {} from configtype {}, maybe cleanup your JSON definition to remove this warning".format(attr,self.__class__.__name__))
+                logger.debug("Strip attribute {} from configtype {}, maybe cleanup your JSON definition to remove this warning".format(attr,self.__class__.__name__))
                 newdto.pop(attr,None)
         return newdto
 
@@ -111,14 +109,32 @@ class TenantEntity(TenantConfigEntity):
         self.stripDTOMetaData(self.dto)
 
     def __str__(self):
-        return "TenantEntity: {} [name: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
+        return "{}: {} [name: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
     
     def __repr__(self):
-        return "TenantEntity: {} [name: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
+        return "{}: {} [name: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
 
     def setID(self,id):
         self.id = id
         self.apipath = self.uri+"/"+self.id
+
+class TenantSetting(TenantConfigEntity):
+    def __init__(self,**kwargs):   
+        self.apipath = self.uri
+        self.file = kwargs.get("file",self.__class__.__name__)
+        self.dto = kwargs.get("dto",None)
+        basedir = kwargs.get("basedir","")
+        if basedir != "":
+            self.dto = self.loadDTO(basedir)
+
+        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
+        self.dto = self.stripDTOMetaData(self.dto)
+
+    def __str__(self):
+        return "{}: {}".format(self.__class__.__base__.__name__,type(self).__name__)
+    
+    def __repr__(self):
+        return "{}: {}".format(self.__class__.__base__.__name__,type(self).__name__)
 
 class ClusterConfigEntity(ConfigEntity):
     uri = "/api/v1.0/control/tenantManagement"
@@ -133,7 +149,7 @@ class ClusterConfigEntity(ConfigEntity):
             self.dto = self.loadDTO(basedir)
 
         #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
-        self.stripDTOMetaData(self.dto)
+        self.dto = self.stripDTOMetaData(self.dto)
 
 class license(ClusterConfigEntity):
     entityuri = "/license"
@@ -191,20 +207,20 @@ class calculatedMetricsservice(TenantConfigEntity):
     uri = TenantConfigEntity.uri + entityuri
     pass
 
-class anomalyDetectionapplications(TenantConfigEntity):
+class anomalyDetectionapplications(TenantSetting):
     entityuri = "/anomalyDetection/applications"
     uri = TenantConfigEntity.uri + entityuri
 
     def __init__(self,**kwargs):   
-        TenantConfigEntity.__init__(self,**kwargs)
+        TenantSetting.__init__(self,**kwargs)
         self.apipath = self.uri
 
-class anomalyDetectionservices(TenantConfigEntity):
+class anomalyDetectionservices(TenantSetting):
     entityuri = "/anomalyDetection/services"
     uri = TenantConfigEntity.uri + entityuri
 
     def __init__(self,**kwargs):   
-        TenantConfigEntity.__init__(self,**kwargs)
+        TenantSetting.__init__(self,**kwargs)
         self.apipath = self.uri
 
 class applicationsweb(TenantConfigEntity):
@@ -216,10 +232,10 @@ class applicationsweb(TenantConfigEntity):
         self.detectionrules = []
         
     def __str__(self):
-        return "ConfigEntity: {} [application: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
+        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
       
     def __repr__(self):
-        return "ConfigEntity: {} [application: {}] [id: {}]".format(type(self).__name__,self.name, self.id)
+        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
         
     def setName(self,name):
         self.name = name
@@ -258,15 +274,15 @@ class applicationDetectionRules(TenantConfigEntity):
     
     def __str__(self):
         if self.dto:
-            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
         else:
-            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,"no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern" )
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__,type(self).__name__,"no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern" )
     
     def __repr__(self):
         if self.dto:
-            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"] )
         else:
-            return "ConfigEntity: {} [application: {}] [id: {}] [filter: {} {} {}]".format(type(self).__name__,"no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern" )
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__,type(self).__name__,"no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern" )
     
     def setApplicationIdentifier(self,appid):
         self.dto["applicationIdentifier"] = appid
@@ -291,12 +307,12 @@ class notifications(TenantConfigEntity):
     uri = TenantConfigEntity.uri + entityuri
     pass
 
-class dataPrivacy(TenantConfigEntity):
+class dataPrivacy(TenantSetting):
     entityuri = "/dataPrivacy"
     uri = TenantConfigEntity.uri + entityuri
     
     def __init__(self,**kwargs):   
-        TenantConfigEntity.__init__(self,**kwargs)
+        TenantSetting.__init__(self,**kwargs)
         self.apipath = self.uri
 
 
@@ -333,15 +349,15 @@ class dashboards(TenantConfigEntity):
 
     def __str__(self):
         if self.dto:
-            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
         else:
-            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, "no title")
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id, "no title")
       
     def __repr__(self):
         if self.dto:
-            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
         else:
-            return "ConfigEntity: {} [dashboard: {}] [id: {}] [title: {}]".format(type(self).__name__,self.name, self.id, "no title")
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id, "no title")
 
 
     def setName(self,name):

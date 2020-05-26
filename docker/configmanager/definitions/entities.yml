@@ -134,10 +134,10 @@ applications:
       id: "APPLICATION-0000000000000001"
 anomalyDetection:
   applications:
-    - name: "StandardApplicationAnomalyDetection"
+    - name: "anomalyDetectionapplications"
       id: "000"
   services:
-    - name: "StandardServicesAnomalyDetection"
+    - name: "anomalyDetectionservices"
       id: "000"
 applicationDetectionRules:
   - name: "StandardApplicationDetectionRule"
