@@ -119,7 +119,9 @@ class TenantEntity(TenantConfigEntity):
         self.apipath = self.uri+"/"+self.id
 
 class TenantSetting(TenantConfigEntity):
-    def __init__(self,**kwargs):   
+    def __init__(self,**kwargs):
+        self.id = self.__class__.__name__
+        self.name = self.__class__.__name__ 
         self.apipath = self.uri
         self.file = kwargs.get("file",self.__class__.__name__)
         self.dto = kwargs.get("dto",None)

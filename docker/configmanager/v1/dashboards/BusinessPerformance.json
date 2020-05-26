@@ -875,7 +875,7 @@
                     "resultMetadata": {},
                     "series": [
                         {
-                            "aggregation": "AVG",
+                            "aggregation": "NONE",
                             "aggregationRate": "TOTAL",
                             "dimensions": [
                                 {
@@ -922,7 +922,7 @@
                     "resultMetadata": {},
                     "series": [
                         {
-                            "aggregation": "AVG",
+                            "aggregation": "NONE",
                             "aggregationRate": "TOTAL",
                             "dimensions": [
                                 {
@@ -969,7 +969,7 @@
                     "resultMetadata": {},
                     "series": [
                         {
-                            "aggregation": "AVG",
+                            "aggregation": "NONE",
                             "aggregationRate": "TOTAL",
                             "dimensions": [
                                 {
@@ -1016,7 +1016,7 @@
                     "resultMetadata": {},
                     "series": [
                         {
-                            "aggregation": "AVG",
+                            "aggregation": "NONE",
                             "aggregationRate": "TOTAL",
                             "dimensions": [
                                 {
