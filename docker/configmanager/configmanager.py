@@ -485,9 +485,11 @@ def getConfigSettings(entitytypes, parameters):
                             stdEntity = stdConfig.getConfigEntityByName(configtype)
                             #logger.info(stdEntity.dto)
                             match = centity == stdEntity
-                            logger.info("{} settings do match with standard: {}".format(configtype, match))
                             if match:
+                                logger.info("{} settings of {} do match with standard".format(configtype, "::".join([c_id, t_id])))
                                 attrcheck.add(configtype)
+                            else:
+                                logger.warning("{} settings of {} do not match with standard".format(configtype, "::".join([c_id, t_id])))
                             #ToDo: get all 1st level attributes not added by the consolidation API but by DT
                             # iterate through those attributes and find id or namme attributes and if not then it's a setting (eg. dataPrivacy and not a config item)
                             # for those that are setting types it might make sense to compare the settings to the default for match
@@ -707,9 +709,10 @@ def getControlSettings():
     return {**stdSettings, **ctrlsettings}
 
 def performConfig(parameters):
-    logger.info("Configuration Parameters: {}".format(parameters))
+    #logger.info("Configuration Parameters: {}".format(parameters))
     config = getControlSettings()
-    logger.info("Applying Configuration Types: {}".format(config))
+    logger.info("Applying Configuration to: \n{}".format(json.dumps(parameters, indent = 2, separators=(',', ': '))))
+    logger.info("Applying Configuration Types: \n{}".format(json.dumps(config, indent = 2, separators=(',', ': '))))
 
     if config["servicerequestAttributes"]:
         logger.info("++++++++ REQUEST ATTRIBUTES ++++++++")
@@ -866,7 +869,7 @@ def getConfig(parameters):
     getConfigSettings(configtypes, parameters)  
 
 def main(argv):
-    logger.info(stdConfig)
+    
 
     #subscribe to a control channel, we will listen for
     cfgcontrol = configcache.pubsub()
@@ -877,18 +880,22 @@ def main(argv):
     logger.info("Able to manage these tenant configuration settings of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()]))
     logger.info("Able to manage these entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()]))
 
+    logger.info(stdConfig)
+
     while True:
         message = cfgcontrol.get_message()
         if message:
             command = message['data']
             #logger.info("Received Command: {}".format(command))
             if command == 'START_CONFIG':
-                logger.info("========== STARTING CONFIG PUSH ==========")
+                
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
-                    logger.info("Found Parameters: {}".format(parameters))
+                    logger.info("========== STARTING CONFIG FETCH ==========")
                     getConfig(parameters)
+                    logger.info("========== FINISHED CONFIG FETCH ==========")
+                    logger.info("========== STARTING CONFIG PUSH ==========")
                     performConfig(parameters)    
 
                     # cleanup redis

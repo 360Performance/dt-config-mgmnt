@@ -38,16 +38,16 @@ class DTEnvironmentConfig:
         return entities
     
     def __repr__(self):
-        repr = "=== Dynatrace Environment Configuration Set ===\n"
+        repr = "========== MANAGED CONFIGURTION SET ==========\n"
         for e in self.entities:
             repr += str(e) +"\n"
-        return repr
+        return repr[:-1]
     
     def __str__(self):
-        repr = "=== Dynatrace Environment Configuration Set ===\n"
+        repr = "========== MANAGED CONFIGURTION SET ==========\n"
         for e in self.entities:
             repr += str(e) +"\n"
-        return repr
+        return repr[:-1]
 
     '''
     Create a standardized ID string for entities that use IDs from tenantid and application name
