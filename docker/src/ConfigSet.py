@@ -10,7 +10,7 @@ logger = logging.getLogger("ConfigSet")
 class DTEnvironmentConfig:
     
     def __init__(self,definitions):
-        self.configbasedir = "/v1"
+        self.configbasedir = "/config"
         try:
             with open(definitions) as definition_file:  
                 config = yaml.load(definition_file, Loader=yaml.Loader)

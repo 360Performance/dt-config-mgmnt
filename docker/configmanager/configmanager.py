@@ -36,7 +36,7 @@ if not apiuser:
 if not apipwd:
     sys.exit("No password for api user found (ensure env variable DT_API_PWD is set) ... can't continue")
 
-stdConfig = DTEnvironmentConfig("/definitions/entities.yml")
+stdConfig = DTEnvironmentConfig("/config/entities.yml")
 internaldomains = ["ondemand","hybrishosting","ycs"]
 
 
@@ -913,6 +913,18 @@ def main(argv):
 
             if command == 'DUMP_CONFIG':
                 logger.info("========== STARTING CONFIG PULL ==========")
+                source_param = configcache.get("source")
+                target_param = configcache.get("target")
+                if source_param and target_param:
+                    source = json.loads(source_param)
+                    target = json.loads(target_param)
+                    logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
+                    logger.info("Target: \n{}".format(json.dumps(target, indent = 2, separators=(',', ': '))))
+                else:
+                    logger.warning("Either from or to config parameters are not specified ... skipping")
+
+                logger.info("========== FINISHED CONFIG PULL ==========")
+
             
         time.sleep(5)
 
