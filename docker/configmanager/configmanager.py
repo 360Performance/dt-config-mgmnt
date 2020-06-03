@@ -954,13 +954,12 @@ def main(argv):
                     logger.info("========== STARTING CONFIG PUSH ==========")
                     performConfig(parameters)    
 
-                    # cleanup redis
+                    # cleanup redis but keep the parameters
                     allkeys = configcache.keys("*")
                     for key in allkeys:
                         if key != "config" and key != "parameters":
                             configcache.delete(key)
-                    # but keep the parameters
-                    #configcache.set("parameters",json.dumps(parameters))
+                    
                     configcache.publish('configcontrol','FINISHED_CONFIG')
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
@@ -981,10 +980,27 @@ def main(argv):
                     logger.info("==== reloading standard config after dump ====")
                     stdConfig = DTEnvironmentConfig(config_dump_dir)
                     logger.info(stdConfig)
+                    
                 else:
                     logger.warning("Either from or to config parameters are not specified ... skipping")
 
                 logger.info("========== FINISHED CONFIG PULL ==========")
+
+            if command == 'COPY_CONFIG':
+                logger.info("========== STARTING CONFIG COPY ==========")
+                source_param = configcache.get("source")
+                target_param = configcache.get("target")
+                if source_param and target_param:
+                    source = json.loads(source_param)
+                    target = json.loads(target_param)
+                    logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
+                    logger.info("Target: \n{}".format(json.dumps(target, indent = 2, separators=(',', ': '))))
+                    configcache.publish("configcontrol", "DUMP_CONFIG")
+                    configcache.setex("parameters",3600,json.dumps(target))
+                    #send ourselves a message to start a config run DANGEROUS if config has been modified
+                    configcache.publish("configcontrol", "START_CONFIG")
+                logger.info("========== FINISHED CONFIG COPY ==========")
+
 
             
         time.sleep(5)
