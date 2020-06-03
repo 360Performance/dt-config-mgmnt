@@ -9,8 +9,9 @@ logger = logging.getLogger("ConfigSet")
 
 class DTEnvironmentConfig:
     
-    def __init__(self,definitions):
-        self.configbasedir = "/config"
+    def __init__(self,basedir):
+        self.configbasedir = basedir
+        definitions = basedir + "/" + "entities.yml"
         try:
             with open(definitions) as definition_file:  
                 config = yaml.load(definition_file, Loader=yaml.Loader)

@@ -1,4 +1,4 @@
-import sys,logging
+import sys,logging,os
 import json
 from textwrap import wrap
 
@@ -9,6 +9,7 @@ logger = logging.getLogger("ConfigEntities")
 
 class ConfigEntity():
     uri = ""
+    entityuri = "/"
 
     def __init__(self,**kwargs):   
         self.id = kwargs.get("id")
@@ -19,6 +20,9 @@ class ConfigEntity():
         basedir = kwargs.get("basedir","")
         if basedir != "":
             self.dto = self.loadDTO(basedir)
+        
+        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
+        self.dto = self.stripDTOMetaData(self.dto)
     
     def loadDTO(self,basedir):
         path = basedir + self.entityuri + "/" + self.file + ".json"
@@ -29,6 +33,28 @@ class ConfigEntity():
                 return dto
         except:
             logger.error("Can't load DTO from (): {}, trying file parameter".format(path,sys.exc_info()))
+
+    def dumpDTO(self,dumpdir):
+        filename = ((self.name + "-" + self.id) if self.name != self.id else self.name)
+        path = dumpdir + self.entityuri + "/" + filename + ".json"
+        logger.info("Dumping {} Entity to: {}".format(self.__class__.__name__,path))
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w') as outfile:
+            json.dump(self.dto, outfile)
+        
+        return {"name":self.name, "id":self.id, "file":filename}
+
+    def stripDTOMetaData(self,dto):
+        if dto is None:
+            logger.error("Why is DTO none?")
+            return
+        newdto = dto.copy()
+        for attr in dto:
+            if attr in ['clusterid','clusterhost','tenantid','metadata','responsecode']:
+                logger.debug("Strip attribute {} from configtype {}, maybe cleanup your JSON definition to remove this warning".format(attr,self.__class__.__name__))
+                newdto.pop(attr,None)
+        return newdto
+        
 
     # helper function to allow comparison of dto representation of a config entity with another
     def ordered(self,obj):
@@ -45,6 +71,10 @@ class ConfigEntity():
             # don't attempt to compare against unrelated types
             return NotImplemented
         return (self.ordered(self.dto) == other.ordered(other.dto))
+
+    # define if this config entity is a shared one. needed for identifying if entities are considered when dumping and transporting configuration
+    def isShared(self):
+        return True
 
 class TenantConfigEntity(ConfigEntity):
     uri = "/e/TENANTID/api/config/v1"
@@ -71,17 +101,6 @@ class TenantConfigEntity(ConfigEntity):
     def setID(self,id):
         self.id = id
         self.apipath = self.uri+"/"+self.id
-
-    def stripDTOMetaData(self,dto):
-        if dto is None:
-            logger.error("Why is DTO none?")
-            return
-        newdto = dto.copy()
-        for attr in dto:
-            if attr in ['clusterid','clusterhost','tenantid','metadata','responsecode']:
-                logger.debug("Strip attribute {} from configtype {}, maybe cleanup your JSON definition to remove this warning".format(attr,self.__class__.__name__))
-                newdto.pop(attr,None)
-        return newdto
 
     # returns the (GET) URI that would return all entities of this config type
     def getEntityListURI(self):
@@ -191,11 +210,6 @@ class servicerequestNaming(TenantConfigEntity):
 
 class autoTags(TenantConfigEntity):
     entityuri = "/autoTags"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
-
-class dashboards(TenantConfigEntity):
-    entityuri = "/dashboards"
     uri = TenantConfigEntity.uri + entityuri
     pass
 
@@ -376,6 +390,10 @@ class dashboards(TenantConfigEntity):
 
     def getID(self):
         return self.id
+
+    def isShared(self):
+        metadata = self.dto["dashboardMetadata"] 
+        return metadata["shared"]
 
     '''
     check if this dashboard is depending on an applictaion by checking if there are any tiles which reference applications 
