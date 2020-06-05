@@ -12,8 +12,8 @@ class ConfigEntity():
     entityuri = "/"
 
     def __init__(self,**kwargs):   
-        self.id = kwargs.get("id")
-        self.name = kwargs.get("name")
+        self.id = kwargs.get("id",self.__class__.__name__)
+        self.name = kwargs.get("name",self.__class__.__name__ )
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file",self.name)
         self.dto = kwargs.get("dto",None)
@@ -54,7 +54,9 @@ class ConfigEntity():
                 logger.debug("Strip attribute {} from configtype {}, maybe cleanup your JSON definition to remove this warning".format(attr,self.__class__.__name__))
                 newdto.pop(attr,None)
         return newdto
-        
+    
+    def setName(self,name):
+        self.name = name
 
     # helper function to allow comparison of dto representation of a config entity with another
     def ordered(self,obj):
@@ -69,7 +71,7 @@ class ConfigEntity():
     def __eq__(self, other): 
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
-            return NotImplemented
+            return False
         return (self.ordered(self.dto) == other.ordered(other.dto))
 
     # define if this config entity is a shared one. needed for identifying if entities are considered when dumping and transporting configuration
@@ -79,18 +81,8 @@ class ConfigEntity():
 class TenantConfigEntity(ConfigEntity):
     uri = "/e/TENANTID/api/config/v1"
     
-    def __init__(self,**kwargs):   
-        self.id = kwargs.get("id")
-        self.name = kwargs.get("name")
-        self.apipath = self.uri+"/"+self.id
-        self.file = kwargs.get("file",self.name)
-        self.dto = kwargs.get("dto",None)
-        basedir = kwargs.get("basedir","")
-        if basedir != "":
-            self.dto = self.loadDTO(basedir)
-
-        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
-        self.dto = self.stripDTOMetaData(self.dto)
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)  
 
     def __str__(self):
         return "{}: {} [name: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
@@ -114,18 +106,9 @@ class TenantConfigEntity(ConfigEntity):
 class TenantEntity(TenantConfigEntity):
     uri = "/e/TENANTID/api/v1"
     
-    def __init__(self,**kwargs):   
-        self.id = kwargs.get("id")
-        self.name = kwargs.get("name")
-        self.apipath = self.uri+"/"+self.id
-        self.file = kwargs.get("file",self.name)
-        self.dto = kwargs.get("dto",None)
-        basedir = kwargs.get("basedir","")
-        if basedir != "":
-            self.dto = self.loadDTO(basedir)
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
 
-        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
-        self.stripDTOMetaData(self.dto)
 
     def __str__(self):
         return "{}: {} [name: {}] [id: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id)
@@ -139,17 +122,11 @@ class TenantEntity(TenantConfigEntity):
 
 class TenantSetting(TenantConfigEntity):
     def __init__(self,**kwargs):
+        super().__init__(**kwargs)
         self.id = self.__class__.__name__
         self.name = self.__class__.__name__ 
         self.apipath = self.uri
         self.file = kwargs.get("file",self.__class__.__name__)
-        self.dto = kwargs.get("dto",None)
-        basedir = kwargs.get("basedir","")
-        if basedir != "":
-            self.dto = self.loadDTO(basedir)
-
-        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
-        self.dto = self.stripDTOMetaData(self.dto)
 
     def __str__(self):
         return "{}: {}".format(self.__class__.__base__.__name__,type(self).__name__)
@@ -161,16 +138,9 @@ class ClusterConfigEntity(ConfigEntity):
     uri = "/api/v1.0/control/tenantManagement"
 
     def __init__(self,**kwargs):
+        super().__init__(**kwargs)
         self.name = kwargs.get("name")
         self.apipath = self.uri + "/TENANTID"
-        self.file = kwargs.get("file",self.name)
-        self.dto = kwargs.get("dto",None)
-        basedir = kwargs.get("basedir","")
-        if basedir != "":
-            self.dto = self.loadDTO(basedir)
-
-        #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
-        self.dto = self.stripDTOMetaData(self.dto)
 
 class license(ClusterConfigEntity):
     entityuri = "/license"
@@ -211,6 +181,14 @@ class servicerequestNaming(TenantConfigEntity):
 class autoTags(TenantConfigEntity):
     entityuri = "/autoTags"
     uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class conditionalNamingprocessGroup(TenantConfigEntity):
+    entityuri = "/conditionalNaming/processGroup"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setName(self,name):
+        self.dto["displayName"] = self.name
     pass
 
 class customServicesjava(TenantConfigEntity):
@@ -374,7 +352,6 @@ class dashboards(TenantConfigEntity):
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id, self.dto["dashboardMetadata"]["name"])
         else:
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__,type(self).__name__,self.name, self.id, "no title")
-
 
     def setName(self,name):
         self.dto["dashboardMetadata"]["name"] = name
