@@ -134,10 +134,10 @@ applications:
       id: "APPLICATION-0000000000000001"
 anomalyDetection:
   applications:
-    - name: "StandardApplicationAnomalyDetection"
+    - name: "anomalyDetectionapplications"
       id: "000"
   services:
-    - name: "StandardServicesAnomalyDetection"
+    - name: "anomalyDetectionservices"
       id: "000"
 applicationDetectionRules:
   - name: "StandardApplicationDetectionRule"
@@ -145,10 +145,12 @@ applicationDetectionRules:
 dashboards:
   - name: "StandardApplicationDashboard"
     id: "ddddd001-0a0a-0b0b-0c0c-000000000001"
-  - name: "DEMLicenseConsumption"
+  - name: ".DEM - License Consumption"
     id: "dddd0001-0a0a-0b0b-0c0c-000000000002"
-  - name: "BusinessPerformance"
+    file: "DEMLicenseConsumption" 
+  - name: ".Business Performance"
     id: "dddd0001-0a0a-0b0b-0c0c-000000000003"
+    file: "BusinessPerformance"
 synthetic:
   monitors:
     - name: "StandardSyntheticBrowserMonitor"

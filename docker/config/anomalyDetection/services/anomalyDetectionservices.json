@@ -1,0 +1,19 @@
+{
+    "failureRateIncrease": {
+        "automaticDetection": {
+            "failingServiceCallPercentageIncreaseAbsolute": 25,
+            "failingServiceCallPercentageIncreaseRelative": 300
+        },
+        "detectionMode": "DETECT_AUTOMATICALLY"
+    },
+    "responseTimeDegradation": {
+        "automaticDetection": {
+            "loadThreshold": "TEN_REQUESTS_PER_MINUTE",
+            "responseTimeDegradationMilliseconds": 500,
+            "responseTimeDegradationPercent": 100,
+            "slowestResponseTimeDegradationMilliseconds": 1000,
+            "slowestResponseTimeDegradationPercent": 200
+        },
+        "detectionMode": "DETECT_AUTOMATICALLY"
+    }
+}

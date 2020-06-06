@@ -9,8 +9,9 @@ logger = logging.getLogger("ConfigSet")
 
 class DTEnvironmentConfig:
     
-    def __init__(self,definitions):
-        self.configbasedir = "/v1"
+    def __init__(self,basedir):
+        self.configbasedir = basedir
+        definitions = basedir + "/" + "entities.yml"
         try:
             with open(definitions) as definition_file:  
                 config = yaml.load(definition_file, Loader=yaml.Loader)
@@ -38,16 +39,16 @@ class DTEnvironmentConfig:
         return entities
     
     def __repr__(self):
-        repr = "=== Dynatrace Environment Configuration Set ===\n"
+        repr = "========== MANAGED CONFIGURTION SET ==========\n"
         for e in self.entities:
             repr += str(e) +"\n"
-        return repr
+        return repr[:-1]
     
     def __str__(self):
-        repr = "=== Dynatrace Environment Configuration Set ===\n"
+        repr = "========== MANAGED CONFIGURTION SET ==========\n"
         for e in self.entities:
             repr += str(e) +"\n"
-        return repr
+        return repr[:-1]
 
     '''
     Create a standardized ID string for entities that use IDs from tenantid and application name
@@ -72,7 +73,10 @@ class DTEnvironmentConfig:
         filtered = []
         for entity in self.entities:
             if isinstance(entity, etype):
-                filtered.append(entity.name)
+                if hasattr(entity,"name"):
+                    filtered.append(entity.name)
+                else:
+                    filtered.append(entity.__class__.__name__)
                 
         return filtered
     
@@ -80,14 +84,23 @@ class DTEnvironmentConfig:
         filtered = []
         for entity in self.entities:
             if isinstance(entity, etype):
-                filtered.append(entity.id)
+                if hasattr(entity,"id"):
+                    filtered.append(entity.id)
+                else:
+                    filtered.append(entity.__class__.__name__)
                 
         return filtered
     
-    def getConfigEntityByName(selfself, name):
+    def getConfigEntityByName(self, name):
         # not very clean but assuming that the list of entities is not huge this is ok
         for entity in self.entities:
-            if entity.name == name:
+            if entity.__class__.__name__ == name or (hasattr(entity,"name") and entity.name == name):
+                return entity
+
+    def getConfigEntityByID(self, id):
+        # not very clean but assuming that the list of entities is not huge this is ok
+        for entity in self.entities:
+            if entity.__class__.__name__ == id or (hasattr(entity,"id") and entity.id == id):
                 return entity
     
     def getRequestAttributes(self):
