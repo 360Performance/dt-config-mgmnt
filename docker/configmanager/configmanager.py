@@ -271,8 +271,8 @@ def putSyntheticMonitors(monitors):
                 existing_monitorentities.append(monitor)
                 logger.info("PUT Monitor for {} : {}".format(parameters,monitor))
             
-        postConfigEntities(new_monitorentities, parameters)
-        putConfigEntities(existing_monitorentities, parameters)
+        postConfigEntities(new_monitorentities, parameters, False)
+        putConfigEntities(existing_monitorentities, parameters, False)
 
         # since other configs might depend on the monitors to be available test if all have been applied successfully
         tries = complete = 0
@@ -572,7 +572,7 @@ This method goes one by one for each tenant based on the information found alrea
 It's using the information from the configcache that has been populated before with the config entities and their ID or if they are missing.
 By going one by one tenant this is not a very effective method, but it's required for a initial "cleanup"of all tenants and establishing the standard
 '''    
-def updateOrCreateConfigEntities(entities, parameters):
+def updateOrCreateConfigEntities(entities, parameters,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
     
@@ -593,7 +593,7 @@ def updateOrCreateConfigEntities(entities, parameters):
             
             if "missing" == curID:
                 logger.info("Standard {} {} is missing on {}".format(configtype,entity.name,tenantid))
-                putConfigEntities([entity],{"tenantid":tenantid})
+                putConfigEntities([entity],{"tenantid":tenantid},validateonly)
                 missing += 1
                 continue
             if stdID != curID:
@@ -601,7 +601,7 @@ def updateOrCreateConfigEntities(entities, parameters):
                 delEntity = copy.deepcopy(entity)
                 delEntity.setID(curID)
                 deleteConfigEntities([delEntity],{"tenantid":tenantid})
-                putConfigEntities([entity],{"tenantid":tenantid})
+                putConfigEntities([entity],{"tenantid":tenantid},validateonly)
                 unmatched += 1
             else:
                 #logger.info("Standard RequestAttribute IDs match, no action needed")
@@ -683,33 +683,45 @@ def deleteConfigEntities(entities,parameters):
             logger.error("Problem deleting {}: {}".format(configtype,sys.exc_info()))
             
 
-def putConfigEntities(entities,parameters):
+def putConfigEntities(entities,parameters,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
+
+    session = requests.Session()
+    validator = ''
+    httpmeth = 'PUT'
+    if validateonly:
+        validator = '/validator'
+        httpmeth = 'POST'
     
     for entity in entities:
         status = {"200":0, "204":0, "201":0, "400":0, "401":0, "404":0}
-        url = server + entity.apipath + query
+        url = server + entity.apipath + validator + query
         configtype = type(entity).__name__
-        logger.info("PUT {}: {}".format(configtype,url))
+        logger.info("{} {}: {}".format(httpmeth,configtype,url))
         
-        try:   
-            resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd))
+        try:
+            req = requests.Request(httpmeth,url,json=entity.dto, auth=(apiuser, apipwd))
+            prep = session.prepare_request(req)
+            resp = session.send(prep)
+            #resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd))
             if len(resp.content) > 0:
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
                         logger.info("tenant: {} status: {}".format(tenant["tenantid"], tenant["responsecode"]))
-                        logger.error("PUT Payload: {}".format(json.dumps(entity.dto)))
-                        logger.error("PUT Response: {}".format(json.dumps(tenant)))
-                logger.info("Status Summary: {} {}".format(len(resp.json()),status))
+                        logger.error("{} Payload: {}".format(httpmeth, json.dumps(entity.dto)))
+                        logger.error("{} Response: {}".format(httpmeth, json.dumps(tenant)))
+                logger.info("Status Summary (Dryrun: {}): {} {}".format(validateonly,len(resp.json()),status))
+            if validateonly and len(resp.content) == 0:
+                logger.info("All target tenants have sucessfully validated the payload: HTTP {}".format(resp.status_code))
         except:
             logger.error("Problem putting {}: {}".format(configtype,sys.exc_info()))
 
     # add additional verification that entities have been created?
 
 
-def postConfigEntities(entities,parameters):
+def postConfigEntities(entities,parameters,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
     
@@ -770,15 +782,18 @@ def performConfig(parameters):
     logger.info("Applying Configuration to: \n{}".format(json.dumps(parameters, indent = 2, separators=(',', ': '))))
     logger.info("Applying Configuration Types: \n{}".format(json.dumps(config, indent = 2, separators=(',', ': '))))
 
+    validateonly = config["dryrun"]
+
     if config["servicerequestAttributes"]:
         logger.info("++++++++ REQUEST ATTRIBUTES ++++++++")
         if config["dryrun"]:
             logger.info("Dryrun: servicerequestAttributes")
+            putConfigEntities(stdConfig.getRequestAttributes(),parameters,validateonly)
         else:
             # requestAttributes
             #purgeConfigEntities([ConfigTypes.servicerequestAttributes], parameters)
             updateOrCreateConfigEntities(stdConfig.getRequestAttributes(),parameters)
-            putConfigEntities(stdConfig.getRequestAttributes(),parameters)
+            putConfigEntities(stdConfig.getRequestAttributes(),parameters,validateonly)
             
     
     if config["autoTags"]:
@@ -789,7 +804,7 @@ def performConfig(parameters):
             # autoTags
             #purgeConfigEntities([ConfigTypes.autoTags], parameters)
             updateOrCreateConfigEntities(stdConfig.getAutoTags(),parameters)
-            putConfigEntities(stdConfig.getAutoTags(),parameters)
+            putConfigEntities(stdConfig.getAutoTags(),parameters,validateonly)
     
     if config["customServicesjava"]:
         logger.info("++++++++ CUSTOM SERVICES ++++++++")
@@ -799,7 +814,7 @@ def performConfig(parameters):
             # customServices
             #purgeConfigEntities([ConfigTypes.customServicesjava], parameters)
             updateOrCreateConfigEntities(stdConfig.getCustomJavaServices(),parameters)
-            putConfigEntities(stdConfig.getCustomJavaServices(),parameters)
+            putConfigEntities(stdConfig.getCustomJavaServices(),parameters,validateonly)
     
     if config["servicerequestNaming"]:
         logger.info("++++++++ REQUEST NAMING ++++++++")
@@ -809,7 +824,7 @@ def performConfig(parameters):
             # requestNaming
             #purgeConfigEntities([ConfigTypes.servicerequestNaming], parameters)
             updateOrCreateConfigEntities(stdConfig.getRequestNamings(),parameters)
-            putConfigEntities(stdConfig.getRequestNamings(),parameters)
+            putConfigEntities(stdConfig.getRequestNamings(),parameters,validateonly)
 
     if config["calculatedMetricsservice"]:
         logger.info("++++++++ CUSTOM METRICS ++++++++")
@@ -819,7 +834,7 @@ def performConfig(parameters):
             # customMetrics
             #purgeConfigEntities([ConfigTypes.customMetricservice], parameters, True)
             updateOrCreateConfigEntities(stdConfig.getCalculatedMetricsService(),parameters)
-            putConfigEntities(stdConfig.getCalculatedMetricsService(),parameters)
+            putConfigEntities(stdConfig.getCalculatedMetricsService(),parameters,validateonly)
         
     if config["dataPrivacy"]:
         logger.info("++++++++ DATA PRIVACY ++++++++")
@@ -828,7 +843,7 @@ def performConfig(parameters):
         else:
             # dataPrivacy
             updateOrCreateConfigEntities(stdConfig.getDataPrivacy(),parameters)
-            putConfigEntities(stdConfig.getDataPrivacy(),parameters)
+            putConfigEntities(stdConfig.getDataPrivacy(),parameters,validateonly)
 
     if config["anomalyDetectionapplications"]:
         logger.info("++++++++ APPLICATION ANOMALY DETECTION ++++++++")
@@ -837,7 +852,7 @@ def performConfig(parameters):
         else:
             # anomalyDetection Applications
             updateOrCreateConfigEntities(stdConfig.getAnomalyDetectionApplications(),parameters)
-            putConfigEntities(stdConfig.getAnomalyDetectionApplications(),parameters)
+            putConfigEntities(stdConfig.getAnomalyDetectionApplications(),parameters,validateonly)
 
     if config["anomalyDetectionservices"]:
         logger.info("++++++++ SERVICES ANOMALY DETECTION ++++++++")
@@ -846,7 +861,7 @@ def performConfig(parameters):
         else:
             # anomalyDetection Applications
             updateOrCreateConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters)
-            putConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters)
+            putConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters,validateonly)
 
     
     if config["applicationsweb"]:
@@ -895,7 +910,7 @@ def performConfig(parameters):
             logger.info("Dryrun: dashboards")
         else:
             # dashboards that do not need parameterization
-            putConfigEntities(stdConfig.getDashboards(),parameters)
+            putConfigEntities(stdConfig.getDashboards(),parameters,validateonly)
 
     if config["alertingProfiles"]:
         logger.info("++++++++ ALERTING PROFILES ++++++++")
@@ -905,7 +920,7 @@ def performConfig(parameters):
             #alertingprofiles  
             #purgeConfigEntities([ConfigTypes.alertingProfiles], parameters)
             updateOrCreateConfigEntities(stdConfig.getAlertingProfiles(),parameters)
-            putConfigEntities(stdConfig.getAlertingProfiles(),parameters)
+            putConfigEntities(stdConfig.getAlertingProfiles(),parameters,validateonly)
 
     if config["notifications"]:
         logger.info("++++++++ NOTIFICATIONS ++++++++")
@@ -915,7 +930,7 @@ def performConfig(parameters):
             #notifications  
             #purgeConfigEntities([ConfigTypes.notifications], parameters)
             updateOrCreateConfigEntities(stdConfig.getNotifications(),parameters)
-            putConfigEntities(stdConfig.getNotifications(),parameters)
+            putConfigEntities(stdConfig.getNotifications(),parameters,validateonly)
 
 def getConfig(parameters, dumpconfig):
     #configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
