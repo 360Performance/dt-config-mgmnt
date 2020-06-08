@@ -164,7 +164,7 @@ def createAppDashboardEntitiesFromApps(applications):
 
     return dashboardentities_map
 
-def putAppDashboards(dashboards):
+def putAppDashboards(dashboards, validateonly):
     for tenant,dashboardentities in dashboards.items():
         parts = tenant.split("::")
         c_id = parts[0]
@@ -174,7 +174,7 @@ def putAppDashboards(dashboards):
         for dashboard in dashboardentities:
             logger.info("PUT Dashboard for {} : {}".format(parameters,dashboard))
         
-        putConfigEntities(dashboardentities, parameters)
+        putConfigEntities(dashboardentities, parameters,validateonly)
 
 def getSyntheticMonitors(clusterid, tenantid):
     apiurl = "/e/TENANTID/api/v1/synthetic/monitors"
@@ -254,7 +254,7 @@ def createSyntheticMonitorsFromApps(applications):
 
     return monitorentities_map
 
-def putSyntheticMonitors(monitors):
+def putSyntheticMonitors(monitors,validateonly):
     for tenant,monitorentities in monitors.items():
         parts = tenant.split("::")
         c_id = parts[0]
@@ -271,8 +271,8 @@ def putSyntheticMonitors(monitors):
                 existing_monitorentities.append(monitor)
                 logger.info("PUT Monitor for {} : {}".format(parameters,monitor))
             
-        postConfigEntities(new_monitorentities, parameters, False)
-        putConfigEntities(existing_monitorentities, parameters, False)
+        postConfigEntities(new_monitorentities, parameters, validateonly)
+        putConfigEntities(existing_monitorentities, parameters, validateonly)
 
         # since other configs might depend on the monitors to be available test if all have been applied successfully
         tries = complete = 0
@@ -412,7 +412,7 @@ def getApplications(parameters):
 writes Application Configurations (applications and detections rules) to tenants.
 This is ALWAYS a tenant specific operation and NEVER a global one, so we make sure to pass the tenant parameter.
 '''
-def putApplicationConfigs(applications):
+def putApplicationConfigs(applications,validateonly):
     ruleentities = []
     for tenant,appentities in applications.items():
         parts = tenant.split("::")
@@ -428,9 +428,9 @@ def putApplicationConfigs(applications):
             #logger.info(json.dumps(app.dto))
         
         logger.info("PUT Applications for {} : {}".format(parameters,appentities))
-        putConfigEntities(appentities, parameters)
+        putConfigEntities(appentities, parameters, validateonly)
         #logger.info("PUT Application detection rules for {} : {}".format(parameters,ruleentities))
-        putConfigEntities(ruleentities, parameters)
+        putConfigEntities(ruleentities, parameters, validateonly)
 
 
 # helper function to recursively merge two dicts
@@ -600,7 +600,7 @@ def updateOrCreateConfigEntities(entities, parameters,validateonly):
                 logger.info("Standard {} IDs for {} don't match on {}: {} : {}".format(configtype,entity.name,tenantid,stdID,curID))
                 delEntity = copy.deepcopy(entity)
                 delEntity.setID(curID)
-                deleteConfigEntities([delEntity],{"tenantid":tenantid})
+                deleteConfigEntities([delEntity],{"tenantid":tenantid},validateonly)
                 putConfigEntities([entity],{"tenantid":tenantid},validateonly)
                 unmatched += 1
             else:
@@ -662,25 +662,28 @@ def purgeConfigEntities(entitytypes,parameters,force):
         if purged > 0:
             logger.info("Purged non-standard {} Entities: {}".format(configtype,purged))
 
-def deleteConfigEntities(entities,parameters):
+def deleteConfigEntities(entities,parameters,validateonly):
     query = "?"+urlencode(parameters)
     
     for entity in entities:
         status = {"204":0, "201":0, "400":0, "401":0, "404":0}
         url = server + entity.apipath + query
         configtype = type(entity).__name__
-        logger.info("DELETE {}: {}".format(configtype,url))
         
-        try:   
-            resp = requests.delete(url, auth=(apiuser, apipwd))
-            if len(resp.content) > 0:
-                for tenant in resp.json():
-                    status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
-                    if tenant["responsecode"] >= 400:
-                        logger.info("tenant: {} status: {}".format(tenant["tenantid"], tenant["responsecode"]))
-                logger.info("Status Summary: {} {}".format(len(resp.json()),status))
-        except:
-            logger.error("Problem deleting {}: {}".format(configtype,sys.exc_info()))
+        if validateonly:
+            logger.info("DRYRUN - DELETE {}: {}".format(configtype,url))
+        else:
+            logger.info("DELETE {}: {}".format(configtype,url))
+            try:   
+                resp = requests.delete(url, auth=(apiuser, apipwd))
+                if len(resp.content) > 0:
+                    for tenant in resp.json():
+                        status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
+                        if tenant["responsecode"] >= 400:
+                            logger.info("tenant: {} status: {}".format(tenant["tenantid"], tenant["responsecode"]))
+                    logger.info("Status Summary: {} {}".format(len(resp.json()),status))
+            except:
+                logger.error("Problem deleting {}: {}".format(configtype,sys.exc_info()))
             
 
 def putConfigEntities(entities,parameters,validateonly):
@@ -698,7 +701,8 @@ def putConfigEntities(entities,parameters,validateonly):
         status = {"200":0, "204":0, "201":0, "400":0, "401":0, "404":0}
         url = server + entity.apipath + validator + query
         configtype = type(entity).__name__
-        logger.info("{} {}: {}".format(httpmeth,configtype,url))
+        prefix = "DRYRUN - " if validateonly else ""
+        logger.info("{}{} {}: {}".format(prefix,httpmeth,entity,entity.apipath+validator+query))
         
         try:
             req = requests.Request(httpmeth,url,json=entity.dto, auth=(apiuser, apipwd))
@@ -709,27 +713,32 @@ def putConfigEntities(entities,parameters,validateonly):
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
-                        logger.info("tenant: {} status: {}".format(tenant["tenantid"], tenant["responsecode"]))
-                        logger.error("{} Payload: {}".format(httpmeth, json.dumps(entity.dto)))
-                        logger.error("{} Response: {}".format(httpmeth, json.dumps(tenant)))
+                        logger.error("{}{} failed on tenant: {} HTTP{} ({})".format(prefix,httpmeth,tenant["tenantid"], tenant["responsecode"], tenant["error"]))
+                        #logger.debug("{} Payload: {}".format(httpmeth, json.dumps(entity.dto)))
+                        logger.debug("{} Response: {}".format(httpmeth, json.dumps(tenant)))
                 logger.info("Status Summary (Dryrun: {}): {} {}".format(validateonly,len(resp.json()),status))
             if validateonly and len(resp.content) == 0:
-                logger.info("All target tenants have sucessfully validated the payload: HTTP {}".format(resp.status_code))
+                logger.info("All target tenants have sucessfully validated the payload: HTTP{}".format(resp.status_code))
         except:
             logger.error("Problem putting {}: {}".format(configtype,sys.exc_info()))
-
-    # add additional verification that entities have been created?
-
 
 def postConfigEntities(entities,parameters,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
+
+    session = requests.Session()
+    validator = prefix = ""
     
     for entity in entities:
         status = {"200":0, "204":0, "201":0, "400":0, "401":0, "404":0}
-        url = server + entity.uri + query
+        
+        if validateonly:
+            validator = "/" + entity.id + "/validator"
+            prefix = "DRYRUN - "
+
+        url = server + entity.uri + validator + query
         configtype = type(entity).__name__
-        logger.info("POST {}: {}".format(configtype,url))
+        logger.info("{}POST {}: {}".format(prefix,configtype,url))
         
         try:   
             resp = requests.post(url,json=entity.dto, auth=(apiuser, apipwd))
@@ -745,7 +754,6 @@ def postConfigEntities(entities,parameters,validateonly):
             logger.error("Problem putting {}: {}".format(configtype,sys.exc_info()))
 
 def getControlSettings():
-
     stdSettings = {
         "servicerequestAttributes": True,
         "servicerequestNaming": True,
@@ -760,9 +768,8 @@ def getControlSettings():
         "notifications": False,
         "dataPrivacy": True, 
         "dashboards": True,
-        "syntheticMonitors": False,
+        "syntheticmonitors": False,
         "applicationDashboards": False,
-        "dryrun": True
     }
 
     ctrlsettings = {}
@@ -782,155 +789,38 @@ def performConfig(parameters):
     logger.info("Applying Configuration to: \n{}".format(json.dumps(parameters, indent = 2, separators=(',', ': '))))
     logger.info("Applying Configuration Types: \n{}".format(json.dumps(config, indent = 2, separators=(',', ': '))))
 
-    validateonly = config["dryrun"]
+    validateonly = parameters["dryrun"]
+    del parameters["dryrun"]
+    specialHandling = ["applicationsweb","syntheticmonitors"]
 
-    if config["servicerequestAttributes"]:
-        logger.info("++++++++ REQUEST ATTRIBUTES ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: servicerequestAttributes")
-            putConfigEntities(stdConfig.getRequestAttributes(),parameters,validateonly)
-        else:
-            # requestAttributes
-            #purgeConfigEntities([ConfigTypes.servicerequestAttributes], parameters)
-            updateOrCreateConfigEntities(stdConfig.getRequestAttributes(),parameters)
-            putConfigEntities(stdConfig.getRequestAttributes(),parameters,validateonly)
-            
-    
-    if config["autoTags"]:
-        logger.info("++++++++ AUTO TAGS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: autoTags")
-        else:
-            # autoTags
-            #purgeConfigEntities([ConfigTypes.autoTags], parameters)
-            updateOrCreateConfigEntities(stdConfig.getAutoTags(),parameters)
-            putConfigEntities(stdConfig.getAutoTags(),parameters,validateonly)
-    
-    if config["customServicesjava"]:
-        logger.info("++++++++ CUSTOM SERVICES ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: customServicesjava")
-        else:
-            # customServices
-            #purgeConfigEntities([ConfigTypes.customServicesjava], parameters)
-            updateOrCreateConfigEntities(stdConfig.getCustomJavaServices(),parameters)
-            putConfigEntities(stdConfig.getCustomJavaServices(),parameters,validateonly)
-    
-    if config["servicerequestNaming"]:
-        logger.info("++++++++ REQUEST NAMING ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: servicerequestNaming")
-        else:
-            # requestNaming
-            #purgeConfigEntities([ConfigTypes.servicerequestNaming], parameters)
-            updateOrCreateConfigEntities(stdConfig.getRequestNamings(),parameters)
-            putConfigEntities(stdConfig.getRequestNamings(),parameters,validateonly)
-
-    if config["calculatedMetricsservice"]:
-        logger.info("++++++++ CUSTOM METRICS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: calculatedMetricsservice")
-        else:
-            # customMetrics
-            #purgeConfigEntities([ConfigTypes.customMetricservice], parameters, True)
-            updateOrCreateConfigEntities(stdConfig.getCalculatedMetricsService(),parameters)
-            putConfigEntities(stdConfig.getCalculatedMetricsService(),parameters,validateonly)
+    for ename, enabled in config.items():
+        etype = getattr(ConfigTypes,ename,None)
+        logger.info("++++++++ {} ({}) ++++++++".format(ename.upper(),enabled))
+        if enabled and etype is not None:
+            updateOrCreateConfigEntities(stdConfig.getConfigEntitiesByType(etype),parameters,validateonly)
+            putConfigEntities(stdConfig.getConfigEntitiesByType(etype),parameters,validateonly)
+        elif enabled and ename in specialHandling:
+            if ename == "applicationsweb":
+                getServices(parameters)
+                getApplications(parameters)
+                apps = createAppConfigEntitiesFromServices()
+                putApplicationConfigs(apps,validateonly)
+            if ename == "syntheticmonitors":
+                getServices(parameters)
+                getApplications(parameters)
+                apps = createAppConfigEntitiesFromServices()
+                monitors = createSyntheticMonitorsFromApps(apps)
+                putSyntheticMonitors(monitors,validateonly)
+            if ename == "applicationDashboards":
+                getServices(parameters)
+                getApplications(parameters)
+                apps = createAppConfigEntitiesFromServices()
+                appdashboards = createAppDashboardEntitiesFromApps(apps)
+                putAppDashboards(appdashboards,validateonly)
         
-    if config["dataPrivacy"]:
-        logger.info("++++++++ DATA PRIVACY ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: dataPrivacy")
         else:
-            # dataPrivacy
-            updateOrCreateConfigEntities(stdConfig.getDataPrivacy(),parameters)
-            putConfigEntities(stdConfig.getDataPrivacy(),parameters,validateonly)
+            logger.info("{} configuration is disabled or not implemented".format(ename))
 
-    if config["anomalyDetectionapplications"]:
-        logger.info("++++++++ APPLICATION ANOMALY DETECTION ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: anomalyDetectionapplications")
-        else:
-            # anomalyDetection Applications
-            updateOrCreateConfigEntities(stdConfig.getAnomalyDetectionApplications(),parameters)
-            putConfigEntities(stdConfig.getAnomalyDetectionApplications(),parameters,validateonly)
-
-    if config["anomalyDetectionservices"]:
-        logger.info("++++++++ SERVICES ANOMALY DETECTION ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: anomalyDetectionservices")
-        else:
-            # anomalyDetection Applications
-            updateOrCreateConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters)
-            putConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters,validateonly)
-
-    
-    if config["applicationsweb"]:
-        logger.info("++++++++ APPLICATIONS ++++++++")
-        # applications
-        getServices(parameters)
-        getApplications(parameters)
-        apps = createAppConfigEntitiesFromServices()
-        if config["dryrun"]:
-            logger.info("Dryrun: applicationsweb")
-        else:
-            putApplicationConfigs(apps)
-        
-    if config["syntheticMonitors"]:
-        # synthetic monitors
-        if not config["applications"]:
-            getServices(parameters)
-            getApplications(parameters)
-            apps = createAppConfigEntitiesFromServices()
-        
-        logger.info("++++++++ SYNTHETIC MONITORS ++++++++")
-        monitors = createSyntheticMonitorsFromApps(apps)
-        if config["dryrun"]:
-            logger.info("Dryrun: syntheticMonitors")
-        else:
-            putSyntheticMonitors(monitors)
-
-    if config["applicationDashboards"]:
-        logger.info("++++++++ APPLICATION DASHBOARDS ++++++++")
-        # application dashboards
-        # these dashboards are created per application dynamically
-        if not config["applicationsweb"]:
-            getServices(parameters)
-            getApplications(parameters)
-            apps = createAppConfigEntitiesFromServices()
-        appdashboards = createAppDashboardEntitiesFromApps(apps)
-        
-        if config["dryrun"]:
-            logger.info("Dryrun: applicationDashboards")
-        else:
-            putAppDashboards(appdashboards)
-
-    if config["dashboards"]:
-        logger.info("++++++++ DASHBOARDS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: dashboards")
-        else:
-            # dashboards that do not need parameterization
-            putConfigEntities(stdConfig.getDashboards(),parameters,validateonly)
-
-    if config["alertingProfiles"]:
-        logger.info("++++++++ ALERTING PROFILES ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: alertingprofiles")
-        else:
-            #alertingprofiles  
-            #purgeConfigEntities([ConfigTypes.alertingProfiles], parameters)
-            updateOrCreateConfigEntities(stdConfig.getAlertingProfiles(),parameters)
-            putConfigEntities(stdConfig.getAlertingProfiles(),parameters,validateonly)
-
-    if config["notifications"]:
-        logger.info("++++++++ NOTIFICATIONS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: notifications")
-        else:
-            #notifications  
-            #purgeConfigEntities([ConfigTypes.notifications], parameters)
-            updateOrCreateConfigEntities(stdConfig.getNotifications(),parameters)
-            putConfigEntities(stdConfig.getNotifications(),parameters,validateonly)
 
 def getConfig(parameters, dumpconfig):
     #configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
@@ -967,6 +857,10 @@ def main(argv):
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
+                    # assuming that if not otherwise specified we do a dryrun
+                    if "dryrun" not in parameters:
+                        parameters.update({"dryrun":True})
+
                     logger.info("========== STARTING CONFIG FETCH ==========")
                     getConfig(parameters, False)
                     logger.info("========== FINISHED CONFIG FETCH ==========")

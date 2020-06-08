@@ -60,6 +60,12 @@ class DTEnvironmentConfig:
         appid_suffix = "{:0>4}".format(appname.encode("utf-8").hex()[-4:]).upper()
         return appid_prefix+appid_suffix
 
+    def getConfigTypes(self):
+        unique_types = set()
+        for entity in self.entities:
+            unique_types.add(entity.__class__.__name__)
+        return unique_types
+
 
     def getConfigEntitiesByType(self, etype):
         filtered = []
