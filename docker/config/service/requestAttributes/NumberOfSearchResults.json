@@ -29,7 +29,6 @@
         },
         {
           "method": {
-            "technology": "JAVA",
             "visibility": "PUBLIC",
             "modifiers": [],
             "className": "org.apache.solr.client.solrj.SolrClient",
@@ -47,7 +46,6 @@
         },
         {
           "method": {
-            "technology": "JAVA",
             "visibility": "PUBLIC",
             "modifiers": [],
             "className": "org.apache.solr.client.solrj.SolrClient",
@@ -64,7 +62,6 @@
         },
         {
           "method": {
-            "technology": "JAVA",
             "visibility": "PUBLIC",
             "modifiers": [],
             "className": "org.apache.solr.client.solrj.SolrClient",

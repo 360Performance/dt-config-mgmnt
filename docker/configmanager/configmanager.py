@@ -449,6 +449,38 @@ def merge(a, b, path=None):
             a[key] = b[key]
     return a
 
+def verifyConfigSettings(entitytypes, parameters):
+    session = requests.Session()
+    session.auth = (apiuser, apipwd)
+    session.params = parameters
+
+    for entitytype in entitytypes:
+        entities = stdConfig.getConfigEntitiesByType(entitytype)
+        apiuri = entitytype.uri
+
+        #now get every entity from all tenants and then compare every tenant's response to the standard
+        for entity in entities:
+            url = server + apiuri + "/" + entity.id
+            try:
+                response = session.get(url)
+                result = response.json()
+                for tenant in result:
+                    c_id = tenant["clusterid"]
+                    t_id = tenant["tenantid"]
+                    r_code = tenant["responsecode"]
+                    #logger.info("Verifying: {} on {}::{}: {}".format(entity,c_id,t_id,r_code))
+                    if r_code != 200:
+                        logger.warning("{} {} not found on {}::{}".format(entitytype.__name__, entity.id,c_id,t_id))
+                    else:
+                        #create the actual entity
+                        etype = type(entity)
+                        centity = etype(id=entity.id,name=entity.name,dto=tenant)
+                        #logger.info("{}\n{}".format(entity.dto,centity.dto))
+                        logger.info("Verifying: {} : {}::{} {}".format(entity == centity,c_id,t_id,centity))
+            except:
+                logger.error("Problem verifying config settings: {}".format(sys.exc_info()))
+
+
 '''
 Get all tenant's standard config definitions (by name) and store their IDs in cache.
 This is required to get a current state of existing tenants and their config, required for further cleanup
@@ -457,12 +489,15 @@ Caches:
 clusterid::tenantid::entitytype::entityname => id | missing
 '''
 def getConfigSettings(entitytypes, parameters, dumpconfig):
-    query = "?"+urlencode(parameters)
+    #query = "?"+urlencode(parameters)
+    session = requests.Session()
+    session.auth = (apiuser, apipwd)
+    
     dumpentities = {}
     
     for entitytype in entitytypes:
         apiurl = entitytype.uri
-        url = server + apiurl + query
+        url = server + apiurl
         stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
         configtype = entitytype.__name__
         logger.info("Getting configs of type: {} - there are {} configuration definitions of this type in the standard config".format(entitytype.__name__, len(stdConfigNames)))
@@ -470,7 +505,8 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
         entity_defs = []
 
         try:
-            response = requests.get(url, auth=(apiuser, apipwd))
+            session.params = parameters
+            response = session.get(url)
             result = response.json()
             for tenant in result:
                 c_id = tenant["clusterid"]
@@ -500,11 +536,11 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
 
                             #when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
                             if dumpconfig:
-                                query = "?"+urlencode({"tenantid":t_id, "clusterid":c_id})
-                                entityurl = server + apiurl + "/" + attr["id"] + query
+                                session.params = {"tenantid":t_id, "clusterid":c_id}
+                                entityurl = server + apiurl + "/" + attr["id"]
                                 logger.debug("Fetching Entity: {}".format(entityurl))
                                 try:
-                                    response = requests.get(entityurl, auth=(apiuser, apipwd))
+                                    response = session.get(entityurl)
                                     result = response.json()[0]  # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
                                     centity = entitytype(id=attr["id"],name=attr["name"],dto=result)
                                     if centity.isShared():
@@ -548,8 +584,9 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
                         configcache.setex(key,3600,"missing")
             
         except:
-                logger.error("Problem Getting Config Settings: {}".format(sys.exc_info()))
+            logger.error("Problem Getting Config Settings: {}".format(sys.exc_info()))
 
+        # build datastructure for dumping the entities.yml file properly
         if dumpconfig:
             parts = entitytype.entityuri.strip("/").split('/')
             parts.reverse()
@@ -558,7 +595,8 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
                     entity_defs = {i:entity_defs}
 
             dumpentities = merge(dumpentities,entity_defs)
-    
+
+    # write out the stdConfig definition (entities.yml) 
     if dumpconfig:
         path = config_dump_dir + "/entities.yml"
         with open(path, 'w') as file:
@@ -822,12 +860,13 @@ def performConfig(parameters):
             logger.info("{} configuration is disabled or not implemented".format(ename))
 
 
-def getConfig(parameters, dumpconfig):
+def getConfig(parameters):
     #configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
     #configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
     configtypes = [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]
     configtypes = configtypes + [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantSetting.__subclasses__()]
-    getConfigSettings(configtypes, parameters, dumpconfig)  
+    #getConfigSettings(configtypes, parameters, dumpconfig)  
+    return configtypes
 
 def main(argv):
     global stdConfig
@@ -853,7 +892,6 @@ def main(argv):
                 logger.info(stdConfig)
 
             if command == 'START_CONFIG':
-                
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
@@ -862,7 +900,8 @@ def main(argv):
                         parameters.update({"dryrun":True})
 
                     logger.info("========== STARTING CONFIG FETCH ==========")
-                    getConfig(parameters, False)
+                    configtypes = getConfig(parameters)
+                    getConfigSettings(configtypes, parameters, False) 
                     logger.info("========== FINISHED CONFIG FETCH ==========")
                     logger.info("========== STARTING CONFIG PUSH ==========")
                     performConfig(parameters)    
@@ -879,6 +918,17 @@ def main(argv):
             
                 logger.info("========== FINISHED CONFIG PUSH ==========")
 
+            if command == 'VERIFY_CONFIG':
+                params = configcache.get("parameters")
+                if params:
+                    parameters = json.loads(params)
+                    entitytypes = getConfig(parameters)
+                    verifyConfigSettings(entitytypes, parameters)
+
+                else:
+                    logger.warning("No Parameters found in config cache ... skipping")
+
+
             if command == 'DUMP_CONFIG':
                 logger.info("========== STARTING CONFIG PULL ==========")
                 source_param = configcache.get("source")
@@ -888,7 +938,8 @@ def main(argv):
                     target = json.loads(target_param)
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
                     logger.info("Target: \n{}".format(json.dumps(target, indent = 2, separators=(',', ': '))))
-                    getConfig(source, True)
+                    configtypes = getConfig(source)
+                    getConfigSettings(configtypes, source, True)
 
                     logger.info("==== reloading standard config after dump ====")
                     stdConfig = DTEnvironmentConfig(config_dump_dir)

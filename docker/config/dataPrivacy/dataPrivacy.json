@@ -1,17 +1,6 @@
 {
-    "clusterhost": "fr.apm.sap.cx",
-    "clusterid": "fr1",
     "logAuditEvents": false,
     "maskIpAddressesAndGpsCoordinates": true,
     "maskPersonalDataInUris": false,
-    "maskUserActionNames": false,
-    "metadata": {
-        "clusterVersion": "1.188.104.20200323-145140",
-        "configurationVersions": [
-            13,
-            13
-        ]
-    },
-    "responsecode": 200,
-    "tenantid": "vnx-p1"
+    "maskUserActionNames": false
 }

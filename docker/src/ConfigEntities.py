@@ -50,7 +50,7 @@ class ConfigEntity():
             return
         newdto = dto.copy()
         for attr in dto:
-            if attr in ['clusterid','clusterhost','tenantid','metadata','responsecode']:
+            if attr in ['clusterid','clusterhost','tenantid','metadata','responsecode','id']:
                 logger.debug("Strip attribute {} from configtype {}, maybe cleanup your JSON definition to remove this warning".format(attr,self.__class__.__name__))
                 newdto.pop(attr,None)
         return newdto
