@@ -456,11 +456,13 @@ def verifyConfigSettings(entitytypes, parameters):
 
     for entitytype in entitytypes:
         entities = stdConfig.getConfigEntitiesByType(entitytype)
-        apiuri = entitytype.uri
+        apiurl = entitytype.uri
 
         #now get every entity from all tenants and then compare every tenant's response to the standard
         for entity in entities:
-            url = server + apiuri + "/" + entity.id
+            url = server + apiurl
+            if not issubclass(entitytype,ConfigTypes.TenantSetting):
+                url = url + "/" + entity.id
             try:
                 response = session.get(url)
                 result = response.json()
@@ -470,7 +472,7 @@ def verifyConfigSettings(entitytypes, parameters):
                     r_code = tenant["responsecode"]
                     #logger.info("Verifying: {} on {}::{}: {}".format(entity,c_id,t_id,r_code))
                     if r_code != 200:
-                        logger.warning("{} {} not found on {}::{}".format(entitytype.__name__, entity.id,c_id,t_id))
+                        logger.warning("Doesn't exist: {}::{} {}".format(c_id,t_id,entity))
                     else:
                         #create the actual entity
                         etype = type(entity)

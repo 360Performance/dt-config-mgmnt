@@ -70,7 +70,7 @@ class DTEnvironmentConfig:
     def getConfigEntitiesByType(self, etype):
         filtered = []
         for entity in self.entities:
-            if isinstance(entity, etype):
+            if type(entity) is etype:
                 filtered.append(entity)
                 
         return filtered
@@ -78,7 +78,7 @@ class DTEnvironmentConfig:
     def getConfigEntitiesNamesByType(self, etype):
         filtered = []
         for entity in self.entities:
-            if isinstance(entity, etype):
+            if type(entity) is etype:
                 if hasattr(entity,"name"):
                     filtered.append(entity.name)
                 else:
@@ -89,7 +89,7 @@ class DTEnvironmentConfig:
     def getConfigEntitiesIDsByType(self, etype):
         filtered = []
         for entity in self.entities:
-            if isinstance(entity, etype):
+            if type(entity) is etype:
                 if hasattr(entity,"id"):
                     filtered.append(entity.id)
                 else:
