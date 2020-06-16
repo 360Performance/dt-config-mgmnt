@@ -1,7 +1,6 @@
 import time, datetime, sys, os
 import requests, json, yaml, urllib3
 from requests.auth import HTTPBasicAuth
-#import dnspython as dns
 import dns.resolver
 from IPy import IP
 from fqdn import FQDN
@@ -10,14 +9,14 @@ from urllib.parse import urlencode
 import redis
 import logging, traceback
 import random
-from dtconfig.ConfigSet import DTEnvironmentConfig
+import dtconfig.ConfigSet as ConfigSet
+import dtconfig.ConfigTypes as ConfigTypes
 from textwrap import wrap
-import dtconfig.ConfigEntities as ConfigTypes
 import copy
 
 
 # LOG CONFIGURATION
-FORMAT = '%(asctime)s:%(levelname)s:%(name)s:%(message)s'
+FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("")
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -40,7 +39,7 @@ if not apipwd:
     sys.exit("No password for api user found (ensure env variable DT_API_PWD is set) ... can't continue")
 
 # load the standard config from config directory
-stdConfig = DTEnvironmentConfig(config_dir)
+stdConfig = ConfigSet.ConfigSet(config_dir)
 internaldomains = ["ondemand","hybrishosting","ycs"]
 
 
@@ -472,13 +471,13 @@ def verifyConfigSettings(entitytypes, parameters):
                     r_code = tenant["responsecode"]
                     #logger.info("Verifying: {} on {}::{}: {}".format(entity,c_id,t_id,r_code))
                     if r_code != 200:
-                        logger.warning("Doesn't exist: {}::{} {}".format(c_id,t_id,entity))
+                        logger.warning("MISSING : {}::{} {}".format(c_id,t_id,entity))
                     else:
                         #create the actual entity
                         etype = type(entity)
                         centity = etype(id=entity.id,name=entity.name,dto=tenant)
                         #logger.info("{}\n{}".format(entity.dto,centity.dto))
-                        logger.info("Verifying: {} : {}::{} {}".format(entity == centity,c_id,t_id,centity))
+                        logger.info("{} : {}::{} {}".format(("MATCHING" if entity == centity else "DIFFERENT") ,c_id,t_id,centity))
             except:
                 logger.error("Problem verifying config settings: {}".format(sys.exc_info()))
 
@@ -892,7 +891,7 @@ def main(argv):
             #logger.info("Received Command: {}".format(command))
             if command == 'RESET':
                 logger.info("========== RELOADING STANDARD CONFIG ==========")
-                stdConfig = DTEnvironmentConfig(config_dir)
+                stdConfig = dtconfig.ConfigSet(config_dir)
                 logger.info(stdConfig)
 
             if command == 'PUSH_CONFIG':
@@ -944,7 +943,7 @@ def main(argv):
                     getConfigSettings(configtypes, source, True)
 
                     logger.info("==== reloading standard config after dump ====")
-                    stdConfig = DTEnvironmentConfig(config_dump_dir)
+                    stdConfig = ConfigSet(config_dump_dir)
                     logger.info(stdConfig)
                 else:
                     logger.warning("Source parameter is not specified ... skipping")

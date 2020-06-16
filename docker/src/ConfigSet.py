@@ -1,14 +1,14 @@
 import sys, yaml
 import logging
-import dtconfig.ConfigEntities as ConfigTypes
+import dtconfig.ConfigTypes as ConfigTypes
 
 # LOG CONFIGURATION
-FORMAT = '%(asctime)s:%(levelname)s:%(name)s:%(message)s'
+FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("ConfigSet")
 
-class DTEnvironmentConfig:
-    
+class ConfigSet:
+
     def __init__(self,basedir):
         self.configbasedir = basedir
         definitions = basedir + "/" + "entities.yml"
