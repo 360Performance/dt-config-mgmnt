@@ -85,20 +85,20 @@ docker exec -it configcache redis-cli
 
 Control the config configuration to enable disable certain settings:
 ```
- 127.0.0.1:6379>  set config "{\"servicerequestAttributes\": true, \"autoTags\": true, \"customServicesjava\": true, \"calculatedMetricsservice\": true, \"servicerequestNaming\": true, \"dataPrivacy\": false, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"applications\": false, \"syntheticMonitors\": false, \"applicationDashboards\": false, \"dashboards\": true, \"alertingProfiles\": false, \"notifications\": false, \"dryrun\": false}"
+ 127.0.0.1:6379>  set config "{\"servicerequestAttributes\": true, \"autoTags\": true, \"customServicesjava\": true, \"calculatedMetricsservice\": true, \"servicerequestNaming\": true, \"dataPrivacy\": false, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"applications\": false, \"syntheticMonitors\": false, \"applicationDashboards\": false, \"dashboards\": true, \"alertingProfiles\": false, \"notifications\": false}"
 ```
 Set the configuration parameters for applying the configuration:
 e.g. to push the configuration to tenant edg-p1 on cluster bo2 only set:
 ```
-127.0.0.1:6379> set parameters "{\"tenantid\":\"edg-p1\", \"clusterid\":\"bo2\"}"
+127.0.0.1:6379> set parameters "{\"tenantid\":\"edg-p1\", \"clusterid\":\"bo2\", \"dryrun\": false}"
 ```
 To push the config to all develoment tenants on CCv1 you could use:
 ```
-127.0.0.1:6379> set parameters "{\"stage\":\"development\", \"type\":\"ccv10\"}"
+127.0.0.1:6379> set parameters "{\"stage\":\"development\", \"type\":\"ccv10\", \"dryrun\": false}"
 ```
 To start the configuration push publish the "START_CONFIG" message to the "configcontrol" channel
 ```
-127.0.0.1:6379> publish configcontrol START_CONFIG
+127.0.0.1:6379> publish configcontrol PUSH_CONFIG
 ```
 To start a plugin deployment publish the "START_PLUGIN_CONFIG" message to the "configcontrol" channel
 ```

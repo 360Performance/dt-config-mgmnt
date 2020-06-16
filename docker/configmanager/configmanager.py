@@ -27,13 +27,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 configcache = redis.StrictRedis(host='configcache', port=6379, db=0, charset="utf-8", decode_responses=True)
-server = "https://api.dy.natrace.it:8443"
+server = os.environ.get("DT_API_HOST","https://api.dy.natrace.it:8443")
 apiuser = os.environ.get("DT_API_USER")
 apipwd = os.environ.get("DT_API_PWD")
 config_dir = os.environ.get("CONFIG_DIR","/config")
 config_dump_dir = os.environ.get("CONFIG_DUMP_DIR","/config_dump")
 
-logger.info("User for DT API: {}".format(apiuser))
+logger.info("Dynatrace Consolidated API: {}  User: {}".format(server,apiuser))
 if not apiuser:
     sys.exit("No api user found (ensure env variable DT_API_USER is set) ... can't continue")
 if not apipwd:
@@ -164,7 +164,7 @@ def createAppDashboardEntitiesFromApps(applications):
 
     return dashboardentities_map
 
-def putAppDashboards(dashboards):
+def putAppDashboards(dashboards, validateonly):
     for tenant,dashboardentities in dashboards.items():
         parts = tenant.split("::")
         c_id = parts[0]
@@ -174,7 +174,7 @@ def putAppDashboards(dashboards):
         for dashboard in dashboardentities:
             logger.info("PUT Dashboard for {} : {}".format(parameters,dashboard))
         
-        putConfigEntities(dashboardentities, parameters)
+        putConfigEntities(dashboardentities, parameters,validateonly)
 
 def getSyntheticMonitors(clusterid, tenantid):
     apiurl = "/e/TENANTID/api/v1/synthetic/monitors"
@@ -254,7 +254,7 @@ def createSyntheticMonitorsFromApps(applications):
 
     return monitorentities_map
 
-def putSyntheticMonitors(monitors):
+def putSyntheticMonitors(monitors,validateonly):
     for tenant,monitorentities in monitors.items():
         parts = tenant.split("::")
         c_id = parts[0]
@@ -271,8 +271,8 @@ def putSyntheticMonitors(monitors):
                 existing_monitorentities.append(monitor)
                 logger.info("PUT Monitor for {} : {}".format(parameters,monitor))
             
-        postConfigEntities(new_monitorentities, parameters)
-        putConfigEntities(existing_monitorentities, parameters)
+        postConfigEntities(new_monitorentities, parameters, validateonly)
+        putConfigEntities(existing_monitorentities, parameters, validateonly)
 
         # since other configs might depend on the monitors to be available test if all have been applied successfully
         tries = complete = 0
@@ -412,7 +412,7 @@ def getApplications(parameters):
 writes Application Configurations (applications and detections rules) to tenants.
 This is ALWAYS a tenant specific operation and NEVER a global one, so we make sure to pass the tenant parameter.
 '''
-def putApplicationConfigs(applications):
+def putApplicationConfigs(applications,validateonly):
     ruleentities = []
     for tenant,appentities in applications.items():
         parts = tenant.split("::")
@@ -428,9 +428,9 @@ def putApplicationConfigs(applications):
             #logger.info(json.dumps(app.dto))
         
         logger.info("PUT Applications for {} : {}".format(parameters,appentities))
-        putConfigEntities(appentities, parameters)
+        putConfigEntities(appentities, parameters, validateonly)
         #logger.info("PUT Application detection rules for {} : {}".format(parameters,ruleentities))
-        putConfigEntities(ruleentities, parameters)
+        putConfigEntities(ruleentities, parameters, validateonly)
 
 
 # helper function to recursively merge two dicts
@@ -449,6 +449,40 @@ def merge(a, b, path=None):
             a[key] = b[key]
     return a
 
+def verifyConfigSettings(entitytypes, parameters):
+    session = requests.Session()
+    session.auth = (apiuser, apipwd)
+    session.params = parameters
+
+    for entitytype in entitytypes:
+        entities = stdConfig.getConfigEntitiesByType(entitytype)
+        apiurl = entitytype.uri
+
+        #now get every entity from all tenants and then compare every tenant's response to the standard
+        for entity in entities:
+            url = server + apiurl
+            if not issubclass(entitytype,ConfigTypes.TenantSetting):
+                url = url + "/" + entity.id
+            try:
+                response = session.get(url)
+                result = response.json()
+                for tenant in result:
+                    c_id = tenant["clusterid"]
+                    t_id = tenant["tenantid"]
+                    r_code = tenant["responsecode"]
+                    #logger.info("Verifying: {} on {}::{}: {}".format(entity,c_id,t_id,r_code))
+                    if r_code != 200:
+                        logger.warning("Doesn't exist: {}::{} {}".format(c_id,t_id,entity))
+                    else:
+                        #create the actual entity
+                        etype = type(entity)
+                        centity = etype(id=entity.id,name=entity.name,dto=tenant)
+                        #logger.info("{}\n{}".format(entity.dto,centity.dto))
+                        logger.info("Verifying: {} : {}::{} {}".format(entity == centity,c_id,t_id,centity))
+            except:
+                logger.error("Problem verifying config settings: {}".format(sys.exc_info()))
+
+
 '''
 Get all tenant's standard config definitions (by name) and store their IDs in cache.
 This is required to get a current state of existing tenants and their config, required for further cleanup
@@ -457,108 +491,116 @@ Caches:
 clusterid::tenantid::entitytype::entityname => id | missing
 '''
 def getConfigSettings(entitytypes, parameters, dumpconfig):
-    query = "?"+urlencode(parameters)
+    #query = "?"+urlencode(parameters)
+    session = requests.Session()
+    session.auth = (apiuser, apipwd)
+    
     dumpentities = {}
     
     for entitytype in entitytypes:
-        apiurl = entitytype.uri
-        url = server + apiurl + query
-        stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
-        configtype = entitytype.__name__
-        logger.info("Getting configs of type: {} - there are {} configuration definitions of this type in the standard config".format(entitytype.__name__, len(stdConfigNames)))
+        # ensure we only consider config types that are not abstract (that have a entityuri defined)
+        if entitytype.entityuri != "/":
+            apiurl = entitytype.uri
+            url = server + apiurl
+            stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
+            configtype = entitytype.__name__
+            logger.info("Getting configs of type: {} - there are {} configuration definitions of this type in the standard config".format(entitytype.__name__, len(stdConfigNames)))
 
-        entity_defs = []
+            entity_defs = []
 
-        try:
-            response = requests.get(url, auth=(apiuser, apipwd))
-            result = response.json()
-            for tenant in result:
-                c_id = tenant["clusterid"]
-                t_id = tenant["tenantid"]
-                attrcheck = set()
-                try:
-                    attrkey = None
-                    if "values" in tenant:
-                        attrkey = "values"
-                    if "dashboards" in tenant:
-                        attrkey = "dashboards"
-                    
-                    if attrkey and not issubclass(entitytype,ConfigTypes.TenantSetting):
-                        for attr in tenant[attrkey]:
-                            #key = "::".join([c_id, t_id])
-                            key = "::".join([c_id, t_id, configtype, attr["name"]])
-                            #logger.info("Found: {}".format(key))
-                            if "name" in attr and attr["name"] in stdConfigNames:
-                                #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
-                                # we are not getting the details of every config entity (that would be too much - only the list of config entities) so we do not perform a by-entity comparison
-                                # in theory we could now fetch the details by ID and then compare ... maybe later
-                                configcache.setex(key,3600,attr["id"])
-                                attrcheck.add(attr["name"])
-                            else:
-                                configcache.setex(key,3600,attr["id"])
-                                logger.info("{} entities not in standard: {} : {}".format(configtype, key, attr["id"]))
-
-                            #when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
-                            if dumpconfig:
-                                query = "?"+urlencode({"tenantid":t_id, "clusterid":c_id})
-                                entityurl = server + apiurl + "/" + attr["id"] + query
-                                logger.debug("Fetching Entity: {}".format(entityurl))
-                                try:
-                                    response = requests.get(entityurl, auth=(apiuser, apipwd))
-                                    result = response.json()[0]  # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
-                                    centity = entitytype(id=attr["id"],name=attr["name"],dto=result)
-                                    if centity.isShared():
-                                        definition = centity.dumpDTO(config_dump_dir)
-                                        entity_defs.append(definition)
-                                except:
-                                    logger.error("Exception: {}".format(sys.exc_info()))
-
-
-                    elif issubclass(entitytype,ConfigTypes.TenantSetting):
-                        #logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
-                        #logger.info("{}: {}".format(entitytype.__name__,tenant))
-                        centity = entitytype(dto=tenant)
-                        #logger.info(centity.dto)
-                        stdEntity = stdConfig.getConfigEntityByName(configtype)
-                        #logger.info(stdEntity.dto)
-                        match = centity == stdEntity
-                        if match:
-                            logger.info("{} settings of {} do match with standard".format(configtype, "::".join([c_id, t_id])))
-                            attrcheck.add(configtype)
-                        else:
-                            logger.warning("{} settings of {} do not match with standard".format(configtype, "::".join([c_id, t_id])))
+            try:
+                session.params = parameters
+                response = session.get(url)
+                result = response.json()
+                for tenant in result:
+                    c_id = tenant["clusterid"]
+                    t_id = tenant["tenantid"]
+                    attrcheck = set()
+                    try:
+                        attrkey = None
+                        if "values" in tenant:
+                            attrkey = "values"
+                        if "dashboards" in tenant:
+                            attrkey = "dashboards"
                         
-                        key = "::".join([c_id, t_id, configtype])
-                        configcache.setex(key,3600,"true")
-                        if dumpconfig:
-                            definition = centity.dumpDTO(config_dump_dir)
-                            entity_defs.append(definition)
+                        if attrkey and not issubclass(entitytype,ConfigTypes.TenantSetting):
+                            for attr in tenant[attrkey]:
+                                #key = "::".join([c_id, t_id])
+                                key = "::".join([c_id, t_id, configtype, attr[entitytype.name_attr]])
+                                #logger.info("Found: {}".format(key))
+                                if entitytype.name_attr in attr and attr[entitytype.name_attr] in stdConfigNames:
+                                    #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
+                                    # we are not getting the details of every config entity (that would be too much - only the list of config entities) so we do not perform a by-entity comparison
+                                    # in theory we could now fetch the details by ID and then compare ... maybe later
+                                    configcache.setex(key,3600,attr[entitytype.id_attr])
+                                    attrcheck.add(attr[entitytype.name_attr])
+                                else:
+                                    configcache.setex(key,3600,attr[entitytype.id_attr])
+                                    logger.info("{} entities not in standard: {} : {}".format(configtype, key, attr[entitytype.id_attr]))
 
-                except:
-                    logger.error("Problem getting config of type: {} for Tenant {}::{}".format(configtype,c_id,t_id))
-                    traceback.print_exc()
-                    continue
+                                #when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
+                                if dumpconfig:
+                                    session.params = {"tenantid":t_id, "clusterid":c_id}
+                                    entityurl = server + apiurl + "/" + attr[entitytype.id_attr]
+                                    logger.debug("Fetching Entity: {}".format(entityurl))
+                                    try:
+                                        response = session.get(entityurl)
+                                        result = response.json()[0]  # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
+                                        centity = entitytype(id=attr[entitytype.id_attr],name=attr[entitytype.name_attr],dto=result)
+                                        if centity.isShared():
+                                            definition = centity.dumpDTO(config_dump_dir)
+                                            entity_defs.append(definition)
+                                    except:
+                                        logger.error("Exception: {}".format(sys.exc_info()))
+
+
+                        elif issubclass(entitytype,ConfigTypes.TenantSetting):
+                            #logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
+                            #logger.info("{}: {}".format(entitytype.__name__,tenant))
+                            centity = entitytype(dto=tenant)
+                            #logger.info(centity.dto)
+                            stdEntity = stdConfig.getConfigEntityByName(configtype)
+                            #logger.info(stdEntity.dto)
+                            match = centity == stdEntity
+                            if match:
+                                logger.info("{} settings of {} do match with standard".format(configtype, "::".join([c_id, t_id])))
+                                attrcheck.add(configtype)
+                            else:
+                                logger.warning("{} settings of {} do not match with standard".format(configtype, "::".join([c_id, t_id])))
+                            
+                            key = "::".join([c_id, t_id, configtype])
+                            configcache.setex(key,3600,"true")
+                            if dumpconfig:
+                                definition = centity.dumpDTO(config_dump_dir)
+                                entity_defs.append(definition)
+
+                    except:
+                        logger.error("Problem getting config of type: {} for Tenant {}::{}".format(configtype,c_id,t_id))
+                        traceback.print_exc()
+                        continue
+                    
+                    # check if all entities of the standard have been found        
+                    if len(attrcheck) != len(stdConfigNames):
+                        missing = set(set(stdConfigNames) - attrcheck)
+                        logger.warning("Missing entities or different setting for {} on {}: {}".format(configtype,"::".join([c_id, t_id]),missing))
+                        for attr in missing:
+                            key = "::".join([c_id, t_id, configtype, attr])
+                            configcache.setex(key,3600,"missing")
                 
-                # check if all entities of the standard have been found        
-                if len(attrcheck) != len(stdConfigNames):
-                    missing = set(set(stdConfigNames) - attrcheck)
-                    logger.warning("Missing entities or different setting for {} on {}: {}".format(configtype,"::".join([c_id, t_id]),missing))
-                    for attr in missing:
-                        key = "::".join([c_id, t_id, configtype, attr])
-                        configcache.setex(key,3600,"missing")
-            
-        except:
+            except:
                 logger.error("Problem Getting Config Settings: {}".format(sys.exc_info()))
 
-        if dumpconfig:
-            parts = entitytype.entityuri.strip("/").split('/')
-            parts.reverse()
-            if len(entity_defs) > 0:
-                for i in parts:
-                    entity_defs = {i:entity_defs}
+            # build datastructure for dumping the entities.yml file properly
+            if dumpconfig:
+                parts = entitytype.entityuri.strip("/").split('/')
+                parts.reverse()
+                if len(entity_defs) > 0:
+                    for i in parts:
+                        entity_defs = {i:entity_defs}
 
-            dumpentities = merge(dumpentities,entity_defs)
-    
+                dumpentities = merge(dumpentities,entity_defs)
+
+    # write out the stdConfig definition (entities.yml) 
     if dumpconfig:
         path = config_dump_dir + "/entities.yml"
         with open(path, 'w') as file:
@@ -572,7 +614,7 @@ This method goes one by one for each tenant based on the information found alrea
 It's using the information from the configcache that has been populated before with the config entities and their ID or if they are missing.
 By going one by one tenant this is not a very effective method, but it's required for a initial "cleanup"of all tenants and establishing the standard
 '''    
-def updateOrCreateConfigEntities(entities, parameters):
+def updateOrCreateConfigEntities(entities, parameters,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
     
@@ -593,15 +635,15 @@ def updateOrCreateConfigEntities(entities, parameters):
             
             if "missing" == curID:
                 logger.info("Standard {} {} is missing on {}".format(configtype,entity.name,tenantid))
-                putConfigEntities([entity],{"tenantid":tenantid})
+                putConfigEntities([entity],{"tenantid":tenantid},validateonly)
                 missing += 1
                 continue
             if stdID != curID:
                 logger.info("Standard {} IDs for {} don't match on {}: {} : {}".format(configtype,entity.name,tenantid,stdID,curID))
                 delEntity = copy.deepcopy(entity)
                 delEntity.setID(curID)
-                deleteConfigEntities([delEntity],{"tenantid":tenantid})
-                putConfigEntities([entity],{"tenantid":tenantid})
+                deleteConfigEntities([delEntity],{"tenantid":tenantid},validateonly)
+                putConfigEntities([entity],{"tenantid":tenantid},validateonly)
                 unmatched += 1
             else:
                 #logger.info("Standard RequestAttribute IDs match, no action needed")
@@ -662,62 +704,83 @@ def purgeConfigEntities(entitytypes,parameters,force):
         if purged > 0:
             logger.info("Purged non-standard {} Entities: {}".format(configtype,purged))
 
-def deleteConfigEntities(entities,parameters):
+def deleteConfigEntities(entities,parameters,validateonly):
     query = "?"+urlencode(parameters)
     
     for entity in entities:
         status = {"204":0, "201":0, "400":0, "401":0, "404":0}
         url = server + entity.apipath + query
         configtype = type(entity).__name__
-        logger.info("DELETE {}: {}".format(configtype,url))
         
-        try:   
-            resp = requests.delete(url, auth=(apiuser, apipwd))
-            if len(resp.content) > 0:
-                for tenant in resp.json():
-                    status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
-                    if tenant["responsecode"] >= 400:
-                        logger.info("tenant: {} status: {}".format(tenant["tenantid"], tenant["responsecode"]))
-                logger.info("Status Summary: {} {}".format(len(resp.json()),status))
-        except:
-            logger.error("Problem deleting {}: {}".format(configtype,sys.exc_info()))
+        if validateonly:
+            logger.info("DRYRUN - DELETE {}: {}".format(configtype,url))
+        else:
+            logger.info("DELETE {}: {}".format(configtype,url))
+            try:   
+                resp = requests.delete(url, auth=(apiuser, apipwd))
+                if len(resp.content) > 0:
+                    for tenant in resp.json():
+                        status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
+                        if tenant["responsecode"] >= 400:
+                            logger.info("tenant: {} status: {}".format(tenant["tenantid"], tenant["responsecode"]))
+                    logger.info("Status Summary: {} {}".format(len(resp.json()),status))
+            except:
+                logger.error("Problem deleting {}: {}".format(configtype,sys.exc_info()))
             
 
-def putConfigEntities(entities,parameters):
+def putConfigEntities(entities,parameters,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
+
+    session = requests.Session()
+    validator = ''
+    httpmeth = 'PUT'
+    if validateonly:
+        validator = '/validator'
+        httpmeth = 'POST'
     
     for entity in entities:
         status = {"200":0, "204":0, "201":0, "400":0, "401":0, "404":0}
-        url = server + entity.apipath + query
+        url = server + entity.apipath + validator + query
         configtype = type(entity).__name__
-        logger.info("PUT {}: {}".format(configtype,url))
+        prefix = "DRYRUN - " if validateonly else ""
+        logger.info("{}{} {}: {}".format(prefix,httpmeth,entity,entity.apipath+validator+query))
         
-        try:   
-            resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd))
+        try:
+            req = requests.Request(httpmeth,url,json=entity.dto, auth=(apiuser, apipwd))
+            prep = session.prepare_request(req)
+            resp = session.send(prep)
+            #resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd))
             if len(resp.content) > 0:
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
-                        logger.info("tenant: {} status: {}".format(tenant["tenantid"], tenant["responsecode"]))
-                        logger.error("PUT Payload: {}".format(json.dumps(entity.dto)))
-                        logger.error("PUT Response: {}".format(json.dumps(tenant)))
-                logger.info("Status Summary: {} {}".format(len(resp.json()),status))
+                        logger.error("{}{} failed on tenant: {} HTTP{} ({})".format(prefix,httpmeth,tenant["tenantid"], tenant["responsecode"], tenant["error"]))
+                        #logger.debug("{} Payload: {}".format(httpmeth, json.dumps(entity.dto)))
+                        logger.debug("{} Response: {}".format(httpmeth, json.dumps(tenant)))
+                logger.info("Status Summary (Dryrun: {}): {} {}".format(validateonly,len(resp.json()),status))
+            if validateonly and len(resp.content) == 0:
+                logger.info("All target tenants have sucessfully validated the payload: HTTP{}".format(resp.status_code))
         except:
             logger.error("Problem putting {}: {}".format(configtype,sys.exc_info()))
 
-    # add additional verification that entities have been created?
-
-
-def postConfigEntities(entities,parameters):
+def postConfigEntities(entities,parameters,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
+
+    session = requests.Session()
+    validator = prefix = ""
     
     for entity in entities:
         status = {"200":0, "204":0, "201":0, "400":0, "401":0, "404":0}
-        url = server + entity.uri + query
+        
+        if validateonly:
+            validator = "/" + entity.id + "/validator"
+            prefix = "DRYRUN - "
+
+        url = server + entity.uri + validator + query
         configtype = type(entity).__name__
-        logger.info("POST {}: {}".format(configtype,url))
+        logger.info("{}POST {}: {}".format(prefix,configtype,url))
         
         try:   
             resp = requests.post(url,json=entity.dto, auth=(apiuser, apipwd))
@@ -733,7 +796,6 @@ def postConfigEntities(entities,parameters):
             logger.error("Problem putting {}: {}".format(configtype,sys.exc_info()))
 
 def getControlSettings():
-
     stdSettings = {
         "servicerequestAttributes": True,
         "servicerequestNaming": True,
@@ -748,9 +810,8 @@ def getControlSettings():
         "notifications": False,
         "dataPrivacy": True, 
         "dashboards": True,
-        "syntheticMonitors": False,
+        "syntheticmonitors": False,
         "applicationDashboards": False,
-        "dryrun": True
     }
 
     ctrlsettings = {}
@@ -770,159 +831,46 @@ def performConfig(parameters):
     logger.info("Applying Configuration to: \n{}".format(json.dumps(parameters, indent = 2, separators=(',', ': '))))
     logger.info("Applying Configuration Types: \n{}".format(json.dumps(config, indent = 2, separators=(',', ': '))))
 
-    if config["servicerequestAttributes"]:
-        logger.info("++++++++ REQUEST ATTRIBUTES ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: servicerequestAttributes")
-        else:
-            # requestAttributes
-            #purgeConfigEntities([ConfigTypes.servicerequestAttributes], parameters)
-            updateOrCreateConfigEntities(stdConfig.getRequestAttributes(),parameters)
-            putConfigEntities(stdConfig.getRequestAttributes(),parameters)
-            
-    
-    if config["autoTags"]:
-        logger.info("++++++++ AUTO TAGS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: autoTags")
-        else:
-            # autoTags
-            #purgeConfigEntities([ConfigTypes.autoTags], parameters)
-            updateOrCreateConfigEntities(stdConfig.getAutoTags(),parameters)
-            putConfigEntities(stdConfig.getAutoTags(),parameters)
-    
-    if config["customServicesjava"]:
-        logger.info("++++++++ CUSTOM SERVICES ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: customServicesjava")
-        else:
-            # customServices
-            #purgeConfigEntities([ConfigTypes.customServicesjava], parameters)
-            updateOrCreateConfigEntities(stdConfig.getCustomJavaServices(),parameters)
-            putConfigEntities(stdConfig.getCustomJavaServices(),parameters)
-    
-    if config["servicerequestNaming"]:
-        logger.info("++++++++ REQUEST NAMING ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: servicerequestNaming")
-        else:
-            # requestNaming
-            #purgeConfigEntities([ConfigTypes.servicerequestNaming], parameters)
-            updateOrCreateConfigEntities(stdConfig.getRequestNamings(),parameters)
-            putConfigEntities(stdConfig.getRequestNamings(),parameters)
+    validateonly = parameters["dryrun"]
+    del parameters["dryrun"]
+    specialHandling = ["applicationsweb","syntheticmonitors","applicationDashboards"]
 
-    if config["calculatedMetricsservice"]:
-        logger.info("++++++++ CUSTOM METRICS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: calculatedMetricsservice")
-        else:
-            # customMetrics
-            #purgeConfigEntities([ConfigTypes.customMetricservice], parameters, True)
-            updateOrCreateConfigEntities(stdConfig.getCalculatedMetricsService(),parameters)
-            putConfigEntities(stdConfig.getCalculatedMetricsService(),parameters)
+    for ename, enabled in config.items():
+        etype = getattr(ConfigTypes,ename,None)
+        logger.info("++++++++ {} ({}) ++++++++".format(ename.upper(),enabled))
+        if enabled and etype is not None:
+            updateOrCreateConfigEntities(stdConfig.getConfigEntitiesByType(etype),parameters,validateonly)
+            putConfigEntities(stdConfig.getConfigEntitiesByType(etype),parameters,validateonly)
+        elif enabled and ename in specialHandling:
+            if ename == "applicationsweb":
+                getServices(parameters)
+                getApplications(parameters)
+                apps = createAppConfigEntitiesFromServices()
+                putApplicationConfigs(apps,validateonly)
+            if ename == "syntheticmonitors":
+                getServices(parameters)
+                getApplications(parameters)
+                apps = createAppConfigEntitiesFromServices()
+                monitors = createSyntheticMonitorsFromApps(apps)
+                putSyntheticMonitors(monitors,validateonly)
+            if ename == "applicationDashboards":
+                getServices(parameters)
+                getApplications(parameters)
+                apps = createAppConfigEntitiesFromServices()
+                appdashboards = createAppDashboardEntitiesFromApps(apps)
+                putAppDashboards(appdashboards,validateonly)
         
-    if config["dataPrivacy"]:
-        logger.info("++++++++ DATA PRIVACY ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: dataPrivacy")
         else:
-            # dataPrivacy
-            updateOrCreateConfigEntities(stdConfig.getDataPrivacy(),parameters)
-            putConfigEntities(stdConfig.getDataPrivacy(),parameters)
+            logger.info("{} configuration is disabled or not implemented".format(ename))
 
-    if config["anomalyDetectionapplications"]:
-        logger.info("++++++++ APPLICATION ANOMALY DETECTION ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: anomalyDetectionapplications")
-        else:
-            # anomalyDetection Applications
-            updateOrCreateConfigEntities(stdConfig.getAnomalyDetectionApplications(),parameters)
-            putConfigEntities(stdConfig.getAnomalyDetectionApplications(),parameters)
 
-    if config["anomalyDetectionservices"]:
-        logger.info("++++++++ SERVICES ANOMALY DETECTION ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: anomalyDetectionservices")
-        else:
-            # anomalyDetection Applications
-            updateOrCreateConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters)
-            putConfigEntities(stdConfig.getAnomalyDetectionServices(),parameters)
-
-    
-    if config["applicationsweb"]:
-        logger.info("++++++++ APPLICATIONS ++++++++")
-        # applications
-        getServices(parameters)
-        getApplications(parameters)
-        apps = createAppConfigEntitiesFromServices()
-        if config["dryrun"]:
-            logger.info("Dryrun: applicationsweb")
-        else:
-            putApplicationConfigs(apps)
-        
-    if config["syntheticMonitors"]:
-        # synthetic monitors
-        if not config["applications"]:
-            getServices(parameters)
-            getApplications(parameters)
-            apps = createAppConfigEntitiesFromServices()
-        
-        logger.info("++++++++ SYNTHETIC MONITORS ++++++++")
-        monitors = createSyntheticMonitorsFromApps(apps)
-        if config["dryrun"]:
-            logger.info("Dryrun: syntheticMonitors")
-        else:
-            putSyntheticMonitors(monitors)
-
-    if config["applicationDashboards"]:
-        logger.info("++++++++ APPLICATION DASHBOARDS ++++++++")
-        # application dashboards
-        # these dashboards are created per application dynamically
-        if not config["applicationsweb"]:
-            getServices(parameters)
-            getApplications(parameters)
-            apps = createAppConfigEntitiesFromServices()
-        appdashboards = createAppDashboardEntitiesFromApps(apps)
-        
-        if config["dryrun"]:
-            logger.info("Dryrun: applicationDashboards")
-        else:
-            putAppDashboards(appdashboards)
-
-    if config["dashboards"]:
-        logger.info("++++++++ DASHBOARDS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: dashboards")
-        else:
-            # dashboards that do not need parameterization
-            putConfigEntities(stdConfig.getDashboards(),parameters)
-
-    if config["alertingProfiles"]:
-        logger.info("++++++++ ALERTING PROFILES ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: alertingprofiles")
-        else:
-            #alertingprofiles  
-            #purgeConfigEntities([ConfigTypes.alertingProfiles], parameters)
-            updateOrCreateConfigEntities(stdConfig.getAlertingProfiles(),parameters)
-            putConfigEntities(stdConfig.getAlertingProfiles(),parameters)
-
-    if config["notifications"]:
-        logger.info("++++++++ NOTIFICATIONS ++++++++")
-        if config["dryrun"]:
-            logger.info("Dryrun: notifications")
-        else:
-            #notifications  
-            #purgeConfigEntities([ConfigTypes.notifications], parameters)
-            updateOrCreateConfigEntities(stdConfig.getNotifications(),parameters)
-            putConfigEntities(stdConfig.getNotifications(),parameters)
-
-def getConfig(parameters, dumpconfig):
+def getConfig(parameters):
     #configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
     #configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
     configtypes = [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]
     configtypes = configtypes + [getattr(ConfigTypes,cls.__name__) for cls in ConfigTypes.TenantSetting.__subclasses__()]
-    getConfigSettings(configtypes, parameters, dumpconfig)  
+    #getConfigSettings(configtypes, parameters, dumpconfig)  
+    return configtypes
 
 def main(argv):
     global stdConfig
@@ -947,13 +895,17 @@ def main(argv):
                 stdConfig = DTEnvironmentConfig(config_dir)
                 logger.info(stdConfig)
 
-            if command == 'START_CONFIG':
-                
+            if command == 'PUSH_CONFIG':
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
+                    # assuming that if not otherwise specified we do a dryrun
+                    if "dryrun" not in parameters:
+                        parameters.update({"dryrun":True})
+
                     logger.info("========== STARTING CONFIG FETCH ==========")
-                    getConfig(parameters, False)
+                    configtypes = getConfig(parameters)
+                    getConfigSettings(configtypes, parameters, False) 
                     logger.info("========== FINISHED CONFIG FETCH ==========")
                     logger.info("========== STARTING CONFIG PUSH ==========")
                     performConfig(parameters)    
@@ -970,22 +922,32 @@ def main(argv):
             
                 logger.info("========== FINISHED CONFIG PUSH ==========")
 
-            if command == 'DUMP_CONFIG':
+            if command == 'VERIFY_CONFIG':
+                logger.info("========== STARTING CONFIG VERIFICATION ==========")
+                params = configcache.get("parameters")
+                if params:
+                    parameters = json.loads(params)
+                    entitytypes = getConfig(parameters)
+                    verifyConfigSettings(entitytypes, parameters)
+                else:
+                    logger.warning("No Parameters found in config cache ... skipping")
+                logger.info("========== FINISHED CONFIG VERIFICATION ==========")
+
+
+            if command == 'PULL_CONFIG':
                 logger.info("========== STARTING CONFIG PULL ==========")
                 source_param = configcache.get("source")
-                target_param = configcache.get("target")
-                if source_param and target_param:
+                if source_param :
                     source = json.loads(source_param)
-                    target = json.loads(target_param)
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
-                    logger.info("Target: \n{}".format(json.dumps(target, indent = 2, separators=(',', ': '))))
-                    getConfig(source, True)
+                    configtypes = getConfig(source)
+                    getConfigSettings(configtypes, source, True)
 
                     logger.info("==== reloading standard config after dump ====")
                     stdConfig = DTEnvironmentConfig(config_dump_dir)
                     logger.info(stdConfig)
                 else:
-                    logger.warning("Either from or to config parameters are not specified ... skipping")
+                    logger.warning("Source parameter is not specified ... skipping")
 
                 logger.info("========== FINISHED CONFIG PULL ==========")
 
