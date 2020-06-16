@@ -895,7 +895,7 @@ def main(argv):
                 stdConfig = DTEnvironmentConfig(config_dir)
                 logger.info(stdConfig)
 
-            if command == 'START_CONFIG':
+            if command == 'PUSH_CONFIG':
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
