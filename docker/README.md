@@ -98,7 +98,7 @@ To push the config to all develoment tenants on CCv1 you could use:
 ```
 To start the configuration push publish the "START_CONFIG" message to the "configcontrol" channel
 ```
-127.0.0.1:6379> publish configcontrol START_CONFIG
+127.0.0.1:6379> publish configcontrol PUSH_CONFIG
 ```
 To start a plugin deployment publish the "START_PLUGIN_CONFIG" message to the "configcontrol" channel
 ```

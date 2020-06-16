@@ -27,13 +27,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 configcache = redis.StrictRedis(host='configcache', port=6379, db=0, charset="utf-8", decode_responses=True)
-server = "https://api.dy.natrace.it:8443"
+server = os.environ.get("DT_API_HOST","https://api.dy.natrace.it:8443")
 apiuser = os.environ.get("DT_API_USER")
 apipwd = os.environ.get("DT_API_PWD")
 config_dir = os.environ.get("CONFIG_DIR","/config")
 config_dump_dir = os.environ.get("CONFIG_DUMP_DIR","/config_dump")
 
-logger.info("User for DT API: {}".format(apiuser))
+logger.info("Dynatrace Consolidated API: {}  User: {}".format(server,apiuser))
 if not apiuser:
     sys.exit("No api user found (ensure env variable DT_API_USER is set) ... can't continue")
 if not apipwd:
@@ -526,27 +526,27 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
                         if attrkey and not issubclass(entitytype,ConfigTypes.TenantSetting):
                             for attr in tenant[attrkey]:
                                 #key = "::".join([c_id, t_id])
-                                key = "::".join([c_id, t_id, configtype, attr["name"]])
+                                key = "::".join([c_id, t_id, configtype, attr[entitytype.name_attr]])
                                 #logger.info("Found: {}".format(key))
-                                if "name" in attr and attr["name"] in stdConfigNames:
+                                if entitytype.name_attr in attr and attr[entitytype.name_attr] in stdConfigNames:
                                     #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
                                     # we are not getting the details of every config entity (that would be too much - only the list of config entities) so we do not perform a by-entity comparison
                                     # in theory we could now fetch the details by ID and then compare ... maybe later
-                                    configcache.setex(key,3600,attr["id"])
-                                    attrcheck.add(attr["name"])
+                                    configcache.setex(key,3600,attr[entitytype.id_attr])
+                                    attrcheck.add(attr[entitytype.name_attr])
                                 else:
-                                    configcache.setex(key,3600,attr["id"])
-                                    logger.info("{} entities not in standard: {} : {}".format(configtype, key, attr["id"]))
+                                    configcache.setex(key,3600,attr[entitytype.id_attr])
+                                    logger.info("{} entities not in standard: {} : {}".format(configtype, key, attr[entitytype.id_attr]))
 
                                 #when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
                                 if dumpconfig:
                                     session.params = {"tenantid":t_id, "clusterid":c_id}
-                                    entityurl = server + apiurl + "/" + attr["id"]
+                                    entityurl = server + apiurl + "/" + attr[entitytype.id_attr]
                                     logger.debug("Fetching Entity: {}".format(entityurl))
                                     try:
                                         response = session.get(entityurl)
                                         result = response.json()[0]  # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
-                                        centity = entitytype(id=attr["id"],name=attr["name"],dto=result)
+                                        centity = entitytype(id=attr[entitytype.id_attr],name=attr[entitytype.name_attr],dto=result)
                                         if centity.isShared():
                                             definition = centity.dumpDTO(config_dump_dir)
                                             entity_defs.append(definition)
@@ -833,7 +833,7 @@ def performConfig(parameters):
 
     validateonly = parameters["dryrun"]
     del parameters["dryrun"]
-    specialHandling = ["applicationsweb","syntheticmonitors"]
+    specialHandling = ["applicationsweb","syntheticmonitors","applicationDashboards"]
 
     for ename, enabled in config.items():
         etype = getattr(ConfigTypes,ename,None)
@@ -934,15 +934,12 @@ def main(argv):
                 logger.info("========== FINISHED CONFIG VERIFICATION ==========")
 
 
-            if command == 'DUMP_CONFIG':
+            if command == 'PULL_CONFIG':
                 logger.info("========== STARTING CONFIG PULL ==========")
                 source_param = configcache.get("source")
-                target_param = configcache.get("target")
-                if source_param and target_param:
+                if source_param :
                     source = json.loads(source_param)
-                    target = json.loads(target_param)
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
-                    logger.info("Target: \n{}".format(json.dumps(target, indent = 2, separators=(',', ': '))))
                     configtypes = getConfig(source)
                     getConfigSettings(configtypes, source, True)
 
@@ -950,7 +947,7 @@ def main(argv):
                     stdConfig = DTEnvironmentConfig(config_dump_dir)
                     logger.info(stdConfig)
                 else:
-                    logger.warning("Either from or to config parameters are not specified ... skipping")
+                    logger.warning("Source parameter is not specified ... skipping")
 
                 logger.info("========== FINISHED CONFIG PULL ==========")
 

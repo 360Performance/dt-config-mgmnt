@@ -40,7 +40,7 @@ class ConfigEntity():
         logger.info("Dumping {} Entity to: {}".format(self.__class__.__name__,path))
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as outfile:
-            json.dump(self.dto, outfile)
+            json.dump(self.dto, outfile, indent = 4, separators=(',', ': '))
         
         return {"name":self.name, "id":self.id, "file":filename}
 
@@ -86,6 +86,8 @@ class ConfigEntity():
 
 class TenantConfigEntity(ConfigEntity):
     uri = "/e/TENANTID/api/config/v1"
+    name_attr = "name"
+    id_attr = "id"
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)  
@@ -202,10 +204,67 @@ class customServicesjava(TenantConfigEntity):
     uri = TenantConfigEntity.uri + entityuri
     pass
 
+class customServicesdotNet(TenantConfigEntity):
+    entityuri = "/service/customServices/dotNet"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class customServicesgo(TenantConfigEntity):
+    entityuri = "/service/customServices/go"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class customServicesphp(TenantConfigEntity):
+    entityuri = "/service/customServices/php"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class managementZones(TenantConfigEntity):
+    entityuri = "/managementZones"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class maintenanceWindows(TenantConfigEntity):
+    entityuri = "/maintenanceWindows"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
 class calculatedMetricsservice(TenantConfigEntity):
     entityuri = "/calculatedMetrics/service"
     uri = TenantConfigEntity.uri + entityuri
     pass
+
+class calculatedMetricslog(TenantConfigEntity):
+    entityuri = "/calculatedMetrics/log"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class calculatedMetricsrum(TenantConfigEntity):
+    entityuri = "/calculatedMetrics/rum"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class servicedetectionRulesFullWebService(TenantConfigEntity):
+    entityuri = "/service/detectionRules/FULL_WEB_SERVICE"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class servicedetectionRulesFullWebRequest(TenantConfigEntity):
+    entityuri = "/service/detectionRules/FULL_WEB_REQUEST"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class servicedetectionRulesOpaqueAndExternalWebRequest(TenantConfigEntity):
+    entityuri = "/service/detectionRules/FULL_WEB_REQUEST"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class reports(TenantConfigEntity):
+    entityuri = "/reports"
+    uri = TenantConfigEntity.uri + entityuri
+    name_attr = "id"
+    pass
+
 
 class anomalyDetectionapplications(TenantSetting):
     entityuri = "/anomalyDetection/applications"
@@ -222,6 +281,66 @@ class anomalyDetectionservices(TenantSetting):
     def __init__(self,**kwargs):   
         TenantSetting.__init__(self,**kwargs)
         self.apipath = self.uri
+
+class anomalyDetectionhosts(TenantSetting):
+    entityuri = "/anomalyDetection/hosts"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class anomalyDetectiondatabaseServices(TenantSetting):
+    entityuri = "/anomalyDetection/databaseServices"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class anomalyDetectiondiskEvents(TenantSetting):
+    entityuri = "/anomalyDetection/diskEvents"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class anomalyDetectionaws(TenantSetting):
+    entityuri = "/anomalyDetection/aws"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class anomalyDetectionvmware(TenantSetting):
+    entityuri = "/anomalyDetection/vmware"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class anomalyDetectionmetricEvents(TenantSetting):
+    entityuri = "/anomalyDetection/metricEvents"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class frequentIssueDetection(TenantSetting):
+    entityuri = "/frequentIssueDetection"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class remoteEnvironments(TenantConfigEntity):
+    entityuri = "/remoteEnvironments"
+    uri = TenantConfigEntity.uri + entityuri
 
 class applicationsweb(TenantConfigEntity):
     entityuri = "/applications/web"
@@ -296,6 +415,31 @@ class applicationDetectionRules(TenantConfigEntity):
         self.dto["filterConfig"]["pattern"] = pattern
         self.dto["filterConfig"]["applicationMatchType"] = matchType 
         self.dto["filterConfig"]["applicationMatchTarget"] = matchTarget 
+
+class awsiamExternalId(TenantConfigEntity):
+    entityuri = "/aws/iamExternalId"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class awscredentials(TenantConfigEntity):
+    entityuri = "/aws/credentials"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class azurecredentials(TenantConfigEntity):
+    entityuri = "/azure/credentials"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class cloudFoundry(TenantConfigEntity):
+    entityuri = "/cloudFoundry/credentials"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class kubernetescredentials(TenantConfigEntity):
+    entityuri = "/kubernetes/credentials"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
 
 class alertingProfiles(TenantConfigEntity):
     entityuri = "/alertingProfiles"
