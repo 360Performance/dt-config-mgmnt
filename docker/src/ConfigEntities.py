@@ -61,6 +61,8 @@ class ConfigEntity():
     # helper function to allow comparison of dto representation of a config entity with another
     def ordered(self,obj):
         if isinstance(obj, dict):
+            # some dtos have randomly generated IDs these are not relevant for functional comparison, se remove them
+            obj.pop("id",None)
             return sorted((k, self.ordered(v)) for k, v in obj.items())
         if isinstance(obj, list):
             return sorted(self.ordered(x) for x in obj)
@@ -72,7 +74,11 @@ class ConfigEntity():
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
             return False
-        return (self.ordered(self.dto) == other.ordered(other.dto))
+        # as we need to modify the dto's for comparison, we copy them
+        this = self.ordered(self.dto.copy())
+        that = other.ordered(other.dto.copy())
+        return (this == that)
+        #return (self.ordered(self.dto) == other.ordered(other.dto))
 
     # define if this config entity is a shared one. needed for identifying if entities are considered when dumping and transporting configuration
     def isShared(self):

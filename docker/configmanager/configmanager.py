@@ -498,105 +498,107 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
     dumpentities = {}
     
     for entitytype in entitytypes:
-        apiurl = entitytype.uri
-        url = server + apiurl
-        stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
-        configtype = entitytype.__name__
-        logger.info("Getting configs of type: {} - there are {} configuration definitions of this type in the standard config".format(entitytype.__name__, len(stdConfigNames)))
+        # ensure we only consider config types that are not abstract (that have a entityuri defined)
+        if entitytype.entityuri != "/":
+            apiurl = entitytype.uri
+            url = server + apiurl
+            stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
+            configtype = entitytype.__name__
+            logger.info("Getting configs of type: {} - there are {} configuration definitions of this type in the standard config".format(entitytype.__name__, len(stdConfigNames)))
 
-        entity_defs = []
+            entity_defs = []
 
-        try:
-            session.params = parameters
-            response = session.get(url)
-            result = response.json()
-            for tenant in result:
-                c_id = tenant["clusterid"]
-                t_id = tenant["tenantid"]
-                attrcheck = set()
-                try:
-                    attrkey = None
-                    if "values" in tenant:
-                        attrkey = "values"
-                    if "dashboards" in tenant:
-                        attrkey = "dashboards"
-                    
-                    if attrkey and not issubclass(entitytype,ConfigTypes.TenantSetting):
-                        for attr in tenant[attrkey]:
-                            #key = "::".join([c_id, t_id])
-                            key = "::".join([c_id, t_id, configtype, attr["name"]])
-                            #logger.info("Found: {}".format(key))
-                            if "name" in attr and attr["name"] in stdConfigNames:
-                                #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
-                                # we are not getting the details of every config entity (that would be too much - only the list of config entities) so we do not perform a by-entity comparison
-                                # in theory we could now fetch the details by ID and then compare ... maybe later
-                                configcache.setex(key,3600,attr["id"])
-                                attrcheck.add(attr["name"])
-                            else:
-                                configcache.setex(key,3600,attr["id"])
-                                logger.info("{} entities not in standard: {} : {}".format(configtype, key, attr["id"]))
-
-                            #when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
-                            if dumpconfig:
-                                session.params = {"tenantid":t_id, "clusterid":c_id}
-                                entityurl = server + apiurl + "/" + attr["id"]
-                                logger.debug("Fetching Entity: {}".format(entityurl))
-                                try:
-                                    response = session.get(entityurl)
-                                    result = response.json()[0]  # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
-                                    centity = entitytype(id=attr["id"],name=attr["name"],dto=result)
-                                    if centity.isShared():
-                                        definition = centity.dumpDTO(config_dump_dir)
-                                        entity_defs.append(definition)
-                                except:
-                                    logger.error("Exception: {}".format(sys.exc_info()))
-
-
-                    elif issubclass(entitytype,ConfigTypes.TenantSetting):
-                        #logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
-                        #logger.info("{}: {}".format(entitytype.__name__,tenant))
-                        centity = entitytype(dto=tenant)
-                        #logger.info(centity.dto)
-                        stdEntity = stdConfig.getConfigEntityByName(configtype)
-                        #logger.info(stdEntity.dto)
-                        match = centity == stdEntity
-                        if match:
-                            logger.info("{} settings of {} do match with standard".format(configtype, "::".join([c_id, t_id])))
-                            attrcheck.add(configtype)
-                        else:
-                            logger.warning("{} settings of {} do not match with standard".format(configtype, "::".join([c_id, t_id])))
+            try:
+                session.params = parameters
+                response = session.get(url)
+                result = response.json()
+                for tenant in result:
+                    c_id = tenant["clusterid"]
+                    t_id = tenant["tenantid"]
+                    attrcheck = set()
+                    try:
+                        attrkey = None
+                        if "values" in tenant:
+                            attrkey = "values"
+                        if "dashboards" in tenant:
+                            attrkey = "dashboards"
                         
-                        key = "::".join([c_id, t_id, configtype])
-                        configcache.setex(key,3600,"true")
-                        if dumpconfig:
-                            definition = centity.dumpDTO(config_dump_dir)
-                            entity_defs.append(definition)
+                        if attrkey and not issubclass(entitytype,ConfigTypes.TenantSetting):
+                            for attr in tenant[attrkey]:
+                                #key = "::".join([c_id, t_id])
+                                key = "::".join([c_id, t_id, configtype, attr["name"]])
+                                #logger.info("Found: {}".format(key))
+                                if "name" in attr and attr["name"] in stdConfigNames:
+                                    #logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
+                                    # we are not getting the details of every config entity (that would be too much - only the list of config entities) so we do not perform a by-entity comparison
+                                    # in theory we could now fetch the details by ID and then compare ... maybe later
+                                    configcache.setex(key,3600,attr["id"])
+                                    attrcheck.add(attr["name"])
+                                else:
+                                    configcache.setex(key,3600,attr["id"])
+                                    logger.info("{} entities not in standard: {} : {}".format(configtype, key, attr["id"]))
 
-                except:
-                    logger.error("Problem getting config of type: {} for Tenant {}::{}".format(configtype,c_id,t_id))
-                    traceback.print_exc()
-                    continue
+                                #when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
+                                if dumpconfig:
+                                    session.params = {"tenantid":t_id, "clusterid":c_id}
+                                    entityurl = server + apiurl + "/" + attr["id"]
+                                    logger.debug("Fetching Entity: {}".format(entityurl))
+                                    try:
+                                        response = session.get(entityurl)
+                                        result = response.json()[0]  # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
+                                        centity = entitytype(id=attr["id"],name=attr["name"],dto=result)
+                                        if centity.isShared():
+                                            definition = centity.dumpDTO(config_dump_dir)
+                                            entity_defs.append(definition)
+                                    except:
+                                        logger.error("Exception: {}".format(sys.exc_info()))
+
+
+                        elif issubclass(entitytype,ConfigTypes.TenantSetting):
+                            #logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
+                            #logger.info("{}: {}".format(entitytype.__name__,tenant))
+                            centity = entitytype(dto=tenant)
+                            #logger.info(centity.dto)
+                            stdEntity = stdConfig.getConfigEntityByName(configtype)
+                            #logger.info(stdEntity.dto)
+                            match = centity == stdEntity
+                            if match:
+                                logger.info("{} settings of {} do match with standard".format(configtype, "::".join([c_id, t_id])))
+                                attrcheck.add(configtype)
+                            else:
+                                logger.warning("{} settings of {} do not match with standard".format(configtype, "::".join([c_id, t_id])))
+                            
+                            key = "::".join([c_id, t_id, configtype])
+                            configcache.setex(key,3600,"true")
+                            if dumpconfig:
+                                definition = centity.dumpDTO(config_dump_dir)
+                                entity_defs.append(definition)
+
+                    except:
+                        logger.error("Problem getting config of type: {} for Tenant {}::{}".format(configtype,c_id,t_id))
+                        traceback.print_exc()
+                        continue
+                    
+                    # check if all entities of the standard have been found        
+                    if len(attrcheck) != len(stdConfigNames):
+                        missing = set(set(stdConfigNames) - attrcheck)
+                        logger.warning("Missing entities or different setting for {} on {}: {}".format(configtype,"::".join([c_id, t_id]),missing))
+                        for attr in missing:
+                            key = "::".join([c_id, t_id, configtype, attr])
+                            configcache.setex(key,3600,"missing")
                 
-                # check if all entities of the standard have been found        
-                if len(attrcheck) != len(stdConfigNames):
-                    missing = set(set(stdConfigNames) - attrcheck)
-                    logger.warning("Missing entities or different setting for {} on {}: {}".format(configtype,"::".join([c_id, t_id]),missing))
-                    for attr in missing:
-                        key = "::".join([c_id, t_id, configtype, attr])
-                        configcache.setex(key,3600,"missing")
-            
-        except:
-            logger.error("Problem Getting Config Settings: {}".format(sys.exc_info()))
+            except:
+                logger.error("Problem Getting Config Settings: {}".format(sys.exc_info()))
 
-        # build datastructure for dumping the entities.yml file properly
-        if dumpconfig:
-            parts = entitytype.entityuri.strip("/").split('/')
-            parts.reverse()
-            if len(entity_defs) > 0:
-                for i in parts:
-                    entity_defs = {i:entity_defs}
+            # build datastructure for dumping the entities.yml file properly
+            if dumpconfig:
+                parts = entitytype.entityuri.strip("/").split('/')
+                parts.reverse()
+                if len(entity_defs) > 0:
+                    for i in parts:
+                        entity_defs = {i:entity_defs}
 
-            dumpentities = merge(dumpentities,entity_defs)
+                dumpentities = merge(dumpentities,entity_defs)
 
     # write out the stdConfig definition (entities.yml) 
     if dumpconfig:
@@ -921,14 +923,15 @@ def main(argv):
                 logger.info("========== FINISHED CONFIG PUSH ==========")
 
             if command == 'VERIFY_CONFIG':
+                logger.info("========== STARTING CONFIG VERIFICATION ==========")
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
                     entitytypes = getConfig(parameters)
                     verifyConfigSettings(entitytypes, parameters)
-
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
+                logger.info("========== FINISHED CONFIG VERIFICATION ==========")
 
 
             if command == 'DUMP_CONFIG':
