@@ -3,8 +3,8 @@ import json
 from textwrap import wrap
 
 # LOG CONFIGURATION
-FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
+#FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
+#logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("ConfigTypes")
 
 class ConfigEntity():

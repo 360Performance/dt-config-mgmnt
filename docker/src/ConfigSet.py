@@ -3,8 +3,8 @@ import logging
 import dtconfig.ConfigTypes as ConfigTypes
 
 # LOG CONFIGURATION
-FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
+#FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
+#logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("ConfigSet")
 
 class ConfigSet:

@@ -15,6 +15,8 @@ from textwrap import wrap
 import copy
 
 
+loglevel = os.environ.get("LOG_LEVEL",logging.INFO).upper()
+
 # LOG CONFIGURATION
 FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
@@ -656,7 +658,7 @@ Purging of non-standard Config Entitytypes.
 
 Use with caution, this will remove all settings that are not in the standard of the specified entitytypes
 '''
-def purgeConfigEntities(entitytypes,parameters,force):
+def purgeConfigEntities(entitytypes,parameters,force,validateonly):
     headers = {"Content-Type" : "application/json"}
     query = "?"+urlencode(parameters)
     #logger.info("Entities: {}".format(entitytypes))
@@ -689,13 +691,13 @@ def purgeConfigEntities(entitytypes,parameters,force):
                         if force:
                             purgeEntity = entitytype(id=configid,name=configname)
                             logger.warning("Forced purge of standard {} configuration on {}: {}".format(configtype, tenantid, purgeEntity))
-                            deleteConfigEntities([purgeEntity],{"tenantid":tenantid})
+                            deleteConfigEntities([purgeEntity],{"tenantid":tenantid},validateonly)
                             purged += 1
                     else:
                         #create an instance of the entitytype
                         purgeEntity = entitytype(id=configid,name=configname)
                         logger.warning("Non-standard {} configuration on {} will be purged: {}".format(configtype, tenantid, purgeEntity))
-                        deleteConfigEntities([purgeEntity],{"tenantid":tenantid})
+                        deleteConfigEntities([purgeEntity],{"tenantid":tenantid},validateonly)
                         purged += 1
             except:
                 logger.error("Problem purging {} on {}: {}".format(configtype,tenantid,sys.exc_info()))
@@ -878,6 +880,7 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     #list all known config entity types we are aware of
+    logger.setLevel(logging.INFO)
     logger.info("Able to manage these tenant configuration entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]))
     logger.info("Able to manage these tenant configuration settings of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()]))
     logger.info("Able to manage these entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()]))
@@ -886,15 +889,18 @@ def main(argv):
 
     while True:
         message = cfgcontrol.get_message()
+        logger.setLevel(logging.INFO)
         if message:
             command = message['data']
             #logger.info("Received Command: {}".format(command))
             if command == 'RESET':
                 logger.info("========== RELOADING STANDARD CONFIG ==========")
-                stdConfig = dtconfig.ConfigSet(config_dir)
+                stdConfig = ConfigSet.ConfigSet(config_dir)
                 logger.info(stdConfig)
 
-            if command == 'PUSH_CONFIG':
+            elif command == 'PUSH_CONFIG':
+                logger.info("========== STARTING CONFIG PUSH ==========")
+                logger.setLevel(loglevel)
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
@@ -906,7 +912,6 @@ def main(argv):
                     configtypes = getConfig(parameters)
                     getConfigSettings(configtypes, parameters, False) 
                     logger.info("========== FINISHED CONFIG FETCH ==========")
-                    logger.info("========== STARTING CONFIG PUSH ==========")
                     performConfig(parameters)    
 
                     # cleanup redis but keep the parameters
@@ -918,11 +923,13 @@ def main(argv):
                     configcache.publish('configcontrol','FINISHED_CONFIG')
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
-            
+
+                logger.setLevel(logging.INFO)
                 logger.info("========== FINISHED CONFIG PUSH ==========")
 
-            if command == 'VERIFY_CONFIG':
+            elif command == 'VERIFY_CONFIG':
                 logger.info("========== STARTING CONFIG VERIFICATION ==========")
+                logger.setLevel(loglevel)
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
@@ -930,28 +937,32 @@ def main(argv):
                     verifyConfigSettings(entitytypes, parameters)
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
+                logger.setLevel(logging.INFO)
                 logger.info("========== FINISHED CONFIG VERIFICATION ==========")
 
 
-            if command == 'PULL_CONFIG':
+            elif command == 'PULL_CONFIG':
                 logger.info("========== STARTING CONFIG PULL ==========")
                 source_param = configcache.get("source")
                 if source_param :
                     source = json.loads(source_param)
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
+                    logger.setLevel(loglevel)
                     configtypes = getConfig(source)
                     getConfigSettings(configtypes, source, True)
 
                     logger.info("==== reloading standard config after dump ====")
-                    stdConfig = ConfigSet(config_dump_dir)
+                    stdConfig = ConfigSet.ConfigSet(config_dump_dir)
                     logger.info(stdConfig)
                 else:
                     logger.warning("Source parameter is not specified ... skipping")
 
+                logger.setLevel(logging.INFO)
                 logger.info("========== FINISHED CONFIG PULL ==========")
 
-            if command == 'COPY_CONFIG':
+            elif command == 'COPY_CONFIG':
                 logger.info("========== STARTING CONFIG COPY ==========")
+                logger.setLevel(loglevel)
                 source_param = configcache.get("source")
                 target_param = configcache.get("target")
                 if source_param and target_param:
@@ -965,6 +976,8 @@ def main(argv):
                     configcache.publish("configcontrol", "START_CONFIG")
                 logger.info("========== FINISHED CONFIG COPY ==========")
 
+            else:
+                logger.info("Received Command: {} which I do not understand".format(command))
 
             
         time.sleep(5)
