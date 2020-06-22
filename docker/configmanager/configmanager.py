@@ -18,8 +18,17 @@ import copy
 loglevel = os.environ.get("LOG_LEVEL",logging.INFO).upper()
 
 # LOG CONFIGURATION
+
+logging.ALWAYS = 25 
+logging.addLevelName(logging.ALWAYS, "ALWAYS")
+def always(self, message, *args, **kws):
+    if self.isEnabledFor(logging.ALWAYS):
+        # Yes, logger takes its '*args' as 'args'.
+        self._log(logging.ALWAYS, message, args, **kws) 
+logging.Logger.always = always
+
 FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
+logging.basicConfig(stream=sys.stdout, level=loglevel, format=FORMAT)
 logger = logging.getLogger("")
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -34,7 +43,7 @@ apipwd = os.environ.get("DT_API_PWD")
 config_dir = os.environ.get("CONFIG_DIR","/config")
 config_dump_dir = os.environ.get("CONFIG_DUMP_DIR","/config_dump")
 
-logger.info("Dynatrace Consolidated API: {}  User: {}".format(server,apiuser))
+logger.always("Dynatrace Consolidated API: {}  User: {}".format(server,apiuser))
 if not apiuser:
     sys.exit("No api user found (ensure env variable DT_API_USER is set) ... can't continue")
 if not apipwd:
@@ -880,27 +889,24 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     #list all known config entity types we are aware of
-    logger.setLevel(logging.INFO)
-    logger.info("Able to manage these tenant configuration entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]))
-    logger.info("Able to manage these tenant configuration settings of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()]))
-    logger.info("Able to manage these entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()]))
+    logger.always("Able to manage these tenant configuration entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]))
+    logger.always("Able to manage these tenant configuration settings of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()]))
+    logger.always("Able to manage these entities of tenants: {}".format([cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()]))
 
-    logger.info(stdConfig)
+    logger.always(stdConfig)
 
     while True:
         message = cfgcontrol.get_message()
-        logger.setLevel(logging.INFO)
         if message:
             command = message['data']
             #logger.info("Received Command: {}".format(command))
             if command == 'RESET':
-                logger.info("========== RELOADING STANDARD CONFIG ==========")
+                logger.always("========== RELOADING STANDARD CONFIG ==========")
                 stdConfig = ConfigSet.ConfigSet(config_dir)
                 logger.info(stdConfig)
 
             elif command == 'PUSH_CONFIG':
-                logger.info("========== STARTING CONFIG PUSH ==========")
-                logger.setLevel(loglevel)
+                logger.always("========== STARTING CONFIG PUSH ==========")
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
@@ -908,10 +914,10 @@ def main(argv):
                     if "dryrun" not in parameters:
                         parameters.update({"dryrun":True})
 
-                    logger.info("========== STARTING CONFIG FETCH ==========")
+                    logger.always("========== STARTING CONFIG FETCH ==========")
                     configtypes = getConfig(parameters)
                     getConfigSettings(configtypes, parameters, False) 
-                    logger.info("========== FINISHED CONFIG FETCH ==========")
+                    logger.always("========== FINISHED CONFIG FETCH ==========")
                     performConfig(parameters)    
 
                     # cleanup redis but keep the parameters
@@ -924,12 +930,10 @@ def main(argv):
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
 
-                logger.setLevel(logging.INFO)
-                logger.info("========== FINISHED CONFIG PUSH ==========")
+                logger.always("========== FINISHED CONFIG PUSH ==========")
 
             elif command == 'VERIFY_CONFIG':
-                logger.info("========== STARTING CONFIG VERIFICATION ==========")
-                logger.setLevel(loglevel)
+                logger.always("========== STARTING CONFIG VERIFICATION ==========")
                 params = configcache.get("parameters")
                 if params:
                     parameters = json.loads(params)
@@ -937,17 +941,15 @@ def main(argv):
                     verifyConfigSettings(entitytypes, parameters)
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
-                logger.setLevel(logging.INFO)
-                logger.info("========== FINISHED CONFIG VERIFICATION ==========")
+                logger.always("========== FINISHED CONFIG VERIFICATION ==========")
 
 
             elif command == 'PULL_CONFIG':
-                logger.info("========== STARTING CONFIG PULL ==========")
+                logger.always("========== STARTING CONFIG PULL ==========")
                 source_param = configcache.get("source")
                 if source_param :
                     source = json.loads(source_param)
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
-                    logger.setLevel(loglevel)
                     configtypes = getConfig(source)
                     getConfigSettings(configtypes, source, True)
 
@@ -957,12 +959,10 @@ def main(argv):
                 else:
                     logger.warning("Source parameter is not specified ... skipping")
 
-                logger.setLevel(logging.INFO)
-                logger.info("========== FINISHED CONFIG PULL ==========")
+                logger.always("========== FINISHED CONFIG PULL ==========")
 
             elif command == 'COPY_CONFIG':
-                logger.info("========== STARTING CONFIG COPY ==========")
-                logger.setLevel(loglevel)
+                logger.always("========== STARTING CONFIG COPY ==========")
                 source_param = configcache.get("source")
                 target_param = configcache.get("target")
                 if source_param and target_param:
@@ -974,10 +974,10 @@ def main(argv):
                     configcache.setex("parameters",3600,json.dumps(target))
                     #send ourselves a message to start a config run DANGEROUS if config has been modified
                     configcache.publish("configcontrol", "START_CONFIG")
-                logger.info("========== FINISHED CONFIG COPY ==========")
+                logger.always("========== FINISHED CONFIG COPY ==========")
 
             else:
-                logger.info("Received Command: {} which I do not understand".format(command))
+                logger.warning("Received Command: {} which I do not understand".format(command))
 
             
         time.sleep(5)
