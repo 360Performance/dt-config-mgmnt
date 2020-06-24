@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    
+    environment {
+        DOCKER_REGISTRY = 'halfdome.local:50000'
+    }
 
     stages {
         stage('Build') {
