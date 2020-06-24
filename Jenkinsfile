@@ -21,9 +21,15 @@ pipeline {
                     withEnv(['API_HOST=https://api.dy.natrace.it:8443', 'LOG_LEVEL=INFO']) {
                         withCredentials([usernamePassword(credentialsId: 'apiuser', passwordVariable: 'API_PWD', usernameVariable: 'API_USER')]) {
                             sh label: 'Run Configcache', script: 'docker-compose --no-ansi up -d configcache'
-                            sh label: 'Run Configmanger', script: 'docker-compose --no-ansi up configmanager'
+                            sh label: 'Run Configmanger', script: 'docker-compose --no-ansi up -d configmanager'
                         }
                     }
+                    sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set config < test/config.json'
+                    sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set parameters < test/parameters.json'
+                    sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set source < test/source.json'
+                    sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set target < test/target.json'
+                    sh label: 'Pull Config', script: 'docker exec -i configcache redis-cli publish configcontrol PULL_CONFIG'
+                    sh label: 'Verify Config', script: 'docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG'
                 }
             }
         }

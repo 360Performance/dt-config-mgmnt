@@ -1,0 +1,11 @@
+docker exec -i configcache redis-cli -x set config < test/config.json
+docker exec -i configcache redis-cli -x set parameters < test/parameters.json
+docker exec -i configcache redis-cli -x set source < test/source.json
+docker exec -i configcache redis-cli -x set target < test/target.json
+
+
+docker exec -i configcache redis-cli publish configcontrol PULL_CONFIG
+docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG
+docker exec -i configcache redis-cli publish configcontrol RESET
+docker exec -i configcache redis-cli publish configcontrol PUSH_CONFIG
+

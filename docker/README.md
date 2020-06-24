@@ -85,7 +85,13 @@ docker exec -it configcache redis-cli
 
 Control the config configuration to enable disable certain settings:
 ```
- 127.0.0.1:6379>  set config "{\"servicerequestAttributes\": true, \"autoTags\": true, \"customServicesjava\": true, \"calculatedMetricsservice\": true, \"servicerequestNaming\": true, \"dataPrivacy\": false, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"applications\": false, \"syntheticMonitors\": false, \"applicationDashboards\": false, \"dashboards\": true, \"alertingProfiles\": false, \"notifications\": false}"
+
+ 127.0.0.1:6379>  set config "{\"servicerequestAttributes\": true, \"servicerequestNaming\": true, \"autoTags\": true, \"conditionalNamingprocessGroup\": true, \"customServicesjava\": true, \"customServicesdotNet\": true, \"customServicesgo\": true, \"customServicesphp\": true, \"managementZones\": true, \"maintenanceWindows\": true, \"calculatedMetricsservice\": true, \"calculatedMetricslog\": true, \"calculatedMetricsrum\": true, \"servicedetectionRulesFullWebService\": true, \"servicedetectionRulesFullWebRequest\": true, \"servicedetectionRulesOpaqueAndExternalWebRequest\": true, \"reports\": true, \"remoteEnvironments\": true, \"applicationsweb\": true, \"applicationDetectionRules\": true, \"awsiamExternalId\": true, \"awscredentials\": true, \"azurecredentials\": true, \"cloudFoundry\": true, \"kubernetescredentials\": true, \"alertingProfiles\": true, \"notifications\": false, \"dashboards\": true, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"anomalyDetectionhosts\": true, \"anomalyDetectiondatabaseServices\": true, \"anomalyDetectiondiskEvents\": true, \"anomalyDetectionaws\": true, \"anomalyDetectionvmware\": true, \"anomalyDetectionmetricEvents\": true, \"frequentIssueDetection\": true, \"dataPrivacy\", true}"
+
+additionally these config settings might be set"
+```
+\"applicationDashboards\": false
+\"applications\": false
 ```
 Set the configuration parameters for applying the configuration:
 e.g. to push the configuration to tenant edg-p1 on cluster bo2 only set:

@@ -970,7 +970,7 @@ def main(argv):
                     target = json.loads(target_param)
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
                     logger.info("Target: \n{}".format(json.dumps(target, indent = 2, separators=(',', ': '))))
-                    configcache.publish("configcontrol", "DUMP_CONFIG")
+                    configcache.publish("configcontrol", "PULL_CONFIG")
                     configcache.setex("parameters",3600,json.dumps(target))
                     #send ourselves a message to start a config run DANGEROUS if config has been modified
                     configcache.publish("configcontrol", "START_CONFIG")
