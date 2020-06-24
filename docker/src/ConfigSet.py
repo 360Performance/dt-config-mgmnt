@@ -39,13 +39,13 @@ class ConfigSet:
         return entities
     
     def __repr__(self):
-        repr = "========== MANAGED CONFIGURTION SET ==========\n"
+        repr = "========== MANAGED CONFIGURATION SET ==========\n"
         for e in self.entities:
             repr += str(e) +"\n"
         return repr[:-1]
     
     def __str__(self):
-        repr = "========== MANAGED CONFIGURTION SET ==========\n"
+        repr = "========== MANAGED CONFIGURATION SET ==========\n"
         for e in self.entities:
             repr += str(e) +"\n"
         return repr[:-1]
