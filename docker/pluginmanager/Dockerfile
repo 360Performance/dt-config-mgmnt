@@ -8,7 +8,7 @@ RUN pip install redis
 RUN pip install pyyaml
 RUN pip install zipfile2
 
-# Bundle app source
-COPY pluginmanager.py /
+COPY src /dtconfig
+COPY pluginmanager/pluginmanager.py /
 
 CMD ["python","pluginmanager.py"]

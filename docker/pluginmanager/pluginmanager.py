@@ -3,8 +3,8 @@ import requests, json, yaml, urllib3
 from urllib.parse import urlencode
 import redis
 import logging
-from dtconfig.ConfigSet import DTEnvironmentConfig
-import dtconfig.ConfigEntities as ConfigTypes
+import dtconfig.ConfigSet as ConfigSet
+import dtconfig.ConfigTypes as ConfigTypes
 import dtconfig.TenantHelper as TenantHelper
 from zipfile import ZipFile
 from io import StringIO

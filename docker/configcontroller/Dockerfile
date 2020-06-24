@@ -7,8 +7,7 @@ RUN pip install requests
 RUN pip install redis
 RUN pip install pyyaml
 
-# Bundle app source
-#COPY dtconfig /dtconfig
-COPY configcontroller.py /
+COPY src /dtconfig
+COPY configcontroller/configcontroller.py /
 
 CMD ["python","configcontroller.py"]

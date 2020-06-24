@@ -7,9 +7,11 @@ RUN pip install requests
 RUN pip install redis
 RUN pip install pyyaml
 
+COPY src /dtconfig
+
 # Bundle app source
 #COPY dtconfig /dtconfig
-COPY licensequota.yml /
-COPY licensemanager.py /
+COPY licensemanager/licensequota.yml /
+COPY licensemanager/licensemanager.py /
 
 CMD ["python","licensemanager.py"]

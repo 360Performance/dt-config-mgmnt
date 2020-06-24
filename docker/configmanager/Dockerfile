@@ -11,8 +11,9 @@ RUN pip install fqdn
 RUN pip install tldextract
 RUN pip install pyyaml
 
-# Bundle app source
-#COPY dtconfig /dtconfig
-COPY configmanager.py /
+COPY src /dtconfig
+COPY config /config
+RUN mkdir /config_dump
+COPY configmanager/configmanager.py /
 
 CMD ["python","configmanager.py"]

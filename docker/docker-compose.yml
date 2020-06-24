@@ -3,7 +3,8 @@ services:
   configmanager:
     image: ${DOCKER_REGISTRY}/configmanager:1.${BUILD_NUMBER}
     build: 
-     context: ./configmanager
+     context: .
+     dockerfile: ./configmanager/Dockerfile
     container_name: "configmanager"
     environment:
       - "PYTHONUNBUFFERED=1"
@@ -11,10 +12,10 @@ services:
       - "DT_API_USER=${API_USER}"
       - "DT_API_PWD=${API_PWD}"
       - "LOG_LEVEL=${LOG_LEVEL}"
-    volumes:
-      - $PWD/src:/dtconfig
-      - $PWD/config:/config
-      - $PWD/config_dump:/config_dump
+    #volumes:
+    #  - $PWD/src:/dtconfig
+    #  - $PWD/config:/config
+    #  - $PWD/config_dump:/config_dump
     networks: 
       - confignet
     restart: "no"
@@ -25,14 +26,14 @@ services:
   licensemanager:
     image: ${DOCKER_REGISTRY}/licensemanager:1.${BUILD_NUMBER}
     build: 
-     context: ./licensemanager
+     context: .
+     dockerfile: ./licensemanager/Dockerfile
     container_name: "licensemanager"
     environment:
       - "PYTHONUNBUFFERED=1"
       - "DT_API_USER=${API_USER}"
       - "DT_API_PWD=${API_PWD}"
     volumes:
-      - $PWD/src:/dtconfig
       - $PWD/licensemanager/tenantquota:/tenantquota
     networks: 
       - confignet
@@ -44,14 +45,14 @@ services:
   pluginmanager:
     image: ${DOCKER_REGISTRY}/pluginmanager:1.${BUILD_NUMBER}
     build: 
-     context: ./pluginmanager
+     context: .
+     dockerfile: ./pluginmanager/Dockerfile
     container_name: "pluginmanager"
     environment:
       - "PYTHONUNBUFFERED=1"
       - "DT_API_USER=${API_USER}"
       - "DT_API_PWD=${API_PWD}"
     volumes:
-      - $PWD/src:/dtconfig
       - $PWD/pluginmanager/plugins:/plugins
     networks: 
       - confignet
@@ -74,12 +75,12 @@ services:
   configcontroller:
     image: ${DOCKER_REGISTRY}/configcontroller:1.${BUILD_NUMBER}
     build: 
-     context: ./configcontroller
+      context: .
+      dockerfile: ./configcontroller/Dockerfile
     container_name: "configcontroller"
     environment:
       - "PYTHONUNBUFFERED=1"
     volumes:
-      - $PWD/src:/dtconfig
       - $PWD/configcontroller/tenants.csv:/tenants.csv
     networks: 
       - confignet

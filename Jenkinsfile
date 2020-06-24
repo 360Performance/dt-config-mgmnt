@@ -10,15 +10,15 @@ pipeline {
         stage('Build') {
             steps {
                 dir("${env.WORKSPACE}/docker"){
-                    sh label: 'Run Docker Compose', script: 'docker-compose build'
+                    sh label: 'Run Docker Compose', script: 'docker-compose --no-ansi build'
                 }
             }
         }
         stage('Test') {
             steps {
                 dir("${env.WORKSPACE}/docker"){
-                    sh label: 'Run Configcache', script: 'docker-compose up -d configcache'
-                    sh label: 'Run Configmanger', script: 'docker-compose up configmanager'
+                    sh label: 'Run Configcache', script: 'docker-compose --no-ansi up -d configcache'
+                    sh label: 'Run Configmanger', script: 'docker-compose --no-ansi up configmanager'
                 }
             }
         }

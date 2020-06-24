@@ -5,7 +5,7 @@ from requests.auth import HTTPBasicAuth
 from urllib.parse import urlencode
 import redis
 import logging
-from dtconfig.ConfigSet import DTEnvironmentConfig
+import dtconfig.ConfigSet as ConfigSet
 import dtconfig.ConfigEntities as ConfigTypes
 
 # LOG CONFIGURATION
