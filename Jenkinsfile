@@ -4,7 +4,9 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh label: 'Run Docker Compose', script: 'docker-compose build'
+                dir("${env.WORKSPACE}/docker"){
+                    sh label: 'Run Docker Compose', script: 'docker-compose build'
+                }
             }
         }
         stage('Test') {
