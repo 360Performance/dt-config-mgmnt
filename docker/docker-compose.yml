@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   configmanager:
-    image: hyperf/configmanager:1.0
+    image: ${DOCKER_REGISTRY}/configmanager:1.0.0
     build: 
      context: ./configmanager
     container_name: "configmanager"
@@ -23,7 +23,7 @@ services:
         max-size: 50m
   
   licensemanager:
-    image: hyperf/licensemanager:1.0
+    image: ${DOCKER_REGISTRY}/licensemanager:1.0
     build: 
      context: ./licensemanager
     container_name: "licensemanager"
@@ -42,7 +42,7 @@ services:
         max-size: 50m
 
   pluginmanager:
-    image: hyperf/pluginmanager:1.0
+    image: ${DOCKER_REGISTRY}/pluginmanager:1.0
     build: 
      context: ./pluginmanager
     container_name: "pluginmanager"
@@ -61,7 +61,7 @@ services:
         max-size: 50m
            
   configcache:
-    image: hyperf/configcache:1.0
+    image: ${DOCKER_REGISTRY}/configcache:1.0
     container_name: configcache
     build:
       context: ./configcache
@@ -72,7 +72,7 @@ services:
         max-size: 50m
   
   configcontroller:
-    image: hyperf/configcontroller:1.0
+    image: ${DOCKER_REGISTRY}/configcontroller:1.0
     build: 
      context: ./configcontroller
     container_name: "configcontroller"
