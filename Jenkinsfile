@@ -30,9 +30,9 @@ pipeline {
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set target < test/target.json'
                     sh label: 'Pull Config', script: 'docker exec -i configcache redis-cli publish configcontrol PULL_CONFIG'
                     sh label: 'Verify Config', script: 'docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG'
-                    sh label: 'Resetting Config', script 'docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG'
+                    sh label: 'Resetting Config', script: 'docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG'
                     sh label: 'Reset Confirmed', script: 'grep -m1 "RELOADING STANDARD CONFIG" <(docker logs -f configmanager)'
-                    sh label: 'Execution Logs', script: 'docker logs configmanager)'
+                    sh label: 'Execution Logs', script: 'docker logs configmanager'
                 }
             }
         }
