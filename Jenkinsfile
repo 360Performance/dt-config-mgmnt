@@ -20,8 +20,8 @@ pipeline {
                 dir("${env.WORKSPACE}/docker"){
                     withEnv(['API_HOST=https://api.dy.natrace.it:8443', 'LOG_LEVEL=INFO']) {
                         withCredentials([usernamePassword(credentialsId: 'apiuser', passwordVariable: 'API_PWD', usernameVariable: 'API_USER')]) {
-                            sh label: 'Run Configcache', script: 'docker-compose --no-ansi up -d configcache'
-                            sh label: 'Run Configmanger', script: 'docker-compose --no-ansi up -d configmanager'
+                            sh label: 'Run Configcache', script: 'docker-compose --no-ansi --remove-orphans up -d configcache'
+                            sh label: 'Run Configmanger', script: 'docker-compose --no-ansi --remove-orphans up configmanager &'
                         }
                     }
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set config < test/config.json'
