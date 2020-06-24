@@ -3,6 +3,7 @@ pipeline {
     
     environment {
         DOCKER_REGISTRY = 'halfdome.local:50000'
+        BUILD_NUMBER = ${BUILD_NUMBER}
     }
 
     stages {
