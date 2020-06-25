@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_REGISTRY = "halfdome.local:50000"
+        DOCKER_REGISTRY = "halfdome.local:50000/rweber"
         LOG_LEVEL = "INFO"
         BUILD_NUMBER = "${BUILD_NUMBER}"
     }
@@ -39,7 +39,10 @@ pipeline {
         stage('Push Images') {
             steps {
                 dir("${env.WORKSPACE}/docker") {
-                    sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
+                    withEnv(['BUILD_NUMBER=latest') {
+                        sh label: 'Tag with latest', script: 'docker-compose --no-ansi build'
+                        sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
+                    }
                 }
             }
         }
