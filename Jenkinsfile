@@ -36,9 +36,11 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Push Images') {
             steps {
-                echo 'Deploying....'
+                dir("${env.WORKSPACE}/docker") {
+                    sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
+                }
             }
         }
     }
