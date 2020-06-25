@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   configmanager:
-    image: ${DOCKER_REGISTRY}/configmanager:1.${BUILD_NUMBER}
+    image: ${DOCKER_REGISTRY}/configmanager:${TAG}
     build: 
      context: .
      dockerfile: ./configmanager/Dockerfile
@@ -24,7 +24,7 @@ services:
         max-size: 50m
   
   licensemanager:
-    image: ${DOCKER_REGISTRY}/licensemanager:1.${BUILD_NUMBER}
+    image: ${DOCKER_REGISTRY}/licensemanager:${TAG}
     build: 
      context: .
      dockerfile: ./licensemanager/Dockerfile
@@ -43,7 +43,7 @@ services:
         max-size: 50m
 
   pluginmanager:
-    image: ${DOCKER_REGISTRY}/pluginmanager:1.${BUILD_NUMBER}
+    image: ${DOCKER_REGISTRY}/pluginmanager:${TAG}
     build: 
      context: .
      dockerfile: ./pluginmanager/Dockerfile
@@ -62,7 +62,7 @@ services:
         max-size: 50m
            
   configcache:
-    image: ${DOCKER_REGISTRY}/configcache:1.${BUILD_NUMBER}
+    image: ${DOCKER_REGISTRY}/configcache:${TAG}
     container_name: configcache
     build:
       context: ./configcache
@@ -73,7 +73,7 @@ services:
         max-size: 50m
   
   configcontroller:
-    image: ${DOCKER_REGISTRY}/configcontroller:1.${BUILD_NUMBER}
+    image: ${DOCKER_REGISTRY}/configcontroller:${TAG}
     build: 
       context: .
       dockerfile: ./configcontroller/Dockerfile

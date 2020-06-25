@@ -5,6 +5,7 @@ pipeline {
         DOCKER_REGISTRY = "halfdome.local:50000/rweber"
         LOG_LEVEL = "INFO"
         BUILD_NUMBER = "${BUILD_NUMBER}"
+        TAG = "1.${BUILD_NUMBER}"
     }
 
     stages {
@@ -39,7 +40,7 @@ pipeline {
         stage('Push Images') {
             steps {
                 dir("${env.WORKSPACE}/docker") {
-                    withEnv(['BUILD_NUMBER=latest']) {
+                    withEnv(['TAG=latest']) {
                         sh label: 'Tag with latest', script: 'docker-compose --no-ansi build'
                         sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
                     }
