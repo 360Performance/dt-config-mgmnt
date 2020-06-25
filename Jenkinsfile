@@ -39,7 +39,7 @@ pipeline {
         stage('Push Images') {
             steps {
                 dir("${env.WORKSPACE}/docker") {
-                    withEnv(['BUILD_NUMBER=latest') {
+                    withEnv(['BUILD_NUMBER=latest']) {
                         sh label: 'Tag with latest', script: 'docker-compose --no-ansi build'
                         sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
                     }
