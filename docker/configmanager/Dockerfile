@@ -1,4 +1,4 @@
-FROM python:3.8.0-alpine
+FROM python:3.8-buster
 
 # Create stdconfig directory
 WORKDIR /
@@ -10,6 +10,9 @@ RUN pip install IPy
 RUN pip install fqdn
 RUN pip install tldextract
 RUN pip install pyyaml
+
+# Dynatrace OneAgent SDK
+#python -m pip install --upgrade oneagent-sdk
 
 COPY src /dtconfig
 COPY config /config

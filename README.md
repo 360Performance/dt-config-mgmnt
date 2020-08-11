@@ -1,14 +1,41 @@
+## Dynatrace Configuration Management Service
+
+This project and toolset is aimed to help the complete automation of configuration management of one or many (!) Dynatrace tenants or environments. The idea is to manage every configuration aspect of an environment as code and never touch the Dynatrace UI for making any configuration changes.
+
+This fulfills the requirements that are imposed by managing large Dynatrace setups with multiple thousand tenants but is also applicable for smaller environments where you need a clean configuration management or a strict pipeline where you not only handle your applications but also the Dynatrace configuration that goes along with it.
+
+The goal is to provide:
+- complete configuration as code for any settings or configuration items of Dynatrace tenants
+- auditing and verifying of configuration settings changes
+- transport of configuration between Dynatrace tenants (e.g. from development to staging to production)
+- synchronization of configuration settings between tenants
+- backup and export of configuration settings
+
+## Prerequisites
+
+The current version has been built with dependency to my Dynatrace consolidation API project, which allows the efficient access of thousands of Dynatrace environments via a single entry point. This was the original scale requirement. While when working only with a small number of Dynatrace tenants this might not be required, but it also simplifies things a bit.
+In the future this dependency might be removed. For now you will need the consolidation API service as well to use this configuration management toolset.
+
+For more info please see: https://bit.ly/dtapi-ii
+
 ## Setup
 
 Create a .env file in the docker directory to store your credentials for the Dynatrace Consolidated API:
 
 e.g.:
 ```
+# the host of the consolidate dynatrace API
+API_HOST=https://consolidated.dynatrace.api
+# User credentials for the consolidated API
 API_USER=apiuser
 API_PWD=<password>
 ```
 
 ## Services
+
+The configuration service consists of multiple service components and uses a separate project (Dynatrace Consolidation API) for the actual access of the multiple Dynatrace APIs.
+
+![config management architecture](./png/architecture.png)
 
 ### Config Manager
 
@@ -69,10 +96,9 @@ The licensemanager always applies these values regardless of what values already
 
 The configcache service is a redis cache that is used for intermediate storage while configuring tenants. It is also used as a controller mechanism to steer the execution of pluginmanger and configmanager by using a publish/subscriber pattern. Configmanager and Pluginmanger are subscribed to a "configcontrol" channel to listen for messages.
 
-### Controlling & Pushing Configs or Plugins
+## Controlling & Pushing Configs or Plugins
 
-To trigger a configuration push to one or multiple/all tenants we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel.
-Currently this can only be done directly via redis-cli
+To trigger a configuration push to one or multiple/all tenants we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel. This can be done directly via the configcache redi client or with any automation integration tool that publishes thee control messages to redis.
 
 Launch all config services:
 CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS              PORTS               NAMES
