@@ -39,13 +39,10 @@ The configuration service consists of multiple service components and uses a sep
 
 ### Config Manager
 
-This service is responsible to pushing the standard configs to all tenants. The standard configs are defined in entites which are configured/based on the standard Dynatrace JSON configuration files.
-Located in the DTO configuration subdirectory "v1". The configuration set is defined in "definitions/entities.yml"
+This service is responsible to pushing the standard configs to all tenants. The standard configs are defined in entites which are defined on the standard Dynatrace JSON configuration files (DTOs). The configuration files are located in the ```config``` subdirectory. This is the source of your standard configuration set that will be maintained as code.
+The configuration set itself is defined in a yaml file ```entities.yml``` located in this directory. This file defines which configuration entities from the source ```config``` directory the config manager will consider when maintaining the configuration of tenants. The ```entities.yml``` file alse defines metadata of config entities (e.g. their custom predefined ID or names)  
 
-The configuration file has the following structure, which fllows the API path of the respective configuration entity:
-e.g.:
-APi Endpoint:
-services/customServices/java
+The ```entities.yml``` file has the following structure, which follows the API path of the respective configuration entity:
 
 entities.yml:
 ```
@@ -59,7 +56,7 @@ service:
       - name: "ImpExImportJob"
         id: "bbbb0001-0a0a-0b0b-0c0c-000000000003"
 ```
-DT configuration directory:
+The  structure of the ```config``` directory follows the the structure of the ```entities.yml``` file. E.g. for the above definition the config directory structure will look like this:
 ```
 service/customServices/java
     CronJobs.json
@@ -68,14 +65,17 @@ service/customServices/java
 ```
 ### Plugin Manager
 
-The pluginmanager service is responsible to deploy standard (JMX) Plugins to tenants. Plugins are maintained in the subdirectory plugins. Every plugin is located in a directory which is named like the plugin's id. Within that directory a plugin.json file must be located which defines the plugin and also must have the same name attribute as the plugin ind.
+The pluginmanager service is responsible to deploy standard (JMX) Plugins to tenants. Plugins are maintained in the subdirectory ```plugins```. Every plugin is located in a directory which is named like the plugin's id. Within that directory a plugin.json file must be located which defines the plugin and also must have the same name attribute as the plugin id.
+
+The ```pluginconfig.yml``` defines which plugins should be deployed by the pluginmanager.
 
 ### License Manager
 
-The licensemanager service is used to push license quotas - mainly DEM units and storage quotas to tenants. Currently the license entitlements are configured in a file licensquotal.yml
-This file holds the default values which are aplied if not overridden by a tenant-specific configuration.
+The licensemanager service is used to push license quotas - mainly DEM units and storage quotas to tenants. Currently the license entitlements are configured in a file ```licensquotal.yml```
+This file holds the default values which are aplied if not overridden by a tenant-specific configuration. To manage license quotas the Dynatrace Managed cluster API is currently used. This feature cannot be used on the Dynatrace SaaS version
 
 licensequota.yml:
+```
 default:
   demUnitsAnnualQuota: 0
   demUnitsQuota: 0
@@ -89,14 +89,35 @@ tenants:
     pbo-s2:
       demUnitsAnnualQuota: 75000
       demUnitsQuota: 75000
+```
 
 The licensemanager always applies these values regardless of what values already exist on the respective tenant. If additional quotas should be added to Dynatrace you must add that in the config file.
 
 ### Config Cache
 
-The configcache service is a redis cache that is used for intermediate storage while configuring tenants. It is also used as a controller mechanism to steer the execution of pluginmanger and configmanager by using a publish/subscriber pattern. Configmanager and Pluginmanger are subscribed to a "configcontrol" channel to listen for messages.
+The configcache service is a redis cache that is used for intermediate storage while configuring tenants. It is also used as a controller mechanism to steer the execution of pluginmanger and configmanager by using a publish/subscriber pattern. Configmanager and Pluginmanger are subscribed to a "configcontrol" channel to listen for command messages.
 
 ## Controlling & Pushing Configs or Plugins
+
+### General Procedure
+The configmanager is the core component to control configuration operations. The general mode of operation is as follows:
+1. when the configmanager service starts it loads the standard config set that is defined via the ```entities.yml``` in the ```config``` directory (mounted as volume to the docker container)
+1. it will join the ```configcontrol``` pub/sub channel on the redis instance (configcache) - so the configcache service has to be started before
+1. it will wait for commands on the ```configcontrol``` channel and execute the according functions when received
+
+
+### Execution of Configuration Actions
+The configmanager understands these commands:
+
+| Command       | Parameters    | Function  |
+| ------------- |:------------- | :-----|
+| PUSH_CONFIG   |  |  |
+| VERIFY_CONFIG | | |
+| PULL_CONFIG   | | |
+| COPY_CONFIG   | | |
+| RESET         | | |
+
+### Examples
 
 To trigger a configuration push to one or multiple/all tenants we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel. This can be done directly via the configcache redi client or with any automation integration tool that publishes thee control messages to redis.
 
@@ -106,19 +127,22 @@ ca2df050130b        hyperf/configmanager:1.0   "python configmanage…"   3 days
 4f86e0815317        hyperf/configcache:1.0     "docker-entrypoint.s…"   3 days ago          Up 3 days           6379/tcp            configcache
 b6a7d5f7fb01        hyperf/pluginmanager:1.0   "python pluginmanage…"   4 days ago          Up 2 seconds                            pluginmanager
 
-Connect to the configcache redis-client:
+To manually change config settings, connect to the configcache redis-client:
+```
 docker exec -it configcache redis-cli
+```
 
 Control the config configuration to enable disable certain settings:
 ```
-
  127.0.0.1:6379>  set config "{\"servicerequestAttributes\": true, \"servicerequestNaming\": true, \"autoTags\": true, \"conditionalNamingprocessGroup\": true, \"customServicesjava\": true, \"customServicesdotNet\": true, \"customServicesgo\": true, \"customServicesphp\": true, \"managementZones\": true, \"maintenanceWindows\": true, \"calculatedMetricsservice\": true, \"calculatedMetricslog\": true, \"calculatedMetricsrum\": true, \"servicedetectionRulesFullWebService\": true, \"servicedetectionRulesFullWebRequest\": true, \"servicedetectionRulesOpaqueAndExternalWebRequest\": true, \"reports\": true, \"remoteEnvironments\": true, \"applicationsweb\": true, \"applicationDetectionRules\": true, \"awsiamExternalId\": true, \"awscredentials\": true, \"azurecredentials\": true, \"cloudFoundry\": true, \"kubernetescredentials\": true, \"alertingProfiles\": true, \"notifications\": false, \"dashboards\": true, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"anomalyDetectionhosts\": true, \"anomalyDetectiondatabaseServices\": true, \"anomalyDetectiondiskEvents\": true, \"anomalyDetectionaws\": true, \"anomalyDetectionvmware\": true, \"anomalyDetectionmetricEvents\": true, \"frequentIssueDetection\": true, \"dataPrivacy\", true}"
+```
 
-additionally these config settings might be set"
+Alternatively you can also import these settings from json files (examples located in ```docker/test```)
+
 ```
-\"applicationDashboards\": false
-\"applications\": false
+docker exec -i configcache redis-cli -x set config < test/config.json
 ```
+
 Set the configuration parameters for applying the configuration:
 e.g. to push the configuration to tenant edg-p1 on cluster bo2 only set:
 ```
