@@ -123,6 +123,7 @@ Furthermore the configmanager confirms the processing of a command by also publi
 The following parameters control which configuration entities are pusehd or to/from which tenants a config is pusehd or pulled. Parameters are stored in the configcache redis instance and are generally stored as JSON format.
 
 | Parameter | Description | Example |
+| --------- |:----------- |:------- |
 | config    | a list of flags which configtypes should be considered when pushing configuration settings | please see ```test/config.json``` |
 | parameters | a list of properties that are applied for filtering or selecting tenants. These parameters are passed as http parameters to the consolidation API, which then takes care of only sending requests to the filtered tenants | ```{"tenantid":"tenant-p1", "stage":"production", "clusterid":"clusterid", "dryrun": false}``` |
 | source | a list of properties to select tenants according to filters. Same as the ```parameters``` parameter | ```{"stage":"staging", "clusterid":"clusterid"``` e.g. to get all config entities from all staging tenants on cluster with the id "clusterid" | 
