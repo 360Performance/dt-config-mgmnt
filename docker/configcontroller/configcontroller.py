@@ -43,7 +43,7 @@ def doConfigure(clusterid,tenantid):
     configcache.set("config",json.dumps(stdConfig))
 
     pub = configcache.pubsub()
-    configcache.publish("configcontrol", "START_CONFIG")
+    configcache.publish("configcontrol", "PUSH_CONFIG")
     pub.subscribe("configcontrol")
 
     timeout = 0

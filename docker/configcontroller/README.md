@@ -1,0 +1,2 @@
+Quick and dirty implementation of an example how to programatically trigger multiple PUSH_CONFIG commands in batches for individual tenants.
+Tenants are read from a csv file and the example code updates the redis config parameters one by one to go through all tenants.

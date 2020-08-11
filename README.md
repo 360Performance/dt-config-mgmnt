@@ -117,6 +117,8 @@ The configmanager understands these commands (Parameters are keys in redis that 
 | COPY_CONFIG   | config, source, target  | first pulls all supported configuration settings from the tenant(s) defined in ```source``` (PULL_CONFIG) and then pushes these config settings to the tenants defined in ```target``` (only those config entities defined in ```config``` will be pusehd) |
 | RESET         |                         | resets the standard configuration to the initial config set (e.g. after a PULL_CONFIG) |
 
+Furthermore the configmanager confirms the processing of a command by also publishing a ```FINISHED_CONFIG``` message to the ```configcontrol``` communication channel. 
+
 #### Parameters
 The following parameters control which configuration entities are pusehd or to/from which tenants a config is pusehd or pulled. Parameters are stored in the configcache redis instance and are generally stored as JSON format.
 
