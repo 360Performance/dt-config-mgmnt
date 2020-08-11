@@ -82,11 +82,11 @@ default:
   sessionStorageQuota: 2147483647
     
 tenants:
-  bo2:
-    pbo-p1:
+  clusterid:
+    tenant-id1:
       demUnitsAnnualQuota: 6900000
       demUnitsQuota: 690000
-    pbo-s2:
+    tenant-id2:
       demUnitsAnnualQuota: 75000
       demUnitsQuota: 75000
 ```
@@ -97,7 +97,7 @@ The licensemanager always applies these values regardless of what values already
 
 The configcache service is a redis cache that is used for intermediate storage while configuring tenants. It is also used as a controller mechanism to steer the execution of pluginmanger and configmanager by using a publish/subscriber pattern. Configmanager and Pluginmanger are subscribed to a "configcontrol" channel to listen for command messages.
 
-## Controlling & Pushing Configs or Plugins
+## Controlling & Pushing Configs
 
 ### General Procedure
 The configmanager is the core component to control configuration operations. The general mode of operation is as follows:
@@ -107,19 +107,29 @@ The configmanager is the core component to control configuration operations. The
 
 
 ### Execution of Configuration Actions
-The configmanager understands these commands:
+The configmanager understands these commands (Parameters are keys in redis that are used to further parameterize the commands):
 
-| Command       | Parameters    | Function  |
-| ------------- |:------------- | :-----|
-| PUSH_CONFIG   |  |  |
-| VERIFY_CONFIG | | |
-| PULL_CONFIG   | | |
-| COPY_CONFIG   | | |
-| RESET         | | |
+| Command       | Parameters     | Function  |
+| ------------- |:----------------------- | :-----|
+| PUSH_CONFIG   | config, parameters      | pushes the config entities that have been enabled in ```config``` of the standard configuration set to the tenants defined in ```paremeters``` |
+| VERIFY_CONFIG | parameters              | verifies the config settings of the tenant(s) defined in ```parameters``` with the current standard configuration |
+| PULL_CONFIG   | source                  | fetches all supported configuration settings of the tenant(s) defined in ```source``` and dumps them to a temporary directory ```config_dump``` |
+| COPY_CONFIG   | config, source, target  | first pulls all supported configuration settings from the tenant(s) defined in ```source``` (PULL_CONFIG) and then pushes these config settings to the tenants defined in ```target``` (only those config entities defined in ```config``` will be pusehd) |
+| RESET         |                         | resets the standard configuration to the initial config set (e.g. after a PULL_CONFIG) |
+
+#### Parameters
+The following parameters control which configuration entities are pusehd or to/from which tenants a config is pusehd or pulled. Parameters are stored in the configcache redis instance and are generally stored as JSON format.
+
+| Parameter | Description | Example |
+| config    | a list of flags which configtypes should be considered when pushing configuration settings | please see ```test/config.json``` |
+| parameters | a list of properties that are applied for filtering or selecting tenants. These parameters are passed as http parameters to the consolidation API, which then takes care of only sending requests to the filtered tenants | ```{"tenantid":"tenant-p1", "stage":"production", "clusterid":"clusterid", "dryrun": false}``` |
+| source | a list of properties to select tenants according to filters. Same as the ```parameters``` parameter | ```{"stage":"staging", "clusterid":"clusterid"``` e.g. to get all config entities from all staging tenants on cluster with the id "clusterid" | 
+| target | a list of properties to select tenants according to filters. Same as the ```parameters``` parameter | ```{"stage":"production", "clusterid":"clusterid"``` e.g. to push the current standard config to all production tenants on cluster with the id "clusterid" | 
+
 
 ### Examples
 
-To trigger a configuration push to one or multiple/all tenants we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel. This can be done directly via the configcache redi client or with any automation integration tool that publishes thee control messages to redis.
+To trigger a configuration push to one or multiple/all tenants we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel. This can be done directly via the configcache redis client or with any automation integration tool that publishes the control messages to redis.
 
 Launch all config services:
 CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS              PORTS               NAMES
@@ -138,176 +148,52 @@ Control the config configuration to enable disable certain settings:
 ```
 
 Alternatively you can also import these settings from json files (examples located in ```docker/test```)
-
 ```
 docker exec -i configcache redis-cli -x set config < test/config.json
 ```
 
+All the below examples assume you have connected to the ```configcache``` redis via redis-cli. For example:
+```
+docker exec -i configcache redis-cli
+```
+
 Set the configuration parameters for applying the configuration:
-e.g. to push the configuration to tenant edg-p1 on cluster bo2 only set:
+e.g. to push the configuration to tenant tenant-p1 on cluster ```clusterid``` (note that the ```clusterid``` is the ID parameter of the cluster configuraed in the consolidateion API) set:
 ```
-127.0.0.1:6379> set parameters "{\"tenantid\":\"edg-p1\", \"clusterid\":\"bo2\", \"dryrun\": false}"
+127.0.0.1:6379> set parameters "{\"tenantid\":\"tenant-p1\", \"clusterid\":\"clusterid\", \"dryrun\": false}"
 ```
-To push the config to all develoment tenants on CCv1 you could use:
+
+To push the config to all develoment tenants you could use (note that the ```stage``` parameter has to be supported by the consolidateion API):
 ```
-127.0.0.1:6379> set parameters "{\"stage\":\"development\", \"type\":\"ccv10\", \"dryrun\": false}"
+127.0.0.1:6379> set parameters "{\"stage\":\"development\", \"dryrun\": false}"
 ```
+
 To start the configuration push publish the "START_CONFIG" message to the "configcontrol" channel
 ```
 127.0.0.1:6379> publish configcontrol PUSH_CONFIG
 ```
+
 To start a plugin deployment publish the "START_PLUGIN_CONFIG" message to the "configcontrol" channel
 ```
 127.0.0.1:6379> publish configcontrol START_PLUGIN_CONFIG
 ```
 
-### Permission Management
-
-Group Examples:
-CCv1:
-ccv1-dt-cust-adh-d1-advanced
-ccv1-dt-cust-adh-d1-standard
-
-CCv2:
-ccv2-cust-cywsi79vjh-parfumeri1-customer_sys_admin
-ccv2-cust-cywsi79vjh-parfumeri1-customer_developer
-
-
-Permissions, CCv1
-
-Standard:
+To pull the configuration from tenant "tenant-s1" and make it the current standard config set:
 ```
-    {
-        "accessRight": {
-            "LOG_VIEWER": [
-                "adh-d1"
-            ],
-            "VIEWER": [
-                "adh-d1"
-            ],
-            "VIEW_SENSITIVE_REQUEST_DATA": [
-                "adh-d1"
-            ]
-        },
-        "clusterhost": "fr.apm.sap.cx",
-        "clusterid": "fr1",
-        "id": "ccv1-dt-cust-adh-d1-standard",
-        "isClusterAdminGroup": false,
-        "ldapGroupNames": [
-            "ccv1-dt-cust-adh-d1-standard"
-        ],
-        "name": "ccv1-dt-cust-adh-d1-standard",
-        "responsecode": 200
-    }
-```
-Advanced:
-```
-   {
-        "accessRight": {
-            "CONFIGURE_REQUEST_CAPTURE_DATA": [
-                "adh-d1"
-            ],
-            "LOG_VIEWER": [
-                "adh-d1"
-            ],
-            "MANAGE_SETTINGS": [
-                "adh-d1"
-            ],
-            "VIEWER": [
-                "adh-d1"
-            ],
-            "VIEW_SENSITIVE_REQUEST_DATA": [
-                "adh-d1"
-            ]
-        },
-        "clusterhost": "fr.apm.sap.cx",
-        "clusterid": "fr1",
-        "id": "ccv1-dt-cust-adh-d1-advanced",
-        "isClusterAdminGroup": false,
-        "ldapGroupNames": [
-            "ccv1-dt-cust-adh-d1-advanced"
-        ],
-        "name": "ccv1-dt-cust-adh-d1-advanced",
-        "responsecode": 200
-    }
+127.0.0.1:6379> set source "{\"tenantid\":\"tenant-s1\", \"clusterid\":\"clusterid\", \"dryrun\": false}"
+127.0.0.1:6379> publish configcontrol PULL_CONFIG
 ```
 
-Permissions CCv2:
+Then you can push this new standard configuration set to another tenant "tenant-p1" and make it the current standard config set:
+```
+127.0.0.1:6379> set target "{\"tenantid\":\"tenant-p1\", \"clusterid\":\"clusterid\", \"dryrun\": false}"
+127.0.0.1:6379> publish configcontrol PULL_CONFIG
+```
 
-Customer Developer:
+To verify the configuration of tenant "tenant-s1" against the current standard configuration set:
 ```
-    {
-        "accessRight": {
-            "LOG_VIEWER": [
-                "ccv2-cust-cywsi79vjh-parfumeri1-z1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-s1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p2",
-                "ccv2-cust-cywsi79vjh-parfumeri1-d1"
-            ],
-            "VIEWER": [
-                "ccv2-cust-cywsi79vjh-parfumeri1-z1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-s1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p2",
-                "ccv2-cust-cywsi79vjh-parfumeri1-d1"
-            ],
-            "VIEW_SENSITIVE_REQUEST_DATA": [
-                "ccv2-cust-cywsi79vjh-parfumeri1-z1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-s1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p2",
-                "ccv2-cust-cywsi79vjh-parfumeri1-d1"
-            ]
-        },
-        "clusterhost": "weu.apm.sap.cx",
-        "clusterid": "weu",
-        "id": "ccv2-cust-cywsi79vjh-parfumeri1-customerdeveloper",
-        "isClusterAdminGroup": false,
-        "ldapGroupNames": [
-            "ccv2-cust-cywsi79vjh-parfumeri1-customer_developer"
-        ],
-        "name": "ccv2-cust-cywsi79vjh-parfumeri1-customer_developer",
-        "responsecode": 200
-    }
-```
-Customer Sysadmin
-```
-    {
-        "accessRight": {
-            "LOG_VIEWER": [
-                "ccv2-cust-cywsi79vjh-parfumeri1-z1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-s1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p2",
-                "ccv2-cust-cywsi79vjh-parfumeri1-d1"
-            ],
-            "VIEWER": [
-                "ccv2-cust-cywsi79vjh-parfumeri1-z1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-s1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p2",
-                "ccv2-cust-cywsi79vjh-parfumeri1-d1"
-            ],
-            "VIEW_SENSITIVE_REQUEST_DATA": [
-                "ccv2-cust-cywsi79vjh-parfumeri1-z1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-s1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p1",
-                "ccv2-cust-cywsi79vjh-parfumeri1-p2",
-                "ccv2-cust-cywsi79vjh-parfumeri1-d1"
-            ]
-        },
-        "clusterhost": "weu.apm.sap.cx",
-        "clusterid": "weu",
-        "id": "ccv2-cust-cywsi79vjh-parfumeri1-customersysadmin",
-        "isClusterAdminGroup": false,
-        "ldapGroupNames": [
-            "ccv2-cust-cywsi79vjh-parfumeri1-customer_sys_admin"
-        ],
-        "name": "ccv2-cust-cywsi79vjh-parfumeri1-customer_sys_admin",
-        "responsecode": 200
-    }
+127.0.0.1:6379> publish configcontrol VERIFY_CONFIG
 ```
 
 
-
+## Controlling or Pushing Plugins
