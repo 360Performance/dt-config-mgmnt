@@ -15,7 +15,8 @@ RUN pip install pyyaml
 #python -m pip install --upgrade oneagent-sdk
 
 COPY src /dtconfig
-COPY config /config
+#COPY config /config
+RUN mkdir /config
 RUN mkdir /config_dump
 COPY configmanager/configmanager.py /
 

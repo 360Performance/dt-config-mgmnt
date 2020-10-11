@@ -25,6 +25,7 @@ pipeline {
                             sh label: 'Run Configmanger', script: 'docker-compose --no-ansi up --remove-orphans -d configmanager'
                         }
                     }
+                    sh label: 'Copy test config files', script: 'docker cp config configmanager:/config'
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set config < test/config.json'
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set parameters < test/parameters.json'
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set source < test/source.json'
