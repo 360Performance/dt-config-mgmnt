@@ -37,6 +37,7 @@ pipeline {
                         }
                     }
                     sh label: 'Copy test config files', script: 'docker cp config configmanager:/'
+                    sh label: 'Set permissions on config folder', script: 'docker exec configmanager chown root:root -R /config'
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set config < test/config.json'
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set parameters < test/parameters.json'
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set source < test/source.json'
