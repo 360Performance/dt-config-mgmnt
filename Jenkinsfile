@@ -16,6 +16,17 @@ pipeline {
                 }
             }
         }
+        stage('Push Images') {
+            steps {
+                dir("${env.WORKSPACE}/docker") {
+                    sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
+                    withEnv(['TAG=latest']) {
+                        sh label: 'Tag with latest', script: 'docker-compose --no-ansi build'
+                        sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
+                    }
+                }
+            }
+        }
         stage('Test') {
             steps {
                 dir("${env.WORKSPACE}/docker"){
@@ -35,17 +46,6 @@ pipeline {
                     sh label: 'Resetting Config', script: 'docker exec -i configcache redis-cli publish configcontrol RESET'
                     sh label: 'Reset Confirmed', script: 'docker logs -f configmanager | grep -m1 "RELOADING STANDARD CONFIG"'
                     sh label: 'Execution Logs', script: 'docker logs configmanager'
-                }
-            }
-        }
-        stage('Push Images') {
-            steps {
-                dir("${env.WORKSPACE}/docker") {
-                    sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
-                    withEnv(['TAG=latest']) {
-                        sh label: 'Tag with latest', script: 'docker-compose --no-ansi build'
-                        sh label: 'Push Docker Images', script: 'docker-compose --no-ansi push'
-                    }
                 }
             }
         }
