@@ -14,8 +14,8 @@ services:
       - "LOG_LEVEL=${LOG_LEVEL}"
     volumes:
     #  - $PWD/src:/dtconfig
-      - $PWD/config:/config
-      - $PWD/config_dump:/config_dump
+    #  - $PWD/config:/config
+    #  - $PWD/config_dump:/config_dump
     networks: 
       - confignet
     restart: "no"
