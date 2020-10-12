@@ -10,6 +10,7 @@ logger = logging.getLogger("ConfigSet")
 class ConfigSet:
 
     def __init__(self,basedir):
+        self.entities = []
         self.configbasedir = basedir
         definitions = basedir + "/" + "entities.yml"
         try:
@@ -40,7 +41,7 @@ class ConfigSet:
     
     def __repr__(self):
         repr = "========== MANAGED CONFIGURATION SET ==========\n"
-        if self.entities == None:
+        if len(self.entities) == 0:
             return "No entities have been loaded yet, please check config directory and perform RESET command"
         for e in self.entities:
             repr += str(e) +"\n"
@@ -48,7 +49,7 @@ class ConfigSet:
     
     def __str__(self):
         repr = "========== MANAGED CONFIGURATION SET ==========\n"
-        if self.entities == None:
+        if len(self.entities) == 0:
             return "No entities have been loaded yet, please check config directory and perform RESET command"
         for e in self.entities:
             repr += str(e) +"\n"
