@@ -40,6 +40,14 @@ pipeline {
                 }
             }
         }
+        stage('Teardown') {
+            steps {
+                dir("${env.WORKSPACE}/"){
+                    sh label: 'Stop Containers', script: 'docker stop configmanager'
+                    sh label: 'Stop Containers', script: 'docker stop configcache'
+                }
+            }
+        }
         stage('Push Images') {
             steps {
                 dir("${env.WORKSPACE}/docker") {
