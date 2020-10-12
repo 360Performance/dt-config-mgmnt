@@ -899,7 +899,7 @@ def main(argv):
         message = cfgcontrol.get_message()
         if message:
             command = message['data']
-            #logger.info("Received Command: {}".format(command))
+            logger.always("Received Command: {}".format(command))
             if command == 'RESET':
                 logger.always("========== RELOADING STANDARD CONFIG ==========")
                 stdConfig = ConfigSet.ConfigSet(config_dir)
@@ -979,6 +979,7 @@ def main(argv):
             else:
                 logger.warning("Received Command: {} which I do not understand".format(command))
 
+            logger.always("Processed Command: {}".format(command))
             
         time.sleep(5)
 
