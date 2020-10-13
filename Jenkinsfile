@@ -14,6 +14,7 @@ pipeline {
                 dir("${env.WORKSPACE}/docker"){
                     sh label: 'Run Docker Compose', script: 'docker-compose --no-ansi build'
                 }
+                sh label: 'My Shell is', script: 'ps -p "$$"'
             }
         }
         stage('Test') {
