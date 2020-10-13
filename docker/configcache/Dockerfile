@@ -1,7 +1,7 @@
 FROM redis
 
 RUN apt-get update
-RUN apt-get install expect
+RUN apt-get install -y expect
 
 COPY redis.listen /usr/bin/redis.listen
 RUN chmod 755 /usr/bin/redis.listen
