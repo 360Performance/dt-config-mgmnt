@@ -33,11 +33,11 @@ pipeline {
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set target < test/target.json'
                     sh label: 'Resetting Config', script: 'docker exec -i configcache redis-cli publish configcontrol RESET'
                     sh label: 'Pull Config', script: 'docker exec -i configcache redis-cli publish configcontrol PULL_CONFIG'
-                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_PULL_CONFIG < <(docker exec -t configcache redis-cli subscribe configresult)'
+                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_PULL_CONFIG < <(docker exec -it configcache redis-cli subscribe configresult)'
                     sh label: 'Verify Config', script: 'docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG'
-                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_VERIFY_CONFIG < <(docker exec -t configcache redis-cli subscribe configresult)'
+                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_VERIFY_CONFIG < <(docker exec -it configcache redis-cli subscribe configresult)'
                     sh label: 'Resetting Config', script: 'docker exec -i configcache redis-cli publish configcontrol RESET'
-                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_RESET < <(docker exec -t configcache redis-cli subscribe configresult)'
+                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_RESET < <(docker exec -it configcache redis-cli subscribe configresult)'
                     sh label: 'Execution Logs', script: 'docker logs configmanager'
                 }
             }
