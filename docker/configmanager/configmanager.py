@@ -929,10 +929,11 @@ def main(argv):
                         if key != "config" and key != "parameters":
                             configcache.delete(key)
                     
-                    configcache.publish('configcontrol','FINISHED_CONFIG')
+                    #configcache.publish('configcontrol','FINISHED_CONFIG_PUSH')
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
-
+                
+                configcache.publish('configcontrol','FINISHED_CONFIG_PUSH')
                 logger.always("========== FINISHED CONFIG PUSH ==========")
 
             elif command == 'VERIFY_CONFIG':
@@ -944,6 +945,8 @@ def main(argv):
                     verifyConfigSettings(entitytypes, parameters)
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
+                
+                configcache.publish('configcontrol','FINISHED_CONFIG_VERIFICATION')
                 logger.always("========== FINISHED CONFIG VERIFICATION ==========")
 
 
@@ -962,6 +965,7 @@ def main(argv):
                 else:
                     logger.warning("Source parameter is not specified ... skipping")
 
+                configcache.publish('configcontrol','FINISHED_CONFIG_VERIFICATION')
                 logger.always("========== FINISHED CONFIG PULL ==========")
 
             elif command == 'COPY_CONFIG':
@@ -977,6 +981,8 @@ def main(argv):
                     configcache.setex("parameters",3600,json.dumps(target))
                     #send ourselves a message to start a config run DANGEROUS if config has been modified
                     configcache.publish("configcontrol", "START_CONFIG")
+                
+                configcache.publish('configcontrol','FINISHED_CONFIG_COPY')
                 logger.always("========== FINISHED CONFIG COPY ==========")
 
             else:
