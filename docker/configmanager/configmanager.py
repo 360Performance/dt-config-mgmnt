@@ -907,6 +907,8 @@ def main(argv):
                 logger.always("========== RELOADING STANDARD CONFIG ==========")
                 stdConfig = ConfigSet.ConfigSet(config_dir)
                 logger.info(stdConfig)
+                configcache.publish('configcontrol','FINISHED_RESET')
+                logger.always("========== FINISHED RESET ==========")
 
             elif command == 'PUSH_CONFIG':
                 logger.always("========== STARTING CONFIG PUSH ==========")
@@ -933,7 +935,7 @@ def main(argv):
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
                 
-                configcache.publish('configcontrol','FINISHED_CONFIG_PUSH')
+                configcache.publish('configcontrol','FINISHED_PUSH_CONFIG')
                 logger.always("========== FINISHED CONFIG PUSH ==========")
 
             elif command == 'VERIFY_CONFIG':
@@ -946,7 +948,7 @@ def main(argv):
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
                 
-                configcache.publish('configcontrol','FINISHED_CONFIG_VERIFICATION')
+                configcache.publish('configcontrol','FINISHED_VERIFY_CONFIG')
                 logger.always("========== FINISHED CONFIG VERIFICATION ==========")
 
 
@@ -965,7 +967,7 @@ def main(argv):
                 else:
                     logger.warning("Source parameter is not specified ... skipping")
 
-                configcache.publish('configcontrol','FINISHED_CONFIG_VERIFICATION')
+                configcache.publish('configcontrol','FINISHED_PULL_CONFIG')
                 logger.always("========== FINISHED CONFIG PULL ==========")
 
             elif command == 'COPY_CONFIG':
@@ -982,7 +984,7 @@ def main(argv):
                     #send ourselves a message to start a config run DANGEROUS if config has been modified
                     configcache.publish("configcontrol", "START_CONFIG")
                 
-                configcache.publish('configcontrol','FINISHED_CONFIG_COPY')
+                configcache.publish('configcontrol','FINISHED_COPY_CONFIG')
                 logger.always("========== FINISHED CONFIG COPY ==========")
 
             else:

@@ -33,9 +33,11 @@ pipeline {
                     sh label: 'Set up configcache', script: 'docker exec -i configcache redis-cli -x set target < test/target.json'
                     sh label: 'Resetting Config', script: 'docker exec -i configcache redis-cli publish configcontrol RESET'
                     sh label: 'Pull Config', script: 'docker exec -i configcache redis-cli publish configcontrol PULL_CONFIG'
+                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_PULL_CONFIG < <(docker exec -t configcache redis-cli subscribe configcontrol)'
                     sh label: 'Verify Config', script: 'docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG'
+                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_VERIFY_CONFIG < <(docker exec -t configcache redis-cli subscribe configcontrol)'
                     sh label: 'Resetting Config', script: 'docker exec -i configcache redis-cli publish configcontrol RESET'
-                    sh label: 'Reset Confirmed', script: 'docker logs -f configmanager | grep -q "RELOADING STANDARD CONFIG"'
+                    sh label: 'Expecting completion command', script: 'grep -q FINISHED_RESET < <(docker exec -t configcache redis-cli subscribe configcontrol)'
                     sh label: 'Execution Logs', script: 'docker logs configmanager'
                 }
             }
@@ -44,7 +46,7 @@ pipeline {
             steps {
                 dir("${env.WORKSPACE}/"){
                     sh label: 'Stop Containers', script: 'docker stop configmanager'
-                    sh label: 'Stop Containers', script: 'docker stop configcache'
+                    sh label: 'Stop Containers', script: 'docker stop ${CFGCACHE}'
                 }
             }
         }
