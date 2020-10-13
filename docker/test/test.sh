@@ -1,3 +1,3 @@
 #/bin/bash
 
-exec grep -q FINISHED_PULL_CONFIG < <(docker exec -it configcache redis-cli subscribe configresult)
+exec grep -q FINISHED_PULL_CONFIG < <(docker exec  configcache redis-cli subscribe configresult)
