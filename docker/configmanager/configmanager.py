@@ -991,7 +991,8 @@ def main(argv):
                 logger.warning("Received Command: {} which I do not understand".format(command))
 
             logger.always("Processed Command: {}".format(command))
-            
+
+        logger.always("Waiting for new command...")  
         time.sleep(5)
 
 
