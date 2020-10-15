@@ -77,7 +77,9 @@ class ConfigEntity():
         # as we need to modify the dto's for comparison, we copy them
         this = self.ordered(self.dto.copy())
         that = other.ordered(other.dto.copy())
-        return (this == that)
+        #return (this == that)
+        equal = (this == that)
+        return false
         #return (self.ordered(self.dto) == other.ordered(other.dto))
 
     # define if this config entity is a shared one. needed for identifying if entities are considered when dumping and transporting configuration

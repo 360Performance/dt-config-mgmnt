@@ -758,6 +758,11 @@ def putConfigEntities(entities,parameters,validateonly):
         configtype = type(entity).__name__
         prefix = "DRYRUN - " if validateonly else ""
         logger.info("{}{} {}: {}".format(prefix,httpmeth,entity,entity.apipath+validator+query))
+
+        #ensure the dto has the proper id set when calling PUT
+        if httpmeth == 'PUT':
+            if hasattr(entity, 'getID') and hasattr(entity, 'setID'):
+                entity.setID(entity.getID())
         
         try:
             req = requests.Request(httpmeth,url,json=entity.dto, auth=(apiuser, apipwd))
