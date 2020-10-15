@@ -78,8 +78,7 @@ class ConfigEntity():
         this = self.ordered(self.dto.copy())
         that = other.ordered(other.dto.copy())
         #return (this == that)
-        equal = (this == that)
-        return False
+        return (this == that)
         #return (self.ordered(self.dto) == other.ordered(other.dto))
 
     # define if this config entity is a shared one. needed for identifying if entities are considered when dumping and transporting configuration
@@ -516,7 +515,7 @@ class dashboards(TenantConfigEntity):
         self.id = id
         self.apipath = self.uri+"/"+self.id
         self.dto["id"] = id
-        logger.info("SETTING Dashboard ID to: {}".format(id))
+        #logger.info("SETTING Dashboard ID to: {}".format(id))
 
     def getID(self):
         return self.id
