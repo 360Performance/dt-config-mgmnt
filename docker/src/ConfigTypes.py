@@ -102,6 +102,10 @@ class TenantConfigEntity(ConfigEntity):
     def setID(self,id):
         self.id = id
         self.apipath = self.uri+"/"+self.id
+        self.dto["id"] = id
+    
+    def getID(self):
+        return self.id
 
     # returns the (GET) URI that would return all entities of this config type
     def getEntityListURI(self):
