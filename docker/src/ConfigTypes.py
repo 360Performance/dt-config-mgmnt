@@ -61,7 +61,7 @@ class ConfigEntity():
     # helper function to allow comparison of dto representation of a config entity with another
     def ordered(self,obj):
         if isinstance(obj, dict):
-            # some dtos have randomly generated IDs these are not relevant for functional comparison, se remove them
+            # some dtos have randomly generated IDs these are not relevant for functional comparison, so remove them
             obj.pop("id",None)
             return sorted((k, self.ordered(v)) for k, v in obj.items())
         if isinstance(obj, list):
@@ -514,6 +514,7 @@ class dashboards(TenantConfigEntity):
         self.id = id
         self.apipath = self.uri+"/"+self.id
         self.dto["id"] = id
+        logger.info("SETTING Dashboard ID to: {}".format(id))
 
     def getID(self):
         return self.id
