@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "../dt-sapcommerce-config"
+		},
+		{
+			"path": "../dt-sapcommerce-configbysap"
+		},
+		{
+			"path": "../dt-config-xxxlutz"
 		}
 	],
 	"settings": {}
