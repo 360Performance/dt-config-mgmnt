@@ -79,7 +79,7 @@ class ConfigEntity():
         that = other.ordered(other.dto.copy())
         #return (this == that)
         equal = (this == that)
-        return false
+        return False
         #return (self.ordered(self.dto) == other.ordered(other.dto))
 
     # define if this config entity is a shared one. needed for identifying if entities are considered when dumping and transporting configuration
