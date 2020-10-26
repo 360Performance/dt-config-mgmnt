@@ -504,15 +504,20 @@ Caches:
 clusterid::tenantid::entitytype::entityname => id | missing
 '''
 def getConfigSettings(entitytypes, parameters, dumpconfig):
+
+    config = getControlSettings()
     #query = "?"+urlencode(parameters)
     session = requests.Session()
     session.auth = (apiuser, apipwd)
-    
+
     dumpentities = {}
+
+    for ename, enabled in config.items():
+        entitytype = getattr(ConfigTypes,ename,None)
+        logger.info("++++++++ {} ({}) ++++++++".format(ename.upper(),enabled))
     
-    for entitytype in entitytypes:
         # ensure we only consider config types that are not abstract (that have a entityuri defined)
-        if entitytype.entityuri != "/":
+        if enabled and entitytype.entityuri != "/":
             apiurl = entitytype.uri
             url = server + apiurl
             stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)

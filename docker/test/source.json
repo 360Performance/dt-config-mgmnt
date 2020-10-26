@@ -1,4 +1,4 @@
 {
-    "tenantid": "infra-d1",
-    "clusterid": "bo2"
+    "mode": "saas",
+    "clusterid": "allianzprod"
 }

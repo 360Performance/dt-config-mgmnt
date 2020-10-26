@@ -1,8 +1,0 @@
-{
-  "applicationIdentifier": "APPLICATION-123456",
-  "filterConfig": {
-    "pattern": "myapp.example.com",
-    "applicationMatchType": "EQUALS",
-    "applicationMatchTarget": "DOMAIN"
-  }
-}
