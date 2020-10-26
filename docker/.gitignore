@@ -1,6 +1,5 @@
 config/**
 config_dump/**
-test/**
 **/*.pyc
 *.zip
 .env
