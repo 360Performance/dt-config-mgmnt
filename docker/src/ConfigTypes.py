@@ -204,6 +204,22 @@ class conditionalNamingprocessGroup(TenantConfigEntity):
         self.dto["displayName"] = self.name
     pass
 
+class conditionalNaminghost(TenantConfigEntity):
+    entityuri = "/conditionalNaming/host"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setName(self,name):
+        self.dto["displayName"] = self.name
+    pass
+
+class conditionalNamingservice(TenantConfigEntity):
+    entityuri = "/conditionalNaming/service"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setName(self,name):
+        self.dto["displayName"] = self.name
+    pass
+
 class customServicesjava(TenantConfigEntity):
     entityuri = "/service/customServices/java"
     uri = TenantConfigEntity.uri + entityuri
