@@ -63,6 +63,11 @@ service/customServices/java
     TaskEngine.json
     ImpExImportJob.json
 ```
+Every configurable (available via the Dynatrace API) enity is supported. The config directory structure also follows the respective API URI of the Dynatrace API. For example JSON files for service metrics (API URI = ../calculatedMetrics/service) will reside in a subdirectory ./calculatedMetrics/service.
+When exporting configuration from a tenant also this directory structure is generated and also a respective ```entities.yml``` file is created.
+
+So get an example just run this service with the ```PULL_CONFIG``` command as described below.
+
 ### Plugin Manager
 
 The pluginmanager service is responsible to deploy standard (JMX) Plugins to tenants. Plugins are maintained in the subdirectory ```plugins```. Every plugin is located in a directory which is named like the plugin's id. Within that directory a plugin.json file must be located which defines the plugin and also must have the same name attribute as the plugin id.
