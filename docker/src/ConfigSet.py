@@ -33,12 +33,12 @@ class ConfigSet:
                         #logger.info("Class {}".format(class_))
                         #entity.update({"basedir": self.configbasedir})
                         #logger.info("{} : {}".format(class_,entity))
-                        configEntity = class_(basedir=self.configbasedir,**entity)
-                        if configEntity is None:
+                        try:
+                            configEntity = class_(basedir=self.configbasedir,**entity)
+                        except:
                             logger.error("Couldn't create config entity {}, please check config definitions!".format(pscope+k))
-                        else:
                         #configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
-                            entities.append(configEntity)
+                        entities.append(configEntity)
         
         return entities
     

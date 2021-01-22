@@ -23,6 +23,8 @@ class ConfigEntity():
         
         #in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
         self.dto = self.stripDTOMetaData(self.dto)
+        if self.dto is None:
+            raise ValueError("Unable to load entity definition from config files, please check prior errors!") 
     
     def loadDTO(self,basedir):
         path = basedir + self.entityuri + "/" + self.file + ".json"
