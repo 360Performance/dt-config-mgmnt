@@ -30,9 +30,10 @@ class ConfigEntity():
         try:
             with open(path,"r") as dtofile:
                 dto = json.load(dtofile)
-                return dto
         except:
-            logger.error("Can't load DTO from (): {}, trying file parameter".format(path,sys.exc_info()))
+            logger.error("Can't load DTO from (): {}, failing".format(path,sys.exc_info()))
+        
+        return dto
 
     def dumpDTO(self,dumpdir):
         filename = ((self.name + "-" + self.id) if self.name != self.id else self.name)
