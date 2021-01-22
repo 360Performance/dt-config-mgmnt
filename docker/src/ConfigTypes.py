@@ -27,12 +27,13 @@ class ConfigEntity():
     def loadDTO(self,basedir):
         path = basedir + self.entityuri + "/" + self.file + ".json"
 
+        dto = None
         try:
             with open(path,"r") as dtofile:
                 dto = json.load(dtofile)
         except:
-            logger.error("Can't load DTO from (): {}, failing".format(path,sys.exc_info()))
-        
+            logger.error("Can't load DTO from: {}, failing".format(path,sys.exc_info()))
+
         return dto
 
     def dumpDTO(self,dumpdir):
@@ -47,8 +48,8 @@ class ConfigEntity():
 
     def stripDTOMetaData(self,dto):
         if dto is None:
-            logger.error("Why is DTO none?")
-            return
+            logger.error("DTO is none, likely a result from previous errors!")
+            return None
         newdto = dto.copy()
         for attr in dto:
             if attr in ['clusterid','clusterhost','tenantid','metadata','responsecode','id']:
