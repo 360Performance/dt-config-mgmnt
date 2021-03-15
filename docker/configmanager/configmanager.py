@@ -517,7 +517,7 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
         logger.info("++++++++ {} ({}) ++++++++".format(ename.upper(),enabled))
     
         # ensure we only consider config types that are not abstract (that have a entityuri defined)
-        if enabled and entitytype.entityuri != "/":
+        if entitytype and enabled and entitytype.entityuri != "/":
             apiurl = entitytype.uri
             url = server + apiurl
             stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
