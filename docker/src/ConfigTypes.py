@@ -259,8 +259,18 @@ class calculatedMetricsservice(TenantConfigEntity):
     uri = TenantConfigEntity.uri + entityuri
     pass
 
+class calculatedMetricssynthetic(TenantConfigEntity):
+    entityuri = "/calculatedMetrics/synthetic"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
 class calculatedMetricslog(TenantConfigEntity):
     entityuri = "/calculatedMetrics/log"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class calculatedMetricsmobile(TenantConfigEntity):
+    entityuri = "/calculatedMetrics/mobile"
     uri = TenantConfigEntity.uri + entityuri
     pass
 
@@ -280,7 +290,22 @@ class servicedetectionRulesFullWebRequest(TenantConfigEntity):
     pass
 
 class servicedetectionRulesOpaqueAndExternalWebRequest(TenantConfigEntity):
-    entityuri = "/service/detectionRules/FULL_WEB_REQUEST"
+    entityuri = "/service/detectionRules/OPAQUE_AND_EXTERNAL_WEB_REQUEST"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class servicedetectionRulesOpaqueAndExternalWebService(TenantConfigEntity):
+    entityuri = "/service/detectionRules/OPAQUE_AND_EXTERNAL_WEB_SERVICE"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class servicefailureDetectionparameterSelectionparameterSets(TenantConfigEntity):
+    entityuri = "/service/failureDetection/parameterSelection/parameterSets"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class servicefailureDetectionparameterSelectionrules(TenantConfigEntity):
+    entityuri = "/service/failureDetection/parameterSelection/rules"
     uri = TenantConfigEntity.uri + entityuri
     pass
 
@@ -288,6 +313,11 @@ class reports(TenantConfigEntity):
     entityuri = "/reports"
     uri = TenantConfigEntity.uri + entityuri
     name_attr = "id"
+    pass
+
+class allowedBeaconOriginsForCors(TenantConfigEntity):
+    entityuri = "/allowedBeaconOriginsForCors"
+    uri = TenantConfigEntity.uri + entityuri
     pass
 
 
@@ -349,6 +379,14 @@ class anomalyDetectionvmware(TenantSetting):
 
 class anomalyDetectionmetricEvents(TenantSetting):
     entityuri = "/anomalyDetection/metricEvents"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def __init__(self,**kwargs):   
+        TenantSetting.__init__(self,**kwargs)
+        self.apipath = self.uri
+
+class anomalyDetectionprocessGroups(TenantSetting):
+    entityuri = "/anomalyDetection/processGroups"
     uri = TenantConfigEntity.uri + entityuri
 
     def __init__(self,**kwargs):   
@@ -441,6 +479,59 @@ class applicationDetectionRules(TenantConfigEntity):
         self.dto["filterConfig"]["applicationMatchType"] = matchType 
         self.dto["filterConfig"]["applicationMatchTarget"] = matchTarget 
 
+class applicationDetectionRuleshostDetection(TenantConfigEntity):
+    entityuri = "/applicationDetectionRules/hostDetection"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class contentResources(TenantConfigEntity):
+    entityuri = "/contentResources"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class geographicRegionsipDetectionHeaders(TenantConfigEntity):
+    entityuri = "/geographicRegions/ipDetectionHeaders"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class geographicRegionsipAddressMappings(TenantConfigEntity):
+    entityuri = "/geographicRegions/ipAddressMappings"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+### these needs some more attention as it looks quite like some exceptions are required
+# RUM - Mobile and custom application configuration
+class applicationsmobile(TenantConfigEntity):
+    entityuri = "/applications/mobile"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+# this seems to require POST without payload
+# needs special handling for DTO
+class applicationsmobileAppIdkeyUserActions(TenantConfigEntity):
+    entityuri = "/applications/mobile/{appid}/keyUserActions/{actionName}"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setAppID(self,appid):
+        self.appid = appid
+        self.apipath = self.uri.replace("{appid}",self.appid)
+        self.dto = None
+
+    def setActionName(self,actionname):
+        self.actionname = actionname
+        self.apipath = self.uri.replace("{actionname}",self.actionname)
+        self.dto = None
+
+class applicationsmobileAppIduserActionAndSessionProperties(TenantConfigEntity):
+    entityuri = "/applications/mobile/{applicationId}/userActionAndSessionProperties"
+    uri = TenantConfigEntity.uri + entityuri   
+
+    def setAppID(self,appid):
+        self.appid = appid
+        self.apipath = self.uri.replace("{applicationId}",self.appid)  
+
+#### lots of review needed above for the application configs
+
 class awsiamExternalId(TenantConfigEntity):
     entityuri = "/aws/iamExternalId"
     uri = TenantConfigEntity.uri + entityuri
@@ -448,6 +539,11 @@ class awsiamExternalId(TenantConfigEntity):
 
 class awscredentials(TenantConfigEntity):
     entityuri = "/aws/credentials"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+class awsprivateLink(TenantConfigEntity):
+    entityuri = "/aws/privateLink"
     uri = TenantConfigEntity.uri + entityuri
     pass
 
@@ -475,6 +571,52 @@ class notifications(TenantConfigEntity):
     entityuri = "/notifications"
     uri = TenantConfigEntity.uri + entityuri
     pass
+
+# OneAgent - Environment-wide configuration
+class hostsautoupdate(TenantConfigEntity):
+    entityuri = "/hosts/autoupdate"
+    uri = TenantConfigEntity.uri + entityuri
+    pass
+
+# OneAgent in a host group
+class hostgroupsautoupdate(TenantConfigEntity):
+    entityuri = "/hostgroups/{id}/autoupdate"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setID(self,id):
+        self.id = id
+        self.apipath = self.uri.replace("{id}",self.id)
+        self.dto["id"] = id
+
+# OneAgent on a host
+class hostsId(TenantConfigEntity):
+    entityuri = "/hosts/{id}"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setID(self,id):
+        self.id = id
+        self.apipath = self.uri.replace("{id}",self.id)
+        self.dto["id"] = id
+
+# OneAgent on a host
+class hostsIdautoupdate(TenantConfigEntity):
+    entityuri = "/hosts/{id}/autoupdate"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setID(self,id):
+        self.id = id
+        self.apipath = self.uri.replace("{id}",self.id)
+        self.dto["id"] = id
+
+# OneAgent on a host
+class hostsIdmonitoring(TenantConfigEntity):
+    entityuri = "/hosts/{id}/monitoring"
+    uri = TenantConfigEntity.uri + entityuri
+
+    def setID(self,id):
+        self.id = id
+        self.apipath = self.uri.replace("{id}",self.id)
+        self.dto["id"] = id
 
 class dataPrivacy(TenantSetting):
     entityuri = "/dataPrivacy"
@@ -604,7 +746,6 @@ class dashboards(TenantConfigEntity):
                     filtersPerEntityType = filterConfig["filtersPerEntityType"]
                     if "APPLICATION" in filtersPerEntityType:
                         filtersPerEntityType["APPLICATION"] = {"SPECIFIC_ENTITIES": [appid]}
-
 
 
 
