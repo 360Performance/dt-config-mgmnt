@@ -489,9 +489,9 @@ def verifyConfigSettings(entitytypes, parameters):
                         centity = etype(id=entity.id,name=entity.name,dto=tenant)
                         #logger.info("{}\n{}".format(entity.dto,centity.dto))
                         logger.info("{} : {}::{} {}".format(("MATCHING" if entity == centity else "DIFFERENT") ,c_id,t_id,centity))
-                        if entity != centity:
-                            logger.info("Config: \n{}".format(json.dumps(entity.dto, indent = 2, separators=(',', ': '))))
-                            logger.info("Current: \n{}".format(json.dumps(centity.dto, indent = 2, separators=(',', ': '))))
+                        #if entity != centity:
+                        #    logger.info("Config: \n{}".format(json.dumps(entity.dto, indent = 2, separators=(',', ': '))))
+                        #    logger.info("Current: \n{}".format(json.dumps(centity.dto, indent = 2, separators=(',', ': '))))
             except:
                 logger.error("Problem verifying config settings: {}".format(sys.exc_info()))
 

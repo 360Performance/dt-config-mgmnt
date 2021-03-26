@@ -140,10 +140,12 @@ The following parameters control which configuration entities are pusehd or to/f
 To trigger a configuration push to one or multiple/all tenants we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel. This can be done directly via the configcache redis client or with any automation integration tool that publishes the control messages to redis.
 
 Launch all config services:
+```
 CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS              PORTS               NAMES
 ca2df050130b        hyperf/configmanager:1.0   "python configmanage…"   3 days ago          Up 3 days                               configmanager
 4f86e0815317        hyperf/configcache:1.0     "docker-entrypoint.s…"   3 days ago          Up 3 days           6379/tcp            configcache
 b6a7d5f7fb01        hyperf/pluginmanager:1.0   "python pluginmanage…"   4 days ago          Up 2 seconds                            pluginmanager
+```
 
 To manually change config settings, connect to the configcache redis-client:
 ```
