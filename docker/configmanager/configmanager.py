@@ -51,7 +51,7 @@ if not apipwd:
 
 # load the standard config from config directory
 stdConfig = ConfigSet.ConfigSet(config_dir)
-internaldomains = ["ondemand","hybrishosting","ycs"]
+internaldomains = []
 
 
 '''
