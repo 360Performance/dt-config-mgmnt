@@ -34,6 +34,9 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+SSLVerify = bool(int(os.environ.get("PYTHON_HTTPS_VERIFY",1)))
+logger.info("SSL certificate verification is on: {}".format(SSLVerify))
+
 
 
 configcache = redis.StrictRedis(host='configcache', port=6379, db=0, charset="utf-8", decode_responses=True)
@@ -186,6 +189,37 @@ def putAppDashboards(dashboards, validateonly):
         
         putConfigEntities(dashboardentities, parameters,validateonly)
 
+
+'''
+Get all configured synthetic monitors from tenants and store their IDs in the redis cache as sets per tenant
+redis key: <clusterid>::<tenantid>::syntheticmonitors (set with monitor names)
+'''
+def getAllSyntheticMonitors(parameters):
+    apiurl = "/e/TENANTID/api/v1/synthetic/monitors"
+    parameters.pop('type', None)
+    query = "?"+urlencode(parameters)
+    url = server + apiurl + query
+    
+    try:
+        response = requests.get(url, auth=(apiuser, apipwd), verify=SSLVerify)
+        result = response.json()
+        for tenant in result:
+            c_id = tenant["clusterid"]
+            t_id = tenant["tenantid"]
+            key = "::".join([c_id, t_id, "syntheticmonitors"])
+            for monitor in tenant["monitors"]:
+                logger.info("Existing synthetic monitor ({}): {} type: {}".format(monitor["entityId"], monitor["name"], monitor["type"]))
+                try:
+                    configcache.sadd(key,monitor["name"])
+                except:
+                    logger.warning("Exception happened: {}".format(sys.exc_info()))
+                    
+            configcache.expire(key,600)
+    except:
+        logger.error("Problem Getting Synthetic Monitors: {}".format(sys.exc_info()))
+
+
+
 def getSyntheticMonitors(clusterid, tenantid):
     apiurl = "/e/TENANTID/api/v1/synthetic/monitors"
     parameters = {"clusterid":clusterid, "tenantid":tenantid}
@@ -193,7 +227,7 @@ def getSyntheticMonitors(clusterid, tenantid):
     url = server + apiurl + query
     
     try:
-        response = requests.get(url, auth=(apiuser, apipwd))
+        response = requests.get(url, auth=(apiuser, apipwd), verify=SSLVerify)
         result = response.json()
         monitors = {}
         for tenant in result:
@@ -342,7 +376,7 @@ def getServices(parameters):
     url = server + apiurl + query
     
     try:
-        response = requests.get(url, auth=(apiuser, apipwd))
+        response = requests.get(url, auth=(apiuser, apipwd), verify=SSLVerify)
         result = response.json()
         for tenant in result:
             c_id = tenant["clusterid"]
@@ -384,6 +418,7 @@ def getServices(parameters):
 
 '''
 Get all configured applications from tenants and store their IDs in the redis cache as sets per tenant
+redis key: <clusterid>::<tenantid>::applications (set with application IDs)
 '''
 def getApplications(parameters):
     apiurl = "/e/TENANTID/api/config/v1/applications/web"
@@ -391,7 +426,7 @@ def getApplications(parameters):
     url = server + apiurl + query
     
     try:
-        response = requests.get(url, auth=(apiuser, apipwd))
+        response = requests.get(url, auth=(apiuser, apipwd), verify=SSLVerify)
         result = response.json()
         for tenant in result:
             c_id = tenant["clusterid"]
@@ -474,7 +509,7 @@ def verifyConfigSettings(entitytypes, parameters):
             if not issubclass(entitytype,ConfigTypes.TenantSetting):
                 url = url + "/" + entity.id
             try:
-                response = session.get(url)
+                response = session.get(url, verify=SSLVerify)
                 result = response.json()
                 for tenant in result:
                     c_id = tenant["clusterid"]
@@ -528,7 +563,7 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
 
             try:
                 session.params = parameters
-                response = session.get(url)
+                response = session.get(url, verify=SSLVerify)
                 result = response.json()
                 for tenant in result:
                     c_id = tenant["clusterid"]
@@ -562,7 +597,7 @@ def getConfigSettings(entitytypes, parameters, dumpconfig):
                                     entityurl = server + apiurl + "/" + attr[entitytype.id_attr]
                                     logger.debug("Fetching Entity: {}".format(entityurl))
                                     try:
-                                        response = session.get(entityurl)
+                                        response = session.get(entityurl, verify=SSLVerify)
                                         result = response.json()[0]  # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
                                         centity = entitytype(id=attr[entitytype.id_attr],name=attr[entitytype.name_attr],dto=result)
                                         if centity.isShared():
@@ -647,7 +682,7 @@ def updateOrCreateConfigEntities(entities, parameters,validateonly):
             tenantid = parts[1]
             try:
                 stdID = entity.id
-                curID = configcache.get(key)
+                curID = configcache.get(key, verify=SSLVerify)
             except:
                 continue
             
@@ -697,7 +732,7 @@ def purgeConfigEntities(entitytypes,parameters,force,validateonly):
             configname = key.split("::")[-1]
             
             try:
-                configid = configcache.get(key)
+                configid = configcache.get(key, verify=SSLVerify)
                 logger.info("Checking to purge: {} {}".format(configname,configid))
             
                 # only purge the config if it's not within our own standard (do not purge old versions of our own standard)
@@ -752,12 +787,13 @@ def putConfigEntities(entities,parameters,validateonly):
 
     session = requests.Session()
     validator = ''
-    httpmeth = 'PUT'
-    if validateonly:
-        validator = '/validator'
-        httpmeth = 'POST'
     
     for entity in entities:
+        httpmeth = entity.getHttpMethod()
+        if validateonly:
+            validator = '/validator'
+            httpmeth = 'POST'
+
         status = {"200":0, "204":0, "201":0, "400":0, "401":0, "404":0}
         url = server + entity.apipath + validator + query
         configtype = type(entity).__name__
@@ -773,7 +809,7 @@ def putConfigEntities(entities,parameters,validateonly):
             req = requests.Request(httpmeth,url,json=entity.dto, auth=(apiuser, apipwd))
             prep = session.prepare_request(req)
             resp = session.send(prep)
-            #resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd))
+            #resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
             if len(resp.content) > 0:
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
@@ -806,7 +842,7 @@ def postConfigEntities(entities,parameters,validateonly):
         logger.info("{}POST {}: {}".format(prefix,configtype,url))
         
         try:   
-            resp = requests.post(url,json=entity.dto, auth=(apiuser, apipwd))
+            resp = requests.post(url,json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
             if len(resp.content) > 0:
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]):status[str(tenant["responsecode"])]+1})
@@ -864,7 +900,7 @@ def performConfig(parameters):
     for ename, enabled in config.items():
         etype = getattr(ConfigTypes,ename,None)
         logger.info("++++++++ {} ({}) ++++++++".format(ename.upper(),enabled))
-        if enabled and etype is not None:
+        if enabled and etype is not None and ename not in specialHandling:
             updateOrCreateConfigEntities(stdConfig.getConfigEntitiesByType(etype),parameters,validateonly)
             putConfigEntities(stdConfig.getConfigEntitiesByType(etype),parameters,validateonly)
         elif enabled and ename in specialHandling:
@@ -874,11 +910,21 @@ def performConfig(parameters):
                 apps = createAppConfigEntitiesFromServices()
                 putApplicationConfigs(apps,validateonly)
             if ename == "syntheticmonitors":
+                # for monitors purely defined by config (and not generated based on applications) this needs special handling
+                # need to fetch all configured monitors first, then match by name against the defined ones in the configset.
+                # if monitor by name exists => update it (PUT is possible with the existing id)
+                # if monitor by name doesn't exist => create it (oly POST is possible)
+
+                # first: merge existing monitors with the config set
+                getAllSyntheticMonitors(parameters)
+
+                '''
                 getServices(parameters)
                 getApplications(parameters)
                 apps = createAppConfigEntitiesFromServices()
                 monitors = createSyntheticMonitorsFromApps(apps)
                 putSyntheticMonitors(monitors,validateonly)
+                '''
             if ename == "applicationDashboards":
                 getServices(parameters)
                 getApplications(parameters)

@@ -119,6 +119,11 @@ class TenantConfigEntity(ConfigEntity):
     def getEntityURI(self):
         return self.apipath
 
+    # return the http method that should be used when creating new entities
+    # for entities that support defining a custom ID this is usually PUT, however entities like synthetic monitors can override this
+    def getHttpMethod(self):
+        return "PUT"
+
 
 class TenantEntity(TenantConfigEntity):
     uri = "/e/TENANTID/api/v1"
@@ -630,6 +635,9 @@ class dataPrivacy(TenantSetting):
 class syntheticmonitors(TenantEntity):
     entityuri = "/synthetic/monitors"
     uri = TenantEntity.uri + entityuri
+
+    def getHttpMethod(self):
+        return "POST"
     
     def setName(self,name):
         self.name = name
@@ -639,11 +647,16 @@ class syntheticmonitors(TenantEntity):
         return self.dto["name"]
 
     def setID(self,id):
+        self.id = id
+        self.apipath = self.uri 
+    '''    
+    def setID(self,id):
         self.id = "SYNTHETIC_TEST-" + id
         super(syntheticmonitors,self).setID(self.id)
         self.dto["entityId"] = "" if id == "" else self.id
         self.dto["events"][0]["entityId"] = "SYNTHETIC_TEST_STEP-" + id
-    
+    '''
+
     def setManuallyAssignedApps(self,appid):
         self.dto["manuallyAssignedApps"] = [appid]
 
