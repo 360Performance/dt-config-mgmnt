@@ -191,32 +191,92 @@ def putAppDashboards(dashboards, validateonly):
 
 
 '''
+Get all currently used domain names of web applications.
+This is done by using User Session Query Language, so that it is independent of any other configuration.
+This information can be used to determine which synthetic monitors should eventually be created.
+Drawback of this is that it requires already end user information being present.
+(other option is to get the public domain information from services, though this depends on services being detected exactly by domain name - which isn't always the case)
+'''
+def getUsedDomains(parameters):
+    apiurl = "/e/TENANTID/api/v1/userSessionQueryLanguage/table"
+    parameters.update({"query":"SELECT useraction.domain FROM usersession GROUP BY useraction.domain"})
+    url = server + apiurl
+    
+    try:
+        response = requests.get(url, auth=(apiuser, apipwd), params=parameters, verify=SSLVerify)
+        result = response.json()
+        for tenant in result:
+            c_id = tenant["clusterid"]
+            t_id = tenant["tenantid"]
+            if tenant["responsecode"] == 200:
+                domains = [item for sublist in tenant["values"] for item in sublist]
+                '''
+                for domain in tenant["values"]:
+                    key = "::".join([c_id, t_id, "domains"])
+                    logger.info("Used domain by user sessions: {} {}".format(key,domain[0]))
+                    configcache.sadd(key,domain[0])
+                '''
+                key = "::".join([c_id, t_id, "domains"])
+                logger.info("Used domains by user sessions: {} {}".format(key,domains))
+                configcache.sadd(key,*domains)           
+                configcache.expire(key,600)
+    except:
+        logger.error("Problem Getting Domains: {}".format(sys.exc_info()))
+    
+
+'''
 Get all configured synthetic monitors from tenants and store their IDs in the redis cache as sets per tenant
 redis key: <clusterid>::<tenantid>::syntheticmonitors (set with monitor names)
 '''
 def getAllSyntheticMonitors(parameters):
     apiurl = "/e/TENANTID/api/v1/synthetic/monitors"
     parameters.pop('type', None)
-    query = "?"+urlencode(parameters)
-    url = server + apiurl + query
+    url = server + apiurl
     
     try:
-        response = requests.get(url, auth=(apiuser, apipwd), verify=SSLVerify)
+        response = requests.get(url, auth=(apiuser, apipwd), params=parameters, verify=SSLVerify)
         result = response.json()
         for tenant in result:
             c_id = tenant["clusterid"]
             t_id = tenant["tenantid"]
-            key = "::".join([c_id, t_id, "syntheticmonitors"])
             for monitor in tenant["monitors"]:
                 logger.info("Existing synthetic monitor ({}): {} type: {}".format(monitor["entityId"], monitor["name"], monitor["type"]))
+                key = "::".join([c_id, t_id, "syntheticmonitors", monitor["type"], monitor["name"]])
                 try:
-                    configcache.sadd(key,monitor["name"])
+                    configcache.set(key,monitor["entityId"])
                 except:
                     logger.warning("Exception happened: {}".format(sys.exc_info()))
-                    
-            configcache.expire(key,600)
     except:
         logger.error("Problem Getting Synthetic Monitors: {}".format(sys.exc_info()))
+
+def prepareSyntheticMonitors(monitorentities):
+    monitors = []
+    for monitor in monitorentities:
+        m_name = monitor.getName()
+        m_type = monitor.getType()
+        # check if monitor already exists
+        try:
+            keys = configcache.keys("*::syntheticmonitors::"+m_type+"::"+m_name)
+            if keys:
+                for key in keys:
+                    parts = key.split("::")
+                    c_id = parts[0]
+                    t_id = parts[1]
+                    m_id = configcache.get(key)
+                    logger.info("Synthetic {} monitor {} ({}) exists on {}::{}, it can be updated if necessary, ensuring ID is correct".format(m_type, m_name, m_id, c_id, t_id))
+                    monitor.setID(m_id)
+                    monitors.append(monitor)
+            else:
+                logger.info("No existing {} monitor with name {} found, it can be added (ID will be created)".format(m_type, m_name))
+                # as a sanity check we'll get the used domains and cross-check with the synthetic monitor
+                # we should only add the synthetic monitor to environments that have traffic to the same domains used by real users
+                logger.warning("Note that this will create the monitor on every tenant that matches you config parameters!")
+                monitor.setID("")
+                monitors.append(monitor)
+        except:
+            logger.error("Problem preparing synthetic monitors: {}".format(sys.exc_info()))
+
+    return monitors
 
 
 
@@ -917,7 +977,12 @@ def performConfig(parameters):
 
                 # first: merge existing monitors with the config set
                 getAllSyntheticMonitors(parameters)
-
+                getUsedDomains(parameters)
+                # this will check if configured synthetic monitors already exist, if yes make sure they are just updated (get their ID, modify settings)
+                # if not create a new one
+                monitors = prepareSyntheticMonitors(stdConfig.getConfigEntitiesByType(etype))
+                logger.info(monitors)
+                #putConfigEntities(monitors,parameters,validateonly)
                 '''
                 getServices(parameters)
                 getApplications(parameters)
