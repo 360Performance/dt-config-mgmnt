@@ -15,7 +15,7 @@ from textwrap import wrap
 import copy
 
 
-loglevel = os.environ.get("LOG_LEVEL",logging.INFO).upper()
+loglevel = os.environ.get("LOG_LEVEL","info").upper()
 
 # LOG CONFIGURATION
 
@@ -39,7 +39,9 @@ logger.info("SSL certificate verification is on: {}".format(SSLVerify))
 
 
 
-configcache = redis.StrictRedis(host='configcache', port=6379, db=0, charset="utf-8", decode_responses=True)
+cfgcache = os.environ.get("CONFIG_CACHE","configcache")
+
+configcache = redis.StrictRedis(host=cfgcache, port=6379, db=0, charset="utf-8", decode_responses=True)
 server = os.environ.get("DT_API_HOST","https://api.dy.natrace.it:8443")
 apiuser = os.environ.get("DT_API_USER")
 apipwd = os.environ.get("DT_API_PWD")
@@ -598,9 +600,9 @@ This is required to get a current state of existing tenants and their config, re
 Caches:
 clusterid::tenantid::entitytype::entityname => id | missing
 '''
-def getConfigSettings(entitytypes, parameters, dumpconfig):
+def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
 
-    config = getControlSettings()
+    config = getControlSettings(entityconfig)
     #query = "?"+urlencode(parameters)
     session = requests.Session()
     session.auth = (apiuser, apipwd)
@@ -914,7 +916,7 @@ def postConfigEntities(entities,parameters,validateonly):
         except:
             logger.error("Problem putting {}: {}".format(configtype,sys.exc_info()))
 
-def getControlSettings():
+def getControlSettings(ctrlsettings):
     stdSettings = {
         "servicerequestAttributes": True,
         "servicerequestNaming": True,
@@ -936,20 +938,20 @@ def getControlSettings():
         "applicationDashboards": False,
     }
 
-    ctrlsettings = {}
-    try:
-        if configcache.exists("config") == 1:
-            settings = configcache.get("config")
-            ctrlsettings = json.loads(settings)
-    except:
-        logger.error("Problem reading proper config from redis, continueing with default settings. Error: {}".format(sys.exc_info()))
+    #ctrlsettings = {}
+    #try:
+    #    if configcache.exists("config") == 1:
+    #        settings = configcache.get("config")
+    #        ctrlsettings = json.loads(settings)
+    #except:
+    #    logger.error("Problem reading proper config from redis, continueing with default settings. Error: {}".format(sys.exc_info()))
 
     #merge stdsetting with provided ones
     return {**stdSettings, **ctrlsettings}
 
-def performConfig(parameters):
+def performConfig(entityconfig,parameters):
     #logger.info("Configuration Parameters: {}".format(parameters))
-    config = getControlSettings()
+    config = getControlSettings(entityconfig)
     logger.info("Applying Configuration to: \n{}".format(json.dumps(parameters, indent = 2, separators=(',', ': '))))
     logger.info("Applying Configuration Types: \n{}".format(json.dumps(config, indent = 2, separators=(',', ': '))))
 
@@ -1025,7 +1027,13 @@ def main(argv):
     while True:
         message = cfgcontrol.get_message()
         if message:
-            command = message['data']
+            try:
+                cmd = {}
+                cmd = json.loads(message['data'])
+            except (TypeError, ValueError):
+                logger.warning("Received Command: {} which I do not understand".format(message["data"]))
+
+            command = cmd.get("command",None)
             logger.always("Received Command: {}".format(command))
             if command == 'RESET':
                 logger.always("========== RELOADING STANDARD CONFIG ==========")
@@ -1036,18 +1044,17 @@ def main(argv):
 
             elif command == 'PUSH_CONFIG':
                 logger.always("========== STARTING CONFIG PUSH ==========")
-                params = configcache.get("parameters")
-                if params:
-                    parameters = json.loads(params)
+                target = cmd.get("target",None)
+                if target:
                     # assuming that if not otherwise specified we do a dryrun
-                    if "dryrun" not in parameters:
-                        parameters.update({"dryrun":True})
+                    if "dryrun" not in target:
+                        target.update({"dryrun":True})
 
                     logger.always("========== STARTING CONFIG FETCH ==========")
-                    configtypes = getConfig(parameters)
-                    getConfigSettings(configtypes, parameters, False) 
+                    configtypes = getConfig(target)
+                    getConfigSettings(configtypes, cmd.get("config"), target, False) 
                     logger.always("========== FINISHED CONFIG FETCH ==========")
-                    performConfig(parameters)    
+                    performConfig(cmd.get("config"),target)    
 
                     # cleanup redis but keep the parameters
                     allkeys = configcache.keys("*")
@@ -1064,11 +1071,10 @@ def main(argv):
 
             elif command == 'VERIFY_CONFIG':
                 logger.always("========== STARTING CONFIG VERIFICATION ==========")
-                params = configcache.get("parameters")
-                if params:
-                    parameters = json.loads(params)
-                    entitytypes = getConfig(parameters)
-                    verifyConfigSettings(entitytypes, parameters)
+                target = cmd.get("target",None)
+                if target:
+                    entitytypes = getConfig(target)
+                    verifyConfigSettings(entitytypes, target)
                 else:
                     logger.warning("No Parameters found in config cache ... skipping")
                 
@@ -1078,12 +1084,11 @@ def main(argv):
 
             elif command == 'PULL_CONFIG':
                 logger.always("========== STARTING CONFIG PULL ==========")
-                source_param = configcache.get("source")
-                if source_param :
-                    source = json.loads(source_param)
+                source = cmd.get("source",None)
+                if source:
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
                     configtypes = getConfig(source)
-                    getConfigSettings(configtypes, source, True)
+                    getConfigSettings(configtypes, cmd.get("config"), source, True)
 
                     logger.info("==== reloading standard config after dump ====")
                     stdConfig = ConfigSet.ConfigSet(config_dump_dir)
@@ -1096,11 +1101,9 @@ def main(argv):
 
             elif command == 'COPY_CONFIG':
                 logger.always("========== STARTING CONFIG COPY ==========")
-                source_param = configcache.get("source")
-                target_param = configcache.get("target")
-                if source_param and target_param:
-                    source = json.loads(source_param)
-                    target = json.loads(target_param)
+                source = cmd.get("source", None)
+                target = cmd.get("target",None)
+                if source and target:
                     logger.info("Source: \n{}".format(json.dumps(source, indent = 2, separators=(',', ': '))))
                     logger.info("Target: \n{}".format(json.dumps(target, indent = 2, separators=(',', ': '))))
                     configcache.publish("configcontrol", "PULL_CONFIG")

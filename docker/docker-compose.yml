@@ -12,10 +12,10 @@ services:
       - "DT_API_USER=${API_USER}"
       - "DT_API_PWD=${API_PWD}"
       - "LOG_LEVEL=${LOG_LEVEL}"
-    #volumes:
+    volumes:
     #  - $PWD/src:/dtconfig
-    #  - $PWD/config:/config
-    #  - $PWD/config_dump:/config_dump
+      - $PWD/config:/config
+      - $PWD/config_dump:/config_dump
     networks: 
       - confignet
     restart: "no"

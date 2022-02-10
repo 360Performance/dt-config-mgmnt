@@ -9,3 +9,6 @@ docker exec -i configcache redis-cli publish configcontrol VERIFY_CONFIG
 docker exec -i configcache redis-cli publish configcontrol RESET
 docker exec -i configcache redis-cli publish configcontrol PUSH_CONFIG
 
+docker exec -i configcache redis-cli -x publish configcontrol < test/command.json
+
+
