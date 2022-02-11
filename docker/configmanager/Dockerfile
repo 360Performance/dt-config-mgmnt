@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3.10-alpine
 
 # Create stdconfig directory
 WORKDIR /
@@ -14,10 +14,10 @@ RUN pip install pyyaml
 # Dynatrace OneAgent SDK
 #python -m pip install --upgrade oneagent-sdk
 
-COPY src /dtconfig
+COPY configmanager /
 #COPY config /config
 RUN mkdir /config
 RUN mkdir /config_dump
-COPY configmanager/configmanager.py /
+#COPY configmanager/configmanager.py /
 
 CMD ["python","configmanager.py"]

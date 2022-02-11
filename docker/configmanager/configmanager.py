@@ -9,8 +9,9 @@ from urllib.parse import urlencode
 import redis
 import logging, traceback
 import random
-import dtconfig.ConfigSet as ConfigSet
-import dtconfig.ConfigTypes as ConfigTypes
+#import dtconfig.ConfigSet as ConfigSet
+from configtypes import ConfigTypes
+from configset import ConfigSet
 from textwrap import wrap
 import copy
 
