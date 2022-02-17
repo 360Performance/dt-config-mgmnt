@@ -1,2 +1,0 @@
-from .ConfigTypes import TenantConfigEntity
-
