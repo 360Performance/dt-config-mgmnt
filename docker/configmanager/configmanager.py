@@ -52,16 +52,14 @@ logger.info("SSL certificate verification is on: %s", SSLVerify)
 
 cfgcache = os.environ.get("CONFIG_CACHE", "configcache")
 
-configcache = redis.StrictRedis(
-    host=cfgcache, port=6379, db=0, charset="utf-8", decode_responses=True)
+configcache = redis.StrictRedis(host=cfgcache, port=6379, db=0, charset="utf-8", decode_responses=True)
 server = os.environ.get("DT_API_HOST", "https://api.dy.natrace.it:8443")
 apiuser = os.environ.get("DT_API_USER")
 apipwd = os.environ.get("DT_API_PWD")
 config_dir = os.environ.get("CONFIG_DIR", "/config")
 config_dump_dir = os.environ.get("CONFIG_DUMP_DIR", "/config_dump")
 
-logger.always(
-    "Dynatrace Consolidated API: {}  User: {}".format(server, apiuser))
+logger.always("Dynatrace Consolidated API: %s  User: %s", server, apiuser)
 if not apiuser:
     sys.exit(
         "No api user found (ensure env variable DT_API_USER is set) ... can't continue")
@@ -300,8 +298,7 @@ def prepareSyntheticMonitors(monitorentities):
                     monitor.setID(m_id)
                     monitors.append(monitor)
             else:
-                logger.info("No existing {} monitor with name {} found, it can be added (ID will be created)".format(
-                    m_type, m_name))
+                logger.info("No existing %s monitor with name %s found, it can be added (ID will be created)", m_type, m_name)
                 # as a sanity check we'll get the used domains and cross-check with the synthetic monitor
                 # we should only add the synthetic monitor to environments that have traffic to the same domains used by real users
                 logger.warning("Note that this will create the monitor on every tenant that matches you config parameters!")
@@ -381,7 +378,7 @@ def createSyntheticMonitorsFromApps(applications):
                 for service in services:
                     dc = tldextract.extract(service)
                     if dc.subdomain not in ["", "shop", "www", "store", "commerce"]:
-                        logger.warn("No suitable Subdomain found in services, not configuring monitor for %s", ".".join(dc))
+                        logger.warning("No suitable Subdomain found in services, not configuring monitor for %s", ".".join(dc))
                         continue
                     # in case of multiple domains we just pick first one
                     if appname == dc.domain:
@@ -407,12 +404,10 @@ def putSyntheticMonitors(monitors, validateonly):
         for monitor in monitorentities:
             if monitor.dto["entityId"] == "":
                 new_monitorentities.append(monitor)
-                logger.info("POST Monitor for {} : {}".format(
-                    parameters, monitor))
+                logger.info("POST Monitor for %s : %s", parameters, monitor)
             else:
                 existing_monitorentities.append(monitor)
-                logger.info("PUT Monitor for {} : {}".format(
-                    parameters, monitor))
+                logger.info("PUT Monitor for %s : %s", parameters, monitor)
 
         postConfigEntities(new_monitorentities, parameters, validateonly)
         putConfigEntities(existing_monitorentities, parameters, validateonly)
@@ -424,12 +419,10 @@ def putSyntheticMonitors(monitors, validateonly):
             tries += 1
             for monitor in monitorentities:
                 if monitor.getName() in monitors:
-                    logger.info("Synthetic Monitor Deployed: {}".format(
-                        monitor.getName()))
+                    logger.info("Synthetic Monitor Deployed: %s", monitor.getName())
                     complete += 1
                 else:
-                    logger.info("Synthetic Monitor Missing: {}".format(
-                        monitor.getName()))
+                    logger.info("Synthetic Monitor Missing: %s", monitor.getName())
             time.sleep(2)
 
 
@@ -442,8 +435,8 @@ def getApplicationNames():
         for service in services:
             dc = tldextract.extract(service)
             patterns.add(dc.domain+"."+dc.suffix)
-            # logger.info("{} {} {}".format(dc.subdomain, dc.domain, dc.suffix))
-        logger.info("{} : {}".format(key, patterns))
+            # logger.info("%s %s %s",dc.subdomain, dc.domain, dc.suffix)
+        logger.info("%s : %s", key, patterns)
 
 
 '''
@@ -460,14 +453,12 @@ def isPublicWebService(service):
         for ipval in answer:
             ip = IP(ipval.to_text())
             ispublic = ispublic or ("PUBLIC" == ip.iptype())
-            logger.info('{}: {} (Public: {})'.format(
-                service, ipval.to_text(), ispublic))
+            logger.info('%s: %s (Public: %s)', service, ipval.to_text(), ispublic)
         return ispublic
     except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
         return False
     except:
-        logger.error(
-            "Couldn't resolve {}, problem with DNS service".format(service))
+        logger.error("Couldn't resolve %s, problem with DNS service", service)
 
     return False
 
@@ -489,7 +480,6 @@ def getServices(parameters):
             c_id = tenant["clusterid"]
             t_id = tenant["tenantid"]
             key = "::".join([c_id, t_id, "services"])
-            services = []
             for service in tenant["result"]:
                 # strip any detected port from the service
                 svc = service["discoveredName"].split(":")[0]
@@ -515,13 +505,12 @@ def getServices(parameters):
                                 # logger.info("Service: {} is public".format(service["discoveredName"])))
                                 configcache.sadd(key, svc)
                     except:
-                        logger.warning(
-                            "Exception happened: %s", sys.exc_info())
+                        logger.warning("Exception happened: %s", sys.exc_info())
                         continue
 
             configcache.expire(key, 600)
     except:
-        logger.error("Problem Getting Services: {}".format(sys.exc_info()))
+        logger.error("Problem Getting Services: %s", sys.exc_info())
 
 
 '''
@@ -546,25 +535,21 @@ def getApplications(parameters):
             # so we format them accordingly
             std_appid = "{:0>12}".format(
                 t_id.encode("utf-8").hex()[-12:]).upper()
-            applications = []
             for application in tenant["values"]:
                 a_id = application["id"].split("-")[1]
 
                 if a_id.startswith(std_appid):
-                    logger.info("Application in standard ({}): {} {} : {}".format(
-                        std_appid, key, application["name"], application["id"]))
+                    logger.info("Application in standard (%s): %s %s : %s", std_appid, key, application["name"], application["id"])
                     try:
                         configcache.sadd(key, std_appid)
                     except:
-                        logger.warning(
-                            "Exception happened: {}".format(sys.exc_info()))
+                        logger.warning("Exception: %s", sys.exc_info())
                 else:
-                    logger.info("Application not in standard ({}): {} {} : {}".format(
-                        std_appid, key, application["name"], application["id"]))
+                    logger.info("Application not in standard (%s): %s %s : %s", std_appid, key, application["name"], application["id"])
 
             configcache.expire(key, 600)
     except:
-        logger.error("Problem Getting Applications: {}".format(sys.exc_info()))
+        logger.error("Problem Getting Applications: %s", sys.exc_info())
 
 
 '''
@@ -580,18 +565,15 @@ def putApplicationConfigs(applications, validateonly):
         c_id = parts[0]
         t_id = parts[1]
         parameters = {"tenantid": t_id, "clusterid": c_id}
-        logger.info("Applications to create for {}: {}".format(
-            tenant, appentities))
+        logger.info("Applications to create for %s: %s", tenant, appentities)
         ruleentities = []
         for app in appentities:
             ruleentities.extend(app.getDetectionRules())
             if len(ruleentities) > 250:
-                logger.warning(
-                    "More than 250 application detection rules would be created for {}".format(tenant))
+                logger.warning("More than 250 application detection rules would be created for %s", tenant)
             # logger.info(json.dumps(app.dto))
 
-        logger.info("PUT Applications for {} : {}".format(
-            parameters, appentities))
+        logger.info("PUT Applications for %s : %s", parameters, appentities)
         putConfigEntities(appentities, parameters, validateonly)
         # logger.info("PUT Application detection rules for {} : {}".format(parameters,ruleentities))
         putConfigEntities(ruleentities, parameters, validateonly)
@@ -638,22 +620,19 @@ def verifyConfigSettings(entitytypes, parameters):
                     r_code = tenant["responsecode"]
                     # logger.info("Verifying: {} on {}::{}: {}".format(entity,c_id,t_id,r_code))
                     if r_code != 200:
-                        logger.warning(
-                            "MISSING : {}::{} {}".format(c_id, t_id, entity))
+                        logger.warning("MISSING : %s::%s %s", c_id, t_id, entity)
                     else:
                         # create the actual entity
                         etype = type(entity)
                         centity = etype(
                             id=entity.id, name=entity.name, dto=tenant)
                         # logger.info("{}\n{}".format(entity.dto,centity.dto))
-                        logger.info("{} : {}::{} {}".format(
-                            ("MATCHING" if entity == centity else "DIFFERENT"), c_id, t_id, centity))
+                        logger.info("%s : %s::%s %s", ("MATCHING" if entity == centity else "DIFFERENT"), c_id, t_id, centity)
                         # if entity != centity:
                         #    logger.info("Config: \n{}".format(json.dumps(entity.dto, indent = 2, separators=(',', ': '))))
                         #    logger.info("Current: \n{}".format(json.dumps(centity.dto, indent = 2, separators=(',', ': '))))
             except:
-                logger.error(
-                    "Problem verifying config settings: {}".format(sys.exc_info()))
+                logger.error("Problem verifying config settings: %s", sys.exc_info())
 
 
 '''
@@ -676,7 +655,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
 
     for ename, enabled in config.items():
         entitytype = getattr(ConfigTypes, ename, None)
-        logger.info("++++++++ {} ({}) ++++++++".format(ename.upper(), enabled))
+        logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
 
         # ensure we only consider config types that are not abstract (that have a entityuri defined)
         if entitytype and enabled and entitytype.entityuri != "/":
@@ -684,8 +663,8 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
             url = server + apiurl
             stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
             configtype = entitytype.__name__
-            logger.info("Getting configs of type: {} - there are {} configuration definitions of this type in the standard config".format(
-                entitytype.__name__, len(stdConfigNames)))
+            logger.info("Getting configs of type: %s - there are %s configuration definitions of this type in the standard config",
+                        entitytype.__name__, len(stdConfigNames))
 
             entity_defs = []
 
@@ -720,17 +699,13 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                                 else:
                                     configcache.setex(
                                         key, 3600, attr[entitytype.id_attr])
-                                    logger.info("{} entities not in standard: {} : {}".format(
-                                        configtype, key, attr[entitytype.id_attr]))
+                                    logger.info("%s entities not in standard: %s : %s", configtype, key, attr[entitytype.id_attr])
 
                                 # when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
                                 if dumpconfig:
-                                    session.params = {
-                                        "tenantid": t_id, "clusterid": c_id}
-                                    entityurl = server + apiurl + \
-                                        "/" + attr[entitytype.id_attr]
-                                    logger.debug(
-                                        "Fetching Entity: {}".format(entityurl))
+                                    session.params = {"tenantid": t_id, "clusterid": c_id}
+                                    entityurl = f'{server}{apiurl}/{attr[entitytype.id_attr]}'
+                                    logger.debug("Fetching Entity: %s", entityurl)
                                     try:
                                         response = session.get(
                                             entityurl, verify=SSLVerify)
@@ -743,8 +718,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                                                 config_dump_dir)
                                             entity_defs.append(definition)
                                     except:
-                                        logger.error(
-                                            "Exception: {}".format(sys.exc_info()))
+                                        logger.error("Exception: %s", sys.exc_info())
 
                         elif issubclass(entitytype, ConfigTypes.TenantSetting):
                             # logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
@@ -756,12 +730,10 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                             # logger.info(stdEntity.dto)
                             match = centity == stdEntity
                             if match:
-                                logger.info("{} settings of {} do match with standard".format(
-                                    configtype, "::".join([c_id, t_id])))
+                                logger.info("%s settings of %s do match with standard", configtype, "::".join([c_id, t_id]))
                                 attrcheck.add(configtype)
                             else:
-                                logger.warning("{} settings of {} do not match with standard".format(
-                                    configtype, "::".join([c_id, t_id])))
+                                logger.warning("%s settings of %s do not match with standard", configtype, "::".join([c_id, t_id]))
 
                             key = "::".join([c_id, t_id, configtype])
                             configcache.setex(key, 3600, "true")
@@ -770,23 +742,20 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                                 entity_defs.append(definition)
 
                     except:
-                        logger.error("Problem getting config of type: {} for Tenant {}::{}".format(
-                            configtype, c_id, t_id))
+                        logger.error("Problem getting config of type: %s for Tenant %s::%s", configtype, c_id, t_id)
                         traceback.print_exc()
                         continue
 
                     # check if all entities of the standard have been found
                     if len(attrcheck) != len(stdConfigNames):
                         missing = set(set(stdConfigNames) - attrcheck)
-                        logger.warning("Missing entities or different setting for {} on {}: {}".format(
-                            configtype, "::".join([c_id, t_id]), missing))
+                        logger.warning("Missing entities or different setting for %s on %s: %s", configtype, "::".join([c_id, t_id]), missing)
                         for attr in missing:
                             key = "::".join([c_id, t_id, configtype, attr])
                             configcache.setex(key, 3600, "missing")
 
             except:
-                logger.error(
-                    "Problem Getting Config Settings: {}".format(sys.exc_info()))
+                logger.error("Problem Getting Config Settings: %s", sys.exc_info())
 
             # build datastructure for dumping the entities.yml file properly
             if dumpconfig:
@@ -801,7 +770,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
     # write out the stdConfig definition (entities.yml)
     if dumpconfig:
         path = config_dump_dir + "/entities.yml"
-        with open(path, 'w') as file:
+        with open(path, 'w', encoding="utf-8") as file:
             documents = yaml.dump(dumpentities, file)
 
 
@@ -815,8 +784,8 @@ By going one by one tenant this is not a very effective method, but it's require
 
 
 def updateOrCreateConfigEntities(entities, parameters, validateonly):
-    headers = {"Content-Type": "application/json"}
-    query = "?"+urlencode(parameters)
+    # headers = {"Content-Type": "application/json"}
+    # query = "?"+urlencode(parameters)
 
     missing = unmatched = matched = 0
 
@@ -829,33 +798,27 @@ def updateOrCreateConfigEntities(entities, parameters, validateonly):
             tenantid = parts[1]
             try:
                 stdID = entity.id
-                curID = configcache.get(key, verify=SSLVerify)
+                curID = configcache.get(key)
             except:
                 continue
 
             if "missing" == curID:
-                logger.info("Standard {} {} is missing on {}".format(
-                    configtype, entity.name, tenantid))
-                putConfigEntities(
-                    [entity], {"tenantid": tenantid}, validateonly)
+                logger.info("Standard %s %s is missing on %s", configtype, entity.name, tenantid)
+                putConfigEntities([entity], {"tenantid": tenantid}, validateonly)
                 missing += 1
                 continue
             if stdID != curID:
-                logger.info("Standard {} IDs for {} don't match on {}: {} : {}".format(
-                    configtype, entity.name, tenantid, stdID, curID))
+                logger.info("Standard %s IDs for %s don't match on %s: %s : %s", configtype, entity.name, tenantid, stdID, curID)
                 delEntity = copy.deepcopy(entity)
                 delEntity.setID(curID)
-                deleteConfigEntities(
-                    [delEntity], {"tenantid": tenantid}, validateonly)
-                putConfigEntities(
-                    [entity], {"tenantid": tenantid}, validateonly)
+                deleteConfigEntities([delEntity], {"tenantid": tenantid}, validateonly)
+                putConfigEntities([entity], {"tenantid": tenantid}, validateonly)
                 unmatched += 1
             else:
                 # logger.info("Standard RequestAttribute IDs match, no action needed")
                 matched += 1
 
-    logger.info("Standard Config Entities: missing(added): {} unmatched(updated): {} matched: {}".format(
-        missing, unmatched, matched))
+    logger.info("Standard Config Entities: missing(added): %s unmatched(updated): %s matched: %s", missing, unmatched, matched)
 
 
 '''
@@ -874,7 +837,7 @@ def purgeConfigEntities(entitytypes, parameters, force, validateonly):
 
     for entitytype in entitytypes:
         configtype = entitytype.__name__
-        logger.info("Purging Config of Type: {}".format(configtype))
+        logger.info("Purging Config of Type: %s", configtype)
         configs = configcache.keys("*::"+configtype+"::*")
         stdConfigNames = stdConfig.getConfigEntitiesNamesByType(entitytype)
         stdConfigIDs = stdConfig.getConfigEntitiesIDsByType(entitytype)
@@ -888,39 +851,31 @@ def purgeConfigEntities(entitytypes, parameters, force, validateonly):
             configname = key.split("::")[-1]
 
             try:
-                configid = configcache.get(key, verify=SSLVerify)
-                logger.info("Checking to purge: {} {}".format(
-                    configname, configid))
+                configid = configcache.get(key)
+                logger.info("Checking to purge: %s %s", configname, configid)
 
                 # only purge the config if it's not within our own standard (do not purge old versions of our own standard)
                 if force or (configname not in stdConfigNames) or (configid not in stdConfigIDs):
                     # check if config is maybe an older version
                     if configid.rsplit("-", 1)[0] in stdConfigIDsShort:
-                        logger.info(
-                            "This seems to be one of ours (not purging unless forced): {}".format(configid))
+                        logger.info("This seems to be one of ours (not purging unless forced): %s", configid)
                         if force:
                             purgeEntity = entitytype(
                                 id=configid, name=configname)
-                            logger.warning("Forced purge of standard {} configuration on {}: {}".format(
-                                configtype, tenantid, purgeEntity))
-                            deleteConfigEntities(
-                                [purgeEntity], {"tenantid": tenantid}, validateonly)
+                            logger.warning("Forced purge of standard %s configuration on %s: %s", configtype, tenantid, purgeEntity)
+                            deleteConfigEntities([purgeEntity], {"tenantid": tenantid}, validateonly)
                             purged += 1
                     else:
                         # create an instance of the entitytype
                         purgeEntity = entitytype(id=configid, name=configname)
-                        logger.warning("Non-standard {} configuration on {} will be purged: {}".format(
-                            configtype, tenantid, purgeEntity))
-                        deleteConfigEntities(
-                            [purgeEntity], {"tenantid": tenantid}, validateonly)
+                        logger.warning("Non-standard %s configuration on %s will be purged: %s", configtype, tenantid, purgeEntity)
+                        deleteConfigEntities([purgeEntity], {"tenantid": tenantid}, validateonly)
                         purged += 1
             except:
-                logger.error("Problem purging {} on {}: {}".format(
-                    configtype, tenantid, sys.exc_info()))
+                logger.error("Problem purging %s on %s: %s", configtype, tenantid, sys.exc_info())
 
         if purged > 0:
-            logger.info(
-                "Purged non-standard {} Entities: {}".format(configtype, purged))
+            logger.info("Purged non-standard %s Entities: %s", configtype, purged)
 
 
 def deleteConfigEntities(entities, parameters, validateonly):
@@ -1170,8 +1125,7 @@ def main(argv):
                 cmd = {}
                 cmd = json.loads(message['data'])
             except (TypeError, ValueError):
-                logger.warning(
-                    "Received Command: {} which I do not understand".format(message["data"]))
+                logger.warning("Received Command: %s which I do not understand", message["data"])
 
             command = cmd.get("command", None)
             logger.always("Received Command: {}".format(command))
@@ -1222,8 +1176,7 @@ def main(argv):
                     entitytypes = getConfig(target)
                     verifyConfigSettings(entitytypes, target)
                 else:
-                    logger.warning(
-                        "No Parameters found in config cache ... skipping")
+                    logger.warning("No Parameters found in config cache ... skipping")
 
                 configcache.publish('configresult', 'FINISHED_VERIFY_CONFIG')
                 logger.always(
@@ -1233,19 +1186,15 @@ def main(argv):
                 logger.always("========== STARTING CONFIG PULL ==========")
                 source = cmd.get("source", None)
                 if source:
-                    logger.info("Source: \n{}".format(json.dumps(
-                        source, indent=2, separators=(',', ': '))))
+                    logger.info("Source: \n%s", json.dumps(source, indent=2, separators=(',', ': ')))
                     configtypes = getConfig(source)
-                    getConfigSettings(
-                        configtypes, cmd.get("config"), source, True)
+                    getConfigSettings(configtypes, cmd.get("config"), source, True)
 
-                    logger.info(
-                        "==== reloading standard config after dump ====")
+                    logger.info("==== reloading standard config after dump ====")
                     stdConfig = ConfigSet.ConfigSet(config_dump_dir)
                     logger.info(stdConfig)
                 else:
-                    logger.warning(
-                        "Source parameter is not specified ... skipping")
+                    logger.warning("Source parameter is not specified ... skipping")
 
                 configcache.publish('configresult', 'FINISHED_PULL_CONFIG')
                 logger.always("========== FINISHED CONFIG PULL ==========")

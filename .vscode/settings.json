@@ -4,12 +4,13 @@
         "--max-line-length",
         "160",
         "--experimental"
-    ]
+    ],
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "python.linting.pylintArgs": [
         "--max-line-length=120",
         "-d invalid-name",
+        "-d pointless-string-statement",
         "--class-naming-style=PascalCase"
     ]
 }
