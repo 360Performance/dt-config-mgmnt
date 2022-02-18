@@ -6,7 +6,6 @@ import requests
 import json
 import yaml
 import urllib3
-from requests.auth import HTTPBasicAuth
 import dns.resolver
 from IPy import IP
 from fqdn import FQDN
@@ -15,7 +14,6 @@ from urllib.parse import urlencode
 import redis
 import logging
 import traceback
-import random
 from configtypes import ConfigTypes
 from configset import ConfigSet
 from textwrap import wrap
