@@ -16,7 +16,6 @@ import redis
 import logging
 import traceback
 import random
-# import dtconfig.ConfigSet as ConfigSet
 from configtypes import ConfigTypes
 from configset import ConfigSet
 from textwrap import wrap
@@ -887,23 +886,19 @@ def deleteConfigEntities(entities, parameters, validateonly):
         configtype = type(entity).__name__
 
         if validateonly:
-            logger.info("DRYRUN - DELETE {}: {}".format(configtype, url))
+            logger.info("DRYRUN - DELETE %s: %s", configtype, url)
         else:
-            logger.info("DELETE {}: {}".format(configtype, url))
+            logger.info("DELETE %s: %s", configtype, url)
             try:
                 resp = requests.delete(url, auth=(apiuser, apipwd))
                 if len(resp.content) > 0:
                     for tenant in resp.json():
-                        status.update(
-                            {str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
+                        status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
                         if tenant["responsecode"] >= 400:
-                            logger.info("tenant: {} status: {}".format(
-                                tenant["tenantid"], tenant["responsecode"]))
-                    logger.info("Status Summary: {} {}".format(
-                        len(resp.json()), status))
+                            logger.info("tenant: %s status: %s", tenant["tenantid"], tenant["responsecode"])
+                    logger.info("Status Summary: %s %s", len(resp.json()), status)
             except:
-                logger.error("Problem deleting {}: {}".format(
-                    configtype, sys.exc_info()))
+                logger.error("Problem deleting %s: %s", configtype, sys.exc_info())
 
 
 def putConfigEntities(entities, parameters, validateonly):
@@ -923,8 +918,7 @@ def putConfigEntities(entities, parameters, validateonly):
         url = server + entity.apipath + validator + query
         configtype = type(entity).__name__
         prefix = "DRYRUN - " if validateonly else ""
-        logger.info("{}{} {}: {}".format(prefix, httpmeth,
-                    entity, entity.apipath+validator+query))
+        logger.info("%s%s %s: %s", prefix, httpmeth, entity, entity.apipath+validator+query)
 
         # ensure the dto has the proper id set when calling PUT
         if httpmeth == 'PUT':
@@ -939,22 +933,16 @@ def putConfigEntities(entities, parameters, validateonly):
             # resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
             if len(resp.content) > 0:
                 for tenant in resp.json():
-                    status.update(
-                        {str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
+                    status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
-                        logger.error("{}{} failed on tenant: {} HTTP{} ({})".format(
-                            prefix, httpmeth, tenant["tenantid"], tenant["responsecode"], tenant["error"]))
+                        logger.error("%s%s failed on tenant: %s HTTP%s (%s)", prefix, httpmeth, tenant["tenantid"], tenant["responsecode"], tenant["error"])
                         # logger.debug("{} Payload: {}".format(httpmeth, json.dumps(entity.dto)))
-                        logger.debug("{} Response: {}".format(
-                            httpmeth, json.dumps(tenant)))
-                logger.info("Status Summary (Dryrun: {}): {} {}".format(
-                    validateonly, len(resp.json()), status))
+                        logger.debug("%s Response: %s", httpmeth, json.dumps(tenant))
+                logger.info("Status Summary (Dryrun: %s): %s %s", validateonly, len(resp.json()), status)
             if validateonly and len(resp.content) == 0:
-                logger.info("All target tenants have sucessfully validated the payload: HTTP{}".format(
-                    resp.status_code))
+                logger.info("All target tenants have sucessfully validated the payload: HTTP%s", resp.status_code)
         except:
-            logger.error("Problem putting {}: {}".format(
-                configtype, sys.exc_info()))
+            logger.error("Problem putting %s: %s", configtype, sys.exc_info())
 
 
 def postConfigEntities(entities, parameters, validateonly):
@@ -973,7 +961,7 @@ def postConfigEntities(entities, parameters, validateonly):
 
         url = server + entity.uri + validator + query
         configtype = type(entity).__name__
-        logger.info("{}POST {}: {}".format(prefix, configtype, url))
+        logger.info("%sPOST %s: %s", prefix, configtype, url)
 
         try:
             resp = requests.post(url, json=entity.dto, auth=(
@@ -983,17 +971,12 @@ def postConfigEntities(entities, parameters, validateonly):
                     status.update(
                         {str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
-                        logger.info("tenant: {} status: {}".format(
-                            tenant["tenantid"], tenant["responsecode"]))
-                        logger.error("POST Payload: {}".format(
-                            json.dumps(entity.dto)))
-                        logger.error("POST Response: {}".format(
-                            json.dumps(tenant)))
-                logger.info("Status Summary: {} {}".format(
-                    len(resp.json()), status))
+                        logger.info("tenant: %s status: %s", tenant["tenantid"], tenant["responsecode"])
+                        logger.error("POST Payload: %s", json.dumps(entity.dto))
+                        logger.error("POST Response: %s", json.dumps(tenant))
+                logger.info("Status Summary: %s %s", len(resp.json()), status)
         except:
-            logger.error("Problem putting {}: {}".format(
-                configtype, sys.exc_info()))
+            logger.error("Problem putting %s: %s", configtype, sys.exc_info())
 
 
 def getControlSettings(ctrlsettings):
@@ -1033,10 +1016,8 @@ def getControlSettings(ctrlsettings):
 def performConfig(entityconfig, parameters):
     # logger.info("Configuration Parameters: {}".format(parameters))
     config = getControlSettings(entityconfig)
-    logger.info("Applying Configuration to: \n{}".format(
-        json.dumps(parameters, indent=2, separators=(',', ': '))))
-    logger.info("Applying Configuration Types: \n{}".format(
-        json.dumps(config, indent=2, separators=(',', ': '))))
+    logger.info("Applying Configuration to: \n%s", json.dumps(parameters, indent=2, separators=(',', ': ')))
+    logger.info("Applying Configuration Types: \n%s", json.dumps(config, indent=2, separators=(',', ': ')))
 
     validateonly = parameters["dryrun"]
     del parameters["dryrun"]
@@ -1045,12 +1026,10 @@ def performConfig(entityconfig, parameters):
 
     for ename, enabled in config.items():
         etype = getattr(ConfigTypes, ename, None)
-        logger.info("++++++++ {} ({}) ++++++++".format(ename.upper(), enabled))
+        logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
         if enabled and etype is not None and ename not in specialHandling:
-            updateOrCreateConfigEntities(
-                stdConfig.getConfigEntitiesByType(etype), parameters, validateonly)
-            putConfigEntities(stdConfig.getConfigEntitiesByType(
-                etype), parameters, validateonly)
+            updateOrCreateConfigEntities(stdConfig.getConfigEntitiesByType(etype), parameters, validateonly)
+            putConfigEntities(stdConfig.getConfigEntitiesByType(etype), parameters, validateonly)
         elif enabled and ename in specialHandling:
             if ename == "applicationsweb":
                 getServices(parameters)
@@ -1087,8 +1066,7 @@ def performConfig(entityconfig, parameters):
                 putAppDashboards(appdashboards, validateonly)
 
         else:
-            logger.info(
-                "{} configuration is disabled or not implemented".format(ename))
+            logger.info("%s configuration is disabled or not implemented", ename)
 
 
 def getConfig(parameters):
@@ -1109,12 +1087,9 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     # list all known config entity types we are aware of
-    logger.always("Able to manage these tenant configuration entities of tenants: {}".format(
-        [cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]))
-    logger.always("Able to manage these tenant configuration settings of tenants: {}".format(
-        [cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()]))
-    logger.always("Able to manage these entities of tenants: {}".format(
-        [cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()]))
+    logger.always("Handling configuration entities: %s", [cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()])
+    logger.always("Handling configuration settings: %s", [cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()])
+    logger.always("Handling entities: %s", [cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()])
 
     logger.always(stdConfig)
 
@@ -1204,10 +1179,8 @@ def main(argv):
                 source = cmd.get("source", None)
                 target = cmd.get("target", None)
                 if source and target:
-                    logger.info("Source: \n{}".format(json.dumps(
-                        source, indent=2, separators=(',', ': '))))
-                    logger.info("Target: \n{}".format(json.dumps(
-                        target, indent=2, separators=(',', ': '))))
+                    logger.info("Source: \n%s", source, indent=2, separators=(',', ': '))
+                    logger.info("Target: \n%s", json.dumps(target, indent=2, separators=(',', ': ')))
                     configcache.publish("configcontrol", "PULL_CONFIG")
                     configcache.setex("parameters", 3600, json.dumps(target))
                     # send ourselves a message to start a config run DANGEROUS if config has been modified
@@ -1217,10 +1190,9 @@ def main(argv):
                 logger.always("========== FINISHED CONFIG COPY ==========")
 
             else:
-                logger.warning(
-                    "Received Command: {} which I do not understand".format(command))
+                logger.warning("Received Command: %s which I do not understand", command)
 
-            logger.always("Processed Command: {}".format(command))
+            logger.always("Processed Command: %s", command)
 
         logger.always("Waiting for new command...")
         time.sleep(5)
