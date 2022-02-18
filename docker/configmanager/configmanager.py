@@ -60,11 +60,9 @@ config_dump_dir = os.environ.get("CONFIG_DUMP_DIR", "/config_dump")
 
 logger.always("Dynatrace Consolidated API: %s  User: %s", server, apiuser)
 if not apiuser:
-    sys.exit(
-        "No api user found (ensure env variable DT_API_USER is set) ... can't continue")
+    sys.exit("No api user found (ensure env variable DT_API_USER is set) ... can't continue")
 if not apipwd:
-    sys.exit(
-        "No password for api user found (ensure env variable DT_API_PWD is set) ... can't continue")
+    sys.exit("No password for api user found (ensure env variable DT_API_PWD is set) ... can't continue")
 
 # load the standard config from config directory
 stdConfig = ConfigSet.ConfigSet(config_dir)
@@ -130,10 +128,8 @@ def createAppConfigEntitiesFromServices():
 
                 # create applicationdetectionrules and attach it to the app
                 for filter in patterns:
-                    rule = copy.deepcopy(
-                        stdConfig.getStandardApplicationDetectionRule())
-                    rule.setFilter(
-                        pattern=filter, matchType="CONTAINS", matchTarget="DOMAIN")
+                    rule = copy.deepcopy(stdConfig.getStandardApplicationDetectionRule())
+                    rule.setFilter(pattern=filter, matchType="CONTAINS", matchTarget="DOMAIN")
                     application.addDetectionRule(rule)
                     logger.info(rule)
 
@@ -172,19 +168,16 @@ def createAppDashboardEntitiesFromApps(applications):
                 dashboard.setName(dashboard.getName() + " - " + app.getName())
                 dashboard.setAssignedApplicationEntity(app.getID())
                 if app.getName() in monitors:
-                    dashboard.setAssignedSyntheticMonitorEntity(
-                        monitors[app.getName()])
+                    dashboard.setAssignedSyntheticMonitorEntity(monitors[app.getName()])
                 else:
-                    logger.warning(
-                        "Synthetic Monitor for %s not (yet) found, creating dashboard without synthetic monitor reference", app.getName())
+                    logger.warning("Synthetic Monitor for %s not (yet) found, creating dashboard without synthetic monitor reference", app.getName())
 
                 # ensure the ID of the dashboard is unique and reflects the application it belongs to
                 # replacing the original ID with a generated HEX fromt he application ID that has been generated before
                 # e.g:
                 # gggg0001-0a0a-0b0b-0c0c-000000000001 => gggg0001-6E76-692D-7031-737400000001
                 prefix = dashboard.getID().split('-', 1)[0]
-                dbid = wrap(stdConfig.getStdAppEntityID(
-                    t_id, app.getName()), 4)
+                dbid = wrap(stdConfig.getStdAppEntityID(t_id, app.getName()), 4)
                 # dbid = wrap(app.getID().rsplit('-')[1],4)
                 postfix = "{:0>8}".format(1)
                 dbid[3] = dbid[3]+postfix
@@ -225,23 +218,19 @@ Drawback of this is that it requires already end user information being present.
 
 def getUsedDomains(parameters):
     apiurl = "/e/TENANTID/api/v1/userSessionQueryLanguage/table"
-    parameters.update(
-        {"query": "SELECT useraction.domain FROM usersession GROUP BY useraction.domain"})
+    parameters.update({"query": "SELECT useraction.domain FROM usersession GROUP BY useraction.domain"})
     url = server + apiurl
 
     try:
-        response = requests.get(url, auth=(
-            apiuser, apipwd), params=parameters, verify=SSLVerify)
+        response = requests.get(url, auth=(apiuser, apipwd), params=parameters, verify=SSLVerify)
         result = response.json()
         for tenant in result:
             c_id = tenant["clusterid"]
             t_id = tenant["tenantid"]
             if tenant["responsecode"] == 200:
-                domains = [item for sublist in tenant["values"]
-                           for item in sublist]
+                domains = [item for sublist in tenant["values"] for item in sublist]
                 key = "::".join([c_id, t_id, "domains"])
-                logger.info(
-                    "Used domains by user sessions: %s %s", key, domains)
+                logger.info("Used domains by user sessions: %s %s", key, domains)
                 configcache.sadd(key, *domains)
                 configcache.expire(key, 600)
     except:
@@ -260,16 +249,14 @@ def getAllSyntheticMonitors(parameters):
     url = server + apiurl
 
     try:
-        response = requests.get(url, auth=(
-            apiuser, apipwd), params=parameters, verify=SSLVerify)
+        response = requests.get(url, auth=(apiuser, apipwd), params=parameters, verify=SSLVerify)
         result = response.json()
         for tenant in result:
             c_id = tenant["clusterid"]
             t_id = tenant["tenantid"]
             for monitor in tenant["monitors"]:
                 logger.info("Existing synthetic monitor (%s): %s type: %s", monitor["entityId"], monitor["name"], monitor["type"])
-                key = "::".join([c_id, t_id, "syntheticmonitors",
-                                monitor["type"], monitor["name"]])
+                key = "::".join([c_id, t_id, "syntheticmonitors", monitor["type"], monitor["name"]])
                 try:
                     configcache.set(key, monitor["entityId"])
                 except:
@@ -285,8 +272,7 @@ def prepareSyntheticMonitors(monitorentities):
         m_type = monitor.getType()
         # check if monitor already exists
         try:
-            keys = configcache.keys(
-                "*::syntheticmonitors::"+m_type+"::"+m_name)
+            keys = configcache.keys("*::syntheticmonitors::"+m_type+"::"+m_name)
             if keys:
                 for key in keys:
                     parts = key.split("::")
@@ -353,8 +339,7 @@ def createSyntheticMonitorsFromApps(applications):
             appname = app.getName()
             # there are some internal domains that we do not want to create monitors for
             if appname not in internaldomains:
-                monitor = copy.deepcopy(
-                    stdConfig.getStandardSyntheticMonitor())
+                monitor = copy.deepcopy(stdConfig.getStandardSyntheticMonitor())
                 monitor.setName(appname)
 
                 if appname in monitors:
@@ -532,8 +517,7 @@ def getApplications(parameters):
             key = "::".join([c_id, t_id, "applications"])
             # we want application IDs to be recognizable for the standard (what has been created through automation)
             # so we format them accordingly
-            std_appid = "{:0>12}".format(
-                t_id.encode("utf-8").hex()[-12:]).upper()
+            std_appid = "{:0>12}".format(t_id.encode("utf-8").hex()[-12:]).upper()
             for application in tenant["values"]:
                 a_id = application["id"].split("-")[1]
 
@@ -623,8 +607,7 @@ def verifyConfigSettings(entitytypes, parameters):
                     else:
                         # create the actual entity
                         etype = type(entity)
-                        centity = etype(
-                            id=entity.id, name=entity.name, dto=tenant)
+                        centity = etype(id=entity.id, name=entity.name, dto=tenant)
                         # logger.info("{}\n{}".format(entity.dto,centity.dto))
                         logger.info("%s : %s::%s %s", ("MATCHING" if entity == centity else "DIFFERENT"), c_id, t_id, centity)
                         # if entity != centity:
@@ -685,19 +668,16 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                         if attrkey and not issubclass(entitytype, ConfigTypes.TenantSetting):
                             for attr in tenant[attrkey]:
                                 # key = "::".join([c_id, t_id])
-                                key = "::".join(
-                                    [c_id, t_id, configtype, attr[entitytype.name_attr]])
+                                key = "::".join([c_id, t_id, configtype, attr[entitytype.name_attr]])
                                 # logger.info("Found: {}".format(key))
                                 if entitytype.name_attr in attr and attr[entitytype.name_attr] in stdConfigNames:
                                     # logger.info("{} {} : {}".format(key,attr["name"], attr["id"]))
                                     # we are not getting the details of every config entity (that would be too much - only the list of config entities) so we do not perform a by-entity comparison
                                     # in theory we could now fetch the details by ID and then compare ... maybe later
-                                    configcache.setex(
-                                        key, 3600, attr[entitytype.id_attr])
+                                    configcache.setex(key, 3600, attr[entitytype.id_attr])
                                     attrcheck.add(attr[entitytype.name_attr])
                                 else:
-                                    configcache.setex(
-                                        key, 3600, attr[entitytype.id_attr])
+                                    configcache.setex(key, 3600, attr[entitytype.id_attr])
                                     logger.info("%s entities not in standard: %s : %s", configtype, key, attr[entitytype.id_attr])
 
                                 # when dumping the configuration to files we need to request the actual entity's content (this adds more requests)
@@ -706,15 +686,12 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                                     entityurl = f'{server}{apiurl}/{attr[entitytype.id_attr]}'
                                     logger.debug("Fetching Entity: %s", entityurl)
                                     try:
-                                        response = session.get(
-                                            entityurl, verify=SSLVerify)
+                                        response = session.get(entityurl, verify=SSLVerify)
                                         # consolidated API always returns arrays of tenants, we query only tenant so safe to use the first entry
                                         result = response.json()[0]
-                                        centity = entitytype(
-                                            id=attr[entitytype.id_attr], name=attr[entitytype.name_attr], dto=result)
+                                        centity = entitytype(id=attr[entitytype.id_attr], name=attr[entitytype.name_attr], dto=result)
                                         if centity.isShared():
-                                            definition = centity.dumpDTO(
-                                                config_dump_dir)
+                                            definition = centity.dumpDTO(config_dump_dir)
                                             entity_defs.append(definition)
                                     except:
                                         logger.error("Exception: %s", sys.exc_info())
@@ -724,8 +701,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                             # logger.info("{}: {}".format(entitytype.__name__,tenant))
                             centity = entitytype(dto=tenant)
                             # logger.info(centity.dto)
-                            stdEntity = stdConfig.getConfigEntityByName(
-                                configtype)
+                            stdEntity = stdConfig.getConfigEntityByName(configtype)
                             # logger.info(stdEntity.dto)
                             match = centity == stdEntity
                             if match:
@@ -859,8 +835,7 @@ def purgeConfigEntities(entitytypes, parameters, force, validateonly):
                     if configid.rsplit("-", 1)[0] in stdConfigIDsShort:
                         logger.info("This seems to be one of ours (not purging unless forced): %s", configid)
                         if force:
-                            purgeEntity = entitytype(
-                                id=configid, name=configname)
+                            purgeEntity = entitytype(id=configid, name=configname)
                             logger.warning("Forced purge of standard %s configuration on %s: %s", configtype, tenantid, purgeEntity)
                             deleteConfigEntities([purgeEntity], {"tenantid": tenantid}, validateonly)
                             purged += 1
@@ -964,12 +939,11 @@ def postConfigEntities(entities, parameters, validateonly):
         logger.info("%sPOST %s: %s", prefix, configtype, url)
 
         try:
-            resp = requests.post(url, json=entity.dto, auth=(
+            resp = session.post(url, json=entity.dto, auth=(
                 apiuser, apipwd), verify=SSLVerify)
             if len(resp.content) > 0:
                 for tenant in resp.json():
-                    status.update(
-                        {str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
+                    status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
                         logger.info("tenant: %s status: %s", tenant["tenantid"], tenant["responsecode"])
                         logger.error("POST Payload: %s", json.dumps(entity.dto))
@@ -1021,8 +995,7 @@ def performConfig(entityconfig, parameters):
 
     validateonly = parameters["dryrun"]
     del parameters["dryrun"]
-    specialHandling = ["applicationsweb",
-                       "syntheticmonitors", "applicationDashboards"]
+    specialHandling = ["applicationsweb", "syntheticmonitors", "applicationDashboards"]
 
     for ename, enabled in config.items():
         etype = getattr(ConfigTypes, ename, None)
@@ -1047,8 +1020,7 @@ def performConfig(entityconfig, parameters):
                 getUsedDomains(parameters)
                 # this will check if configured synthetic monitors already exist, if yes make sure they are just updated (get their ID, modify settings)
                 # if not create a new one
-                monitors = prepareSyntheticMonitors(
-                    stdConfig.getConfigEntitiesByType(etype))
+                monitors = prepareSyntheticMonitors(stdConfig.getConfigEntitiesByType(etype))
                 logger.info(monitors)
                 # putConfigEntities(monitors,parameters,validateonly)
                 '''
@@ -1072,10 +1044,8 @@ def performConfig(entityconfig, parameters):
 def getConfig(parameters):
     # configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
     # configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
-    configtypes = [getattr(ConfigTypes, cls.__name__)
-                   for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]
-    configtypes = configtypes + [getattr(ConfigTypes, cls.__name__)
-                                 for cls in ConfigTypes.TenantSetting.__subclasses__()]
+    configtypes = [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]
+    configtypes = configtypes + [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantSetting.__subclasses__()]
     # getConfigSettings(configtypes, parameters, dumpconfig)
     return configtypes
 
@@ -1105,8 +1075,7 @@ def main(argv):
             command = cmd.get("command", None)
             logger.always("Received Command: {}".format(command))
             if command == 'RESET':
-                logger.always(
-                    "========== RELOADING STANDARD CONFIG ==========")
+                logger.always("========== RELOADING STANDARD CONFIG ==========")
                 stdConfig = ConfigSet.ConfigSet(config_dir)
                 logger.info(stdConfig)
                 configcache.publish('configresult', 'FINISHED_RESET')
@@ -1120,13 +1089,10 @@ def main(argv):
                     if "dryrun" not in target:
                         target.update({"dryrun": True})
 
-                    logger.always(
-                        "========== STARTING CONFIG FETCH ==========")
+                    logger.always("========== STARTING CONFIG FETCH ==========")
                     configtypes = getConfig(target)
-                    getConfigSettings(configtypes, cmd.get(
-                        "config"), target, False)
-                    logger.always(
-                        "========== FINISHED CONFIG FETCH ==========")
+                    getConfigSettings(configtypes, cmd.get("config"), target, False)
+                    logger.always("========== FINISHED CONFIG FETCH ==========")
                     performConfig(cmd.get("config"), target)
 
                     # cleanup redis but keep the parameters
@@ -1137,15 +1103,13 @@ def main(argv):
 
                     # configcache.publish('configcontrol','FINISHED_CONFIG_PUSH')
                 else:
-                    logger.warning(
-                        "No Parameters found in config cache ... skipping")
+                    logger.warning("No Parameters found in config cache ... skipping")
 
                 configcache.publish('configresult', 'FINISHED_PUSH_CONFIG')
                 logger.always("========== FINISHED CONFIG PUSH ==========")
 
             elif command == 'VERIFY_CONFIG':
-                logger.always(
-                    "========== STARTING CONFIG VERIFICATION ==========")
+                logger.always("========== STARTING CONFIG VERIFICATION ==========")
                 target = cmd.get("target", None)
                 if target:
                     entitytypes = getConfig(target)
@@ -1154,8 +1118,7 @@ def main(argv):
                     logger.warning("No Parameters found in config cache ... skipping")
 
                 configcache.publish('configresult', 'FINISHED_VERIFY_CONFIG')
-                logger.always(
-                    "========== FINISHED CONFIG VERIFICATION ==========")
+                logger.always("========== FINISHED CONFIG VERIFICATION ==========")
 
             elif command == 'PULL_CONFIG':
                 logger.always("========== STARTING CONFIG PULL ==========")
