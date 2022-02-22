@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class servicedetectionRulesOpaqueAndExternalWebService(TenantConfigEntity):
+class servicedetectionRulesOpaqueAndExternalWebService(TenantConfigV1Entity):
     entityuri = "/service/detectionRules/OPAQUE_AND_EXTERNAL_WEB_SERVICE"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

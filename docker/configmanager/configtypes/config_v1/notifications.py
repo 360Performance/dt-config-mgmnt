@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class notifications(TenantConfigEntity):
+class notifications(TenantConfigV1Entity):
     entityuri = "/notifications"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

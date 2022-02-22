@@ -1,3 +1,4 @@
+from .setting import *
 from .alertingProfiles import *
 from .allowedBeaconOriginsForCors import *
 from .applicationDetectionRules import *

@@ -1,13 +1,13 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 from textwrap import wrap
 
 
-class applicationsweb(TenantConfigEntity):
+class applicationsweb(TenantConfigV1Entity):
     entityuri = "/applications/web"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantConfigEntity.__init__(self, **kwargs)
+        TenantConfigV1Entity.__init__(self, **kwargs)
         self.detectionrules = []
 
     def __str__(self):

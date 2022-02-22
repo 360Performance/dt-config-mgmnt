@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class allowedBeaconOriginsForCors(TenantConfigEntity):
+class allowedBeaconOriginsForCors(TenantConfigV1Entity):
     entityuri = "/allowedBeaconOriginsForCors"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

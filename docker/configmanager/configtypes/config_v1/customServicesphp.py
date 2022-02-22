@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class customServicesphp(TenantConfigEntity):
+class customServicesphp(TenantConfigV1Entity):
     entityuri = "/service/customServices/php"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

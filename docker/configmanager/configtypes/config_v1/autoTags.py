@@ -1,7 +1,7 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class autoTags(TenantConfigEntity):
+class autoTags(TenantConfigV1Entity):
     entityuri = "/autoTags"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass

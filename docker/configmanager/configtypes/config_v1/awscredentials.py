@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class awscredentials(TenantConfigEntity):
+class awscredentials(TenantConfigV1Entity):
     entityuri = "/aws/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

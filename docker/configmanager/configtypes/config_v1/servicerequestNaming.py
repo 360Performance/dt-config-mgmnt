@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class servicerequestNaming(TenantConfigEntity):
+class servicerequestNaming(TenantConfigV1Entity):
     entityuri = "/service/requestNaming"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

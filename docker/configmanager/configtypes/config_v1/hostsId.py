@@ -1,11 +1,11 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 # OneAgent on a host
 
 
-class hostsId(TenantConfigEntity):
+class hostsId(TenantConfigV1Entity):
     entityuri = "/hosts/{id}"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setID(self, id):
         self.id = id

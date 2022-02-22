@@ -1,13 +1,13 @@
 import logging
-from ..ConfigTypes import TenantEntity
+from ..ConfigTypes import TenantEnvironmentV1Entity
 
 
 logger = logging.getLogger(__name__)
 
 
-class syntheticmonitors(TenantEntity):
+class syntheticmonitors(TenantEnvironmentV1Entity):
     entityuri = "/synthetic/monitors"
-    uri = TenantEntity.uri + entityuri
+    uri = TenantEnvironmentV1Entity.uri + entityuri
     httpmethod = "POST"
 
     def getHttpMethod(self):

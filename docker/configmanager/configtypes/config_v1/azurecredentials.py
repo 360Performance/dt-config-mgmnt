@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class azurecredentials(TenantConfigEntity):
+class azurecredentials(TenantConfigV1Entity):
     entityuri = "/azure/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class alertingProfiles(TenantConfigEntity):
+class alertingProfiles(TenantConfigV1Entity):
     entityuri = "/alertingProfiles"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

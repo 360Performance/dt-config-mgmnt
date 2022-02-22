@@ -1,7 +1,7 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class applicationDetectionRuleshostDetection(TenantConfigEntity):
+class applicationDetectionRuleshostDetection(TenantConfigV1Entity):
     entityuri = "/applicationDetectionRules/hostDetection"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass

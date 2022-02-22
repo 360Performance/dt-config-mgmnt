@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class kubernetescredentials(TenantConfigEntity):
+class kubernetescredentials(TenantConfigV1Entity):
     entityuri = "/kubernetes/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

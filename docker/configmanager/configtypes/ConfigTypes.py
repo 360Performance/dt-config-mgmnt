@@ -95,7 +95,7 @@ class ConfigEntity():
         return True
 
 
-class TenantConfigEntity(ConfigEntity):
+class TenantConfigV1Entity(ConfigEntity):
     uri = "/e/TENANTID/api/config/v1"
     name_attr = "name"
     id_attr = "id"
@@ -129,7 +129,7 @@ class TenantConfigEntity(ConfigEntity):
         return "PUT"
 
 
-class TenantEntity(TenantConfigEntity):
+class TenantEnvironmentV1Entity(TenantConfigV1Entity):
     uri = "/e/TENANTID/api/v1"
 
     def __str__(self):
@@ -143,7 +143,42 @@ class TenantEntity(TenantConfigEntity):
         self.apipath = self.uri+"/"+self.id
 
 
-class TenantSetting(TenantConfigEntity):
+class TenantEnvironmentV2Entity(TenantConfigV1Entity):
+    uri = "/e/TENANTID/api/v2"
+
+    def __str__(self):
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+
+    def __repr__(self):
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+
+    def setID(self, id):
+        self.id = id
+        self.apipath = self.uri+"/"+self.id
+
+
+class TenantConfigV1Setting(TenantConfigV1Entity):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.id = self.__class__.__name__
+        self.name = self.__class__.__name__
+        self.apipath = self.uri
+        self.file = kwargs.get("file", self.__class__.__name__)
+
+    def __str__(self):
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__}'
+
+    def __repr__(self):
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__}'
+
+
+'''
+There is a significant change between settings in V1 and V2.
+In API V2 settings are part of the environment API, while in V1 they were part of the config API
+'''
+
+
+class TenantEnvironmentV2Setting(TenantEnvironmentV2Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.id = self.__class__.__name__

@@ -98,7 +98,7 @@ class ConfigEntity():
         return True
 
 
-class TenantConfigEntity(ConfigEntity):
+class TenantConfigV1Entity(ConfigEntity):
     uri = "/e/TENANTID/api/config/v1"
     name_attr = "name"
     id_attr = "id"
@@ -134,7 +134,7 @@ class TenantConfigEntity(ConfigEntity):
         return "PUT"
 
 
-class TenantEntity(TenantConfigEntity):
+class TenantConfigV1Entity(TenantConfigV1Entity):
     uri = "/e/TENANTID/api/v1"
 
     def __init__(self, **kwargs):
@@ -151,7 +151,7 @@ class TenantEntity(TenantConfigEntity):
         self.apipath = self.uri+"/"+self.id
 
 
-class TenantSetting(TenantConfigEntity):
+class TenantConfigV1Setting(TenantConfigV1Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.id = self.__class__.__name__
@@ -201,267 +201,267 @@ class updateLicense(ClusterConfigEntity):
         self.dto[attr] = value
 
 
-class servicerequestAttributes(TenantConfigEntity):
+class servicerequestAttributes(TenantConfigV1Entity):
     entityuri = "/service/requestAttributes"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class servicerequestNaming(TenantConfigEntity):
+class servicerequestNaming(TenantConfigV1Entity):
     entityuri = "/service/requestNaming"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class autoTags(TenantConfigEntity):
+class autoTags(TenantConfigV1Entity):
     entityuri = "/autoTags"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class conditionalNamingprocessGroup(TenantConfigEntity):
+class conditionalNamingprocessGroup(TenantConfigV1Entity):
     entityuri = "/conditionalNaming/processGroup"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setName(self, name):
         self.dto["displayName"] = self.name
     pass
 
 
-class conditionalNaminghost(TenantConfigEntity):
+class conditionalNaminghost(TenantConfigV1Entity):
     entityuri = "/conditionalNaming/host"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setName(self, name):
         self.dto["displayName"] = self.name
     pass
 
 
-class conditionalNamingservice(TenantConfigEntity):
+class conditionalNamingservice(TenantConfigV1Entity):
     entityuri = "/conditionalNaming/service"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setName(self, name):
         self.dto["displayName"] = self.name
     pass
 
 
-class customServicesjava(TenantConfigEntity):
+class customServicesjava(TenantConfigV1Entity):
     entityuri = "/service/customServices/java"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class customServicesdotNet(TenantConfigEntity):
+class customServicesdotNet(TenantConfigV1Entity):
     entityuri = "/service/customServices/dotNet"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class customServicesgo(TenantConfigEntity):
+class customServicesgo(TenantConfigV1Entity):
     entityuri = "/service/customServices/go"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class customServicesphp(TenantConfigEntity):
+class customServicesphp(TenantConfigV1Entity):
     entityuri = "/service/customServices/php"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class managementZones(TenantConfigEntity):
+class managementZones(TenantConfigV1Entity):
     entityuri = "/managementZones"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class maintenanceWindows(TenantConfigEntity):
+class maintenanceWindows(TenantConfigV1Entity):
     entityuri = "/maintenanceWindows"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class calculatedMetricsservice(TenantConfigEntity):
+class calculatedMetricsservice(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/service"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class calculatedMetricssynthetic(TenantConfigEntity):
+class calculatedMetricssynthetic(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/synthetic"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class calculatedMetricslog(TenantConfigEntity):
+class calculatedMetricslog(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/log"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class calculatedMetricsmobile(TenantConfigEntity):
+class calculatedMetricsmobile(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/mobile"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class calculatedMetricsrum(TenantConfigEntity):
+class calculatedMetricsrum(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/rum"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class servicedetectionRulesFullWebService(TenantConfigEntity):
+class servicedetectionRulesFullWebService(TenantConfigV1Entity):
     entityuri = "/service/detectionRules/FULL_WEB_SERVICE"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class servicedetectionRulesFullWebRequest(TenantConfigEntity):
+class servicedetectionRulesFullWebRequest(TenantConfigV1Entity):
     entityuri = "/service/detectionRules/FULL_WEB_REQUEST"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class servicedetectionRulesOpaqueAndExternalWebRequest(TenantConfigEntity):
+class servicedetectionRulesOpaqueAndExternalWebRequest(TenantConfigV1Entity):
     entityuri = "/service/detectionRules/OPAQUE_AND_EXTERNAL_WEB_REQUEST"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class servicedetectionRulesOpaqueAndExternalWebService(TenantConfigEntity):
+class servicedetectionRulesOpaqueAndExternalWebService(TenantConfigV1Entity):
     entityuri = "/service/detectionRules/OPAQUE_AND_EXTERNAL_WEB_SERVICE"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class servicefailureDetectionparameterSelectionparameterSets(TenantConfigEntity):
+class servicefailureDetectionparameterSelectionparameterSets(TenantConfigV1Entity):
     entityuri = "/service/failureDetection/parameterSelection/parameterSets"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class servicefailureDetectionparameterSelectionrules(TenantConfigEntity):
+class servicefailureDetectionparameterSelectionrules(TenantConfigV1Entity):
     entityuri = "/service/failureDetection/parameterSelection/rules"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class reports(TenantConfigEntity):
+class reports(TenantConfigV1Entity):
     entityuri = "/reports"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     name_attr = "id"
     pass
 
 
-class allowedBeaconOriginsForCors(TenantConfigEntity):
+class allowedBeaconOriginsForCors(TenantConfigV1Entity):
     entityuri = "/allowedBeaconOriginsForCors"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class anomalyDetectionapplications(TenantSetting):
+class anomalyDetectionapplications(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/applications"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectionservices(TenantSetting):
+class anomalyDetectionservices(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/services"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectionhosts(TenantSetting):
+class anomalyDetectionhosts(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/hosts"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectiondatabaseServices(TenantSetting):
+class anomalyDetectiondatabaseServices(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/databaseServices"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectiondiskEvents(TenantSetting):
+class anomalyDetectiondiskEvents(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/diskEvents"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectionaws(TenantSetting):
+class anomalyDetectionaws(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/aws"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectionvmware(TenantSetting):
+class anomalyDetectionvmware(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/vmware"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectionmetricEvents(TenantSetting):
+class anomalyDetectionmetricEvents(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/metricEvents"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class anomalyDetectionprocessGroups(TenantSetting):
+class anomalyDetectionprocessGroups(TenantConfigV1Setting):
     entityuri = "/anomalyDetection/processGroups"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class frequentIssueDetection(TenantSetting):
+class frequentIssueDetection(TenantConfigV1Setting):
     entityuri = "/frequentIssueDetection"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class remoteEnvironments(TenantConfigEntity):
+class remoteEnvironments(TenantConfigV1Entity):
     entityuri = "/remoteEnvironments"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
 
-class applicationsweb(TenantConfigEntity):
+class applicationsweb(TenantConfigV1Entity):
     entityuri = "/applications/web"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantConfigEntity.__init__(self, **kwargs)
+        TenantConfigV1Entity.__init__(self, **kwargs)
         self.detectionrules = []
 
     def __str__(self):
@@ -502,21 +502,33 @@ class applicationsweb(TenantConfigEntity):
         return self.detectionrules
 
 
-class applicationDetectionRules(TenantConfigEntity):
+class applicationDetectionRules(TenantConfigV1Entity):
     entityuri = "/applicationDetectionRules"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __str__(self):
         if self.dto:
-            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"])
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.dto["applicationIdentifier"],
+                self.id, self.dto["filterConfig"]["applicationMatchTarget"],
+                self.dto["filterConfig"]["applicationMatchType"],
+                self.dto["filterConfig"]["pattern"])
         else:
-            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern")
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.id, "no applicationMatchTarget",
+                "no applicationMatchType", "no pattern")
 
     def __repr__(self):
         if self.dto:
-            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.dto["applicationIdentifier"], self.id, self.dto["filterConfig"]["applicationMatchTarget"], self.dto["filterConfig"]["applicationMatchType"], self.dto["filterConfig"]["pattern"])
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.dto["applicationIdentifier"],
+                self.id, self.dto["filterConfig"]["applicationMatchTarget"],
+                self.dto["filterConfig"]["applicationMatchType"],
+                self.dto["filterConfig"]["pattern"])
         else:
-            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.id, "no applicationMatchTarget", "no applicationMatchType", "no pattern")
+            return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.id, "no applicationMatchTarget",
+                "no applicationMatchType", "no pattern")
 
     def setApplicationIdentifier(self, appid):
         self.dto["applicationIdentifier"] = appid
@@ -532,45 +544,45 @@ class applicationDetectionRules(TenantConfigEntity):
         self.dto["filterConfig"]["applicationMatchTarget"] = matchTarget
 
 
-class applicationDetectionRuleshostDetection(TenantConfigEntity):
+class applicationDetectionRuleshostDetection(TenantConfigV1Entity):
     entityuri = "/applicationDetectionRules/hostDetection"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class contentResources(TenantConfigEntity):
+class contentResources(TenantConfigV1Entity):
     entityuri = "/contentResources"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class geographicRegionsipDetectionHeaders(TenantConfigEntity):
+class geographicRegionsipDetectionHeaders(TenantConfigV1Entity):
     entityuri = "/geographicRegions/ipDetectionHeaders"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class geographicRegionsipAddressMappings(TenantConfigEntity):
+class geographicRegionsipAddressMappings(TenantConfigV1Entity):
     entityuri = "/geographicRegions/ipAddressMappings"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 # these needs some more attention as it looks quite like some exceptions are required
 # RUM - Mobile and custom application configuration
 
 
-class applicationsmobile(TenantConfigEntity):
+class applicationsmobile(TenantConfigV1Entity):
     entityuri = "/applications/mobile"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 # this seems to require POST without payload
 # needs special handling for DTO
 
 
-class applicationsmobileAppIdkeyUserActions(TenantConfigEntity):
+class applicationsmobileAppIdkeyUserActions(TenantConfigV1Entity):
     entityuri = "/applications/mobile/{appid}/keyUserActions/{actionName}"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setAppID(self, appid):
         self.appid = appid
@@ -583,9 +595,9 @@ class applicationsmobileAppIdkeyUserActions(TenantConfigEntity):
         self.dto = None
 
 
-class applicationsmobileAppIduserActionAndSessionProperties(TenantConfigEntity):
+class applicationsmobileAppIduserActionAndSessionProperties(TenantConfigV1Entity):
     entityuri = "/applications/mobile/{applicationId}/userActionAndSessionProperties"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setAppID(self, appid):
         self.appid = appid
@@ -594,67 +606,67 @@ class applicationsmobileAppIduserActionAndSessionProperties(TenantConfigEntity):
 # lots of review needed above for the application configs
 
 
-class awsiamExternalId(TenantConfigEntity):
+class awsiamExternalId(TenantConfigV1Entity):
     entityuri = "/aws/iamExternalId"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class awscredentials(TenantConfigEntity):
+class awscredentials(TenantConfigV1Entity):
     entityuri = "/aws/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class awsprivateLink(TenantConfigEntity):
+class awsprivateLink(TenantConfigV1Entity):
     entityuri = "/aws/privateLink"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class azurecredentials(TenantConfigEntity):
+class azurecredentials(TenantConfigV1Entity):
     entityuri = "/azure/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class cloudFoundry(TenantConfigEntity):
+class cloudFoundry(TenantConfigV1Entity):
     entityuri = "/cloudFoundry/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class kubernetescredentials(TenantConfigEntity):
+class kubernetescredentials(TenantConfigV1Entity):
     entityuri = "/kubernetes/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class alertingProfiles(TenantConfigEntity):
+class alertingProfiles(TenantConfigV1Entity):
     entityuri = "/alertingProfiles"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 
-class notifications(TenantConfigEntity):
+class notifications(TenantConfigV1Entity):
     entityuri = "/notifications"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 # OneAgent - Environment-wide configuration
 
 
-class hostsautoupdate(TenantConfigEntity):
+class hostsautoupdate(TenantConfigV1Entity):
     entityuri = "/hosts/autoupdate"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass
 
 # OneAgent in a host group
 
 
-class hostgroupsautoupdate(TenantConfigEntity):
+class hostgroupsautoupdate(TenantConfigV1Entity):
     entityuri = "/hostgroups/{id}/autoupdate"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setID(self, id):
         self.id = id
@@ -664,9 +676,9 @@ class hostgroupsautoupdate(TenantConfigEntity):
 # OneAgent on a host
 
 
-class hostsId(TenantConfigEntity):
+class hostsId(TenantConfigV1Entity):
     entityuri = "/hosts/{id}"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setID(self, id):
         self.id = id
@@ -676,9 +688,9 @@ class hostsId(TenantConfigEntity):
 # OneAgent on a host
 
 
-class hostsIdautoupdate(TenantConfigEntity):
+class hostsIdautoupdate(TenantConfigV1Entity):
     entityuri = "/hosts/{id}/autoupdate"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setID(self, id):
         self.id = id
@@ -688,9 +700,9 @@ class hostsIdautoupdate(TenantConfigEntity):
 # OneAgent on a host
 
 
-class hostsIdmonitoring(TenantConfigEntity):
+class hostsIdmonitoring(TenantConfigV1Entity):
     entityuri = "/hosts/{id}/monitoring"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setID(self, id):
         self.id = id
@@ -698,18 +710,18 @@ class hostsIdmonitoring(TenantConfigEntity):
         self.dto["id"] = id
 
 
-class dataPrivacy(TenantSetting):
+class dataPrivacy(TenantConfigV1Setting):
     entityuri = "/dataPrivacy"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __init__(self, **kwargs):
-        TenantSetting.__init__(self, **kwargs)
+        TenantConfigV1Setting.__init__(self, **kwargs)
         self.apipath = self.uri
 
 
-class syntheticmonitors(TenantEntity):
+class syntheticmonitors(TenantConfigV1Entity):
     entityuri = "/synthetic/monitors"
-    uri = TenantEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     httpmethod = "POST"
 
     def getHttpMethod(self):
@@ -756,19 +768,21 @@ class syntheticmonitors(TenantEntity):
         self.dto["tags"] = taglist
 
 
-class dashboards(TenantConfigEntity):
+class dashboards(TenantConfigV1Entity):
     entityuri = "/dashboards"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __str__(self):
         if self.dto:
-            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
         else:
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, "no title")
 
     def __repr__(self):
         if self.dto:
-            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
         else:
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, "no title")
 

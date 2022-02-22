@@ -1,7 +1,7 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class customServicesgo(TenantConfigEntity):
+class customServicesgo(TenantConfigV1Entity):
     entityuri = "/service/customServices/go"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass

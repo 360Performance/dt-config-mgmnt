@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class calculatedMetricslog(TenantConfigEntity):
+class calculatedMetricslog(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/log"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

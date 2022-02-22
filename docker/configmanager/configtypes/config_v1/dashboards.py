@@ -1,19 +1,21 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class dashboards(TenantConfigEntity):
+class dashboards(TenantConfigV1Entity):
     entityuri = "/dashboards"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def __str__(self):
         if self.dto:
-            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
         else:
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, "no title")
 
     def __repr__(self):
         if self.dto:
-            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
         else:
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, "no title")
 

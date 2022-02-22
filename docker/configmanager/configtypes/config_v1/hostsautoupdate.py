@@ -1,8 +1,8 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 # OneAgent - Environment-wide configuration
 
 
-class hostsautoupdate(TenantConfigEntity):
+class hostsautoupdate(TenantConfigV1Entity):
     entityuri = "/hosts/autoupdate"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

@@ -1,5 +1,4 @@
 import time
-import datetime
 import sys
 import os
 import requests
@@ -590,7 +589,7 @@ def verifyConfigSettings(entitytypes, parameters):
         # now get every entity from all tenants and then compare every tenant's response to the standard
         for entity in entities:
             url = server + apiurl
-            if not issubclass(entitytype, ConfigTypes.TenantSetting):
+            if not issubclass(entitytype, ConfigTypes.TenantConfigV1Setting):
                 url = url + "/" + entity.id
             try:
                 response = session.get(url, verify=SSLVerify)
@@ -663,7 +662,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                         if "dashboards" in tenant:
                             attrkey = "dashboards"
 
-                        if attrkey and not issubclass(entitytype, ConfigTypes.TenantSetting):
+                        if attrkey and not issubclass(entitytype, ConfigTypes.TenantConfigV1Setting):
                             for attr in tenant[attrkey]:
                                 # key = "::".join([c_id, t_id])
                                 key = "::".join([c_id, t_id, configtype, attr[entitytype.name_attr]])
@@ -694,7 +693,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                                     except:
                                         logger.error("Exception: %s", sys.exc_info())
 
-                        elif issubclass(entitytype, ConfigTypes.TenantSetting):
+                        elif issubclass(entitytype, ConfigTypes.TenantConfigV1Setting):
                             # logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
                             # logger.info("{}: {}".format(entitytype.__name__,tenant))
                             centity = entitytype(dto=tenant)
@@ -899,8 +898,7 @@ def putConfigEntities(entities, parameters, validateonly):
                 entity.setID(entity.getID())
 
         try:
-            req = requests.Request(
-                httpmeth, url, json=entity.dto, auth=(apiuser, apipwd))
+            req = requests.Request(httpmeth, url, json=entity.dto, auth=(apiuser, apipwd))
             prep = session.prepare_request(req)
             resp = session.send(prep)
             # resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
@@ -937,8 +935,7 @@ def postConfigEntities(entities, parameters, validateonly):
         logger.info("%sPOST %s: %s", prefix, configtype, url)
 
         try:
-            resp = session.post(url, json=entity.dto, auth=(
-                apiuser, apipwd), verify=SSLVerify)
+            resp = session.post(url, json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
             if len(resp.content) > 0:
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
@@ -1040,10 +1037,9 @@ def performConfig(entityconfig, parameters):
 
 
 def getConfig(parameters):
-    # configtypes = [ConfigTypes.servicerequestAttributes, ConfigTypes.customServicesjava, ConfigTypes.calculatedMetricsservice, ConfigTypes.autoTags, ConfigTypes.servicerequestNaming, ConfigTypes.notifications]
-    # configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigEntity.__subclasses__()][1:]
-    configtypes = [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantConfigEntity.__subclasses__()]
-    configtypes = configtypes + [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantSetting.__subclasses__()]
+    # configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()][1:]
+    configtypes = [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()]
+    configtypes = configtypes + [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantConfigV1Setting.__subclasses__()]
     # getConfigSettings(configtypes, parameters, dumpconfig)
     return configtypes
 
@@ -1055,9 +1051,16 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     # list all known config entity types we are aware of
-    logger.always("Handling configuration entities: %s", [cls.__name__ for cls in ConfigTypes.TenantConfigEntity.__subclasses__()])
-    logger.always("Handling configuration settings: %s", [cls.__name__ for cls in ConfigTypes.TenantSetting.__subclasses__()])
-    logger.always("Handling entities: %s", [cls.__name__ for cls in ConfigTypes.TenantEntity.__subclasses__()])
+    logger.always("Handling V1 configuration entities:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
+        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()] if c))
+    logger.always("Handling V1 configuration settings:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
+        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantConfigV1Setting.__subclasses__()] if c))
+    logger.always("Handling V1 environment entities:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
+        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantEnvironmentV1Entity.__subclasses__()] if c))
+    logger.always("Handling V2 configuration entities:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
+        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantEnvironmentV2Entity.__subclasses__()] if c))
+    logger.always("Handling V2 configuration settings:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
+        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantEnvironmentV2Setting.__subclasses__()] if c))
 
     logger.always(stdConfig)
 

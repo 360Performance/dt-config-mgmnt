@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 
-class geographicRegionsipDetectionHeaders(TenantConfigEntity):
+class geographicRegionsipDetectionHeaders(TenantConfigV1Entity):
     entityuri = "/geographicRegions/ipDetectionHeaders"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

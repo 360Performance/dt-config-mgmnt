@@ -1,12 +1,12 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
 # this seems to require POST without payload
 # needs special handling for DTO
 
 
-class applicationsmobileAppIdkeyUserActions(TenantConfigEntity):
+class applicationsmobileAppIdkeyUserActions(TenantConfigV1Entity):
     entityuri = "/applications/mobile/{appid}/keyUserActions/{actionName}"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
 
     def setAppID(self, appid):
         self.appid = appid
