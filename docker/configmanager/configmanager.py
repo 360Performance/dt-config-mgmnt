@@ -1,5 +1,6 @@
 import time
 import sys
+import inspect
 import os
 import requests
 import json
@@ -64,6 +65,16 @@ if not apipwd:
 # load the standard config from config directory
 stdConfig = ConfigSet.ConfigSet(config_dir)
 internaldomains = []
+
+
+def getClass(kls):
+    parts = kls.split('.')
+    module = ".".join(parts[:-1])
+    m = __import__(module)
+    obj = getattr(m, parts[-1])
+    # for comp in parts[1:]:
+    #    m = getattr(module, comp)
+    return obj
 
 
 '''
@@ -633,7 +644,8 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
     dumpentities = {}
 
     for ename, enabled in config.items():
-        entitytype = getattr(ConfigTypes, ename, None)
+        #entitytype = getattr(ConfigTypes, ename, None)
+        entitytype = getClass(ename)
         logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
 
         # ensure we only consider config types that are not abstract (that have a entityuri defined)
@@ -948,7 +960,7 @@ def postConfigEntities(entities, parameters, validateonly):
             logger.error("Problem putting %s: %s", configtype, sys.exc_info())
 
 
-def getControlSettings(ctrlsettings):
+def getControlSettings(cmdsettings):
     stdSettings = {
         "servicerequestAttributes": True,
         "servicerequestNaming": True,
@@ -970,16 +982,17 @@ def getControlSettings(ctrlsettings):
         "applicationDashboards": False,
     }
 
-    # ctrlsettings = {}
-    # try:
-    #    if configcache.exists("config") == 1:
-    #        settings = configcache.get("config")
-    #        ctrlsettings = json.loads(settings)
-    # except:
-    #    logger.error("Problem reading proper config from redis, continueing with default settings. Error: {}".format(sys.exc_info()))
+    supportedEntities = getConfigEntities()
 
-    # merge stdsetting with provided ones
-    return {**stdSettings, **ctrlsettings}
+    result = {}
+    for entity, enabled in cmdsettings.items():
+        if enabled:
+            for definition in supportedEntities:
+                if entity in definition:
+                    result.update({definition: True})
+
+    logger.info("Config: \n%s", json.dumps(result, indent=2, separators=(',', ': ')))
+    return result
 
 
 def performConfig(entityconfig, parameters):
@@ -1038,10 +1051,21 @@ def performConfig(entityconfig, parameters):
 
 def getConfig(parameters):
     # configtypes = [getattr(ConfigTypes,cls.__name__)(id="",name="") for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()][1:]
-    configtypes = [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()]
+    configtypes = [c for c in [getattr(ConfigTypes, cls.__name__) if len(
+        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()] if c]
     configtypes = configtypes + [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantConfigV1Setting.__subclasses__()]
     # getConfigSettings(configtypes, parameters, dumpconfig)
     return configtypes
+
+
+def getConfigEntities():
+    modules = [s for s in [m if m.startswith("configtypes") else None for m in sys.modules.keys()] if s]
+    for m in modules:
+        clsmembers = inspect.getmembers(sys.modules[m], inspect.isclass)
+
+    fq_classnames = sorted([c for c in [cls[1].__module__+'.'+cls[1].__name__ if len(cls[1].__subclasses__()) == 0 else None for cls in clsmembers] if c])
+
+    return fq_classnames
 
 
 def main(argv):
@@ -1051,17 +1075,7 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     # list all known config entity types we are aware of
-    logger.always("Handling V1 configuration entities:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
-        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()] if c))
-    logger.always("Handling V1 configuration settings:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
-        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantConfigV1Setting.__subclasses__()] if c))
-    logger.always("Handling V1 environment entities:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
-        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantEnvironmentV1Entity.__subclasses__()] if c))
-    logger.always("Handling V2 configuration entities:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
-        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantEnvironmentV2Entity.__subclasses__()] if c))
-    logger.always("Handling V2 configuration settings:\n\t%s", "\n\t".join(c for c in [cls.__name__ if len(
-        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantEnvironmentV2Setting.__subclasses__()] if c))
-
+    logger.info("Supported Configuration Entities:\n\t%s", "\n\t".join(getConfigEntities()))
     logger.always(stdConfig)
 
     while True:
@@ -1126,8 +1140,7 @@ def main(argv):
                 source = cmd.get("source", None)
                 if source:
                     logger.info("Source: \n%s", json.dumps(source, indent=2, separators=(',', ': ')))
-                    configtypes = getConfig(source)
-                    getConfigSettings(configtypes, cmd.get("config"), source, True)
+                    getConfigSettings(None, cmd.get("config"), source, True)
 
                     logger.info("==== reloading standard config after dump ====")
                     stdConfig = ConfigSet.ConfigSet(config_dump_dir)
