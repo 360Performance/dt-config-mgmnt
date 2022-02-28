@@ -26,24 +26,23 @@ class ConfigSet:
         try:
             with open(definitions) as definition_file:
                 config = yaml.load(definition_file, Loader=yaml.Loader)
-                self.entities = self.load(config, "", "")
+                self.entities = self.load(config, "configtypes", None)
         except:
             logger.error("Can't load definitions: {}".format(sys.exc_info()))
 
     def load(self, config, pscope, cscope):
         entities = []
+        logger.info("Load: %s.%s", pscope, cscope if cscope else "")
         for k, v in config.items():
             if isinstance(v, dict):
-                logger.info("Load: config: %s %s", k, v)
-                entities = entities + self.load(v, k, pscope)
+                #entities = entities + self.load(v, k, pscope)
+                entities = entities + self.load(v, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
             else:
                 if isinstance(v, list):
                     for entity in v:
-                        #class_ = getattr(ConfigTypes, pscope+k)
-                        class_ = getClass("configtypes"+"."+pscope+"."+k)
-                        logger.info("Class {}".format(class_))
-                        #entity.update({"basedir": self.configbasedir})
-                        #logger.info("{} : {}".format(class_,entity))
+                        logger.info("Load: %s.%s.%s", pscope, cscope, k)
+                        class_ = getClass(pscope+"."+k)
+
                         try:
                             configEntity = class_(basedir=self.configbasedir, **entity)
                         except:

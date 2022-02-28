@@ -744,6 +744,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
             # build datastructure for dumping the entities.yml file properly
             if dumpconfig:
                 parts = entitytype.entityuri.strip("/").split('/')
+                parts = f'{entitytype.__module__}.{entitytype.__class__.__qualname__}'.split(".")[1:-1]
                 parts.reverse()
                 if len(entity_defs) > 0:
                     for i in parts:
