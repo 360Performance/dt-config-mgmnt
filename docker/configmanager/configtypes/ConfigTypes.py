@@ -29,7 +29,8 @@ class ConfigEntity():
                 "Unable to load entity definition from config files, please check prior errors!")
 
     def loadDTO(self, basedir):
-        path = basedir + self.entityuri + "/" + self.file + ".json"
+        parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+        path = "/".join([basedir]+parts+[f'{self.file}.json'])
 
         dto = None
         try:

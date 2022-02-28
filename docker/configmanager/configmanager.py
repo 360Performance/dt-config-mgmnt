@@ -1006,7 +1006,8 @@ def performConfig(entityconfig, parameters):
     specialHandling = ["applicationsweb", "syntheticmonitors", "applicationDashboards"]
 
     for ename, enabled in config.items():
-        etype = getattr(ConfigTypes, ename, None)
+        #etype = getattr(ConfigTypes, ename, None)
+        etype = getClass(ename)
         logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
         if enabled and etype is not None and ename not in specialHandling:
             updateOrCreateConfigEntities(stdConfig.getConfigEntitiesByType(etype), parameters, validateonly)
@@ -1105,8 +1106,12 @@ def main(argv):
                         target.update({"dryrun": True})
 
                     logger.always("========== STARTING CONFIG FETCH ==========")
-                    configtypes = getConfig(target)
-                    getConfigSettings(configtypes, cmd.get("config"), target, False)
+                    #configtypes = getConfig(target)
+                    #getConfigSettings(configtypes, cmd.get("config"), target, False)
+                    source = cmd.get("target", None)
+                    if source:
+                        logger.info("Source: \n%s", json.dumps(source, indent=2, separators=(',', ': ')))
+                        getConfigSettings(None, cmd.get("config"), source, True)
                     logger.always("========== FINISHED CONFIG FETCH ==========")
                     performConfig(cmd.get("config"), target)
 
