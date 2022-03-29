@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class servicefailureDetectionparameterSelectionparameterSets(TenantConfigEntity):
+
+class servicefailureDetectionparameterSelectionparameterSets(TenantConfigV1Entity):
     entityuri = "/service/failureDetection/parameterSelection/parameterSets"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

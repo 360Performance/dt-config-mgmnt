@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class maintenanceWindows(TenantConfigEntity):
+
+class maintenanceWindows(TenantConfigV1Entity):
     entityuri = "/maintenanceWindows"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

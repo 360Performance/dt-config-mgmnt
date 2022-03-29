@@ -1,0 +1,16 @@
+{
+    "editor.formatOnSave": true,
+    "python.formatting.autopep8Args": [
+        "--max-line-length",
+        "160",
+        "--experimental"
+    ],
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--max-line-length=160",
+        "-d invalid-name",
+        "-d pointless-string-statement",
+        "--class-naming-style=PascalCase"
+    ]
+}

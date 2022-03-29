@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class contentResources(TenantConfigEntity):
+
+class contentResources(TenantConfigV1Entity):
     entityuri = "/contentResources"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

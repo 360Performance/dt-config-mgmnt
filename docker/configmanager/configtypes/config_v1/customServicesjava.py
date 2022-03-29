@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class customServicesjava(TenantConfigEntity):
+
+class customServicesjava(TenantConfigV1Entity):
     entityuri = "/service/customServices/java"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

@@ -1,6 +1,7 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class awsiamExternalId(TenantConfigEntity):
+
+class awsiamExternalId(TenantConfigV1Entity):
     entityuri = "/aws/iamExternalId"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass

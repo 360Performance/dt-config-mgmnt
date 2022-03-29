@@ -1,6 +1,7 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class cloudFoundry(TenantConfigEntity):
+
+class cloudFoundry(TenantConfigV1Entity):
     entityuri = "/cloudFoundry/credentials"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri
     pass

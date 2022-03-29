@@ -1,5 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class remoteEnvironments(TenantConfigEntity):
+
+class remoteEnvironments(TenantConfigV1Entity):
     entityuri = "/remoteEnvironments"
-    uri = TenantConfigEntity.uri + entityuri
+    uri = TenantConfigV1Entity.uri + entityuri

@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class calculatedMetricssynthetic(TenantConfigEntity):
+
+class calculatedMetricssynthetic(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/synthetic"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

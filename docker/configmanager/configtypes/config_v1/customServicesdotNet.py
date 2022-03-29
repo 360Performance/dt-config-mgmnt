@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class customServicesdotNet(TenantConfigEntity):
+
+class customServicesdotNet(TenantConfigV1Entity):
     entityuri = "/service/customServices/dotNet"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

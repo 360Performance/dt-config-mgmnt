@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class awsprivateLink(TenantConfigEntity):
+
+class awsprivateLink(TenantConfigV1Entity):
     entityuri = "/aws/privateLink"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class calculatedMetricsrum(TenantConfigEntity):
+
+class calculatedMetricsrum(TenantConfigV1Entity):
     entityuri = "/calculatedMetrics/rum"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

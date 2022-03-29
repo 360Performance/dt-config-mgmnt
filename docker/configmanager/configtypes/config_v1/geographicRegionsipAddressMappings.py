@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class geographicRegionsipAddressMappings(TenantConfigEntity):
+
+class geographicRegionsipAddressMappings(TenantConfigV1Entity):
     entityuri = "/geographicRegions/ipAddressMappings"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri

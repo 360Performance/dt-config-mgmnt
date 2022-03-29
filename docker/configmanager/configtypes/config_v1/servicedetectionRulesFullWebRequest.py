@@ -1,6 +1,6 @@
-from ..ConfigTypes import TenantConfigEntity
+from ..ConfigTypes import TenantConfigV1Entity
 
-class servicedetectionRulesFullWebRequest(TenantConfigEntity):
+
+class servicedetectionRulesFullWebRequest(TenantConfigV1Entity):
     entityuri = "/service/detectionRules/FULL_WEB_REQUEST"
-    uri = TenantConfigEntity.uri + entityuri
-    pass
+    uri = TenantConfigV1Entity.uri + entityuri
