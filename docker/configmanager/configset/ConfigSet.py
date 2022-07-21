@@ -1,6 +1,7 @@
 import sys
-import yaml
 import logging
+import yaml
+
 from configtypes import ConfigTypes
 
 # LOG CONFIGURATION

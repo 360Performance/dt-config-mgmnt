@@ -11,6 +11,7 @@
         "--max-line-length=160",
         "-d invalid-name",
         "-d pointless-string-statement",
+        "-d missing-function-docstring",
         "--class-naming-style=PascalCase"
     ]
 }
