@@ -1,0 +1,16 @@
+{
+    "command": "PUSH_CONFIG",
+    "source": {
+        "mode": "saas",
+        "clusterid": "360perf",
+        "dryrun": true
+    },
+    "target": {
+        "mode": "saas",
+        "clusterid": "360perf",
+        "dryrun": false
+    },
+    "config": {
+        "config_v1.autoTags": true
+    }
+}

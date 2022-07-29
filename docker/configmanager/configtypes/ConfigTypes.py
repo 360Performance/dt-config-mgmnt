@@ -29,7 +29,8 @@ class ConfigEntity():
                 "Unable to load entity definition from config files, please check prior errors!")
 
     def loadDTO(self, basedir):
-        path = basedir + self.entityuri + "/" + self.file + ".json"
+        parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+        path = "/".join([basedir]+parts+[f'{self.file}.json'])
 
         dto = None
         try:
@@ -41,9 +42,11 @@ class ConfigEntity():
         return dto
 
     def dumpDTO(self, dumpdir):
-        filename = ((self.name + "-" + self.id)
-                    if self.name != self.id else self.name)
-        path = dumpdir + self.entityuri + "/" + filename + ".json"
+        filename = ((self.name + "-" + self.id) if self.name != self.id else self.name)
+        #path = dumpdir + self.entityuri + "/" + filename + ".json"
+        parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+        path = "/".join([dumpdir]+parts+[f'{filename}.json'])
+
         logger.info("Dumping %s Entity to: %s", self.__class__.__name__, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w', encoding="utf-8") as outfile:

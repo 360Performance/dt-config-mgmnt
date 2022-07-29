@@ -1,5 +1,7 @@
-import sys, yaml
+import sys
 import logging
+import yaml
+
 from configtypes import ConfigTypes
 
 # LOG CONFIGURATION
@@ -7,55 +9,64 @@ from configtypes import ConfigTypes
 #logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("ConfigSet")
 
+
+def getClass(kls):
+    parts = kls.split('.')
+    module = ".".join(parts[:-1])
+    m = __import__(module)
+    obj = getattr(m, parts[-1])
+    return obj
+
+
 class ConfigSet:
 
-    def __init__(self,basedir):
+    def __init__(self, basedir):
         self.entities = []
         self.configbasedir = basedir
         definitions = basedir + "/" + "entities.yml"
         try:
-            with open(definitions) as definition_file:  
+            with open(definitions) as definition_file:
                 config = yaml.load(definition_file, Loader=yaml.Loader)
-                self.entities = self.load(config,"","")
+                self.entities = self.load(config, "configtypes", None)
         except:
             logger.error("Can't load definitions: {}".format(sys.exc_info()))
-        
-        
-    def load(self,config,pscope,cscope):
+
+    def load(self, config, pscope, cscope):
         entities = []
+        logger.info("Load: %s.%s", pscope, cscope if cscope else "")
         for k, v in config.items():
             if isinstance(v, dict):
-                entities = entities + self.load(v,k,pscope)
+                #entities = entities + self.load(v, k, pscope)
+                entities = entities + self.load(v, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
             else:
                 if isinstance(v, list):
                     for entity in v:
-                        class_ = getattr(ConfigTypes, pscope+k)
-                        #logger.info("Class {}".format(class_))
-                        #entity.update({"basedir": self.configbasedir})
-                        #logger.info("{} : {}".format(class_,entity))
+                        logger.info("Load: %s.%s.%s", pscope, cscope, k)
+                        class_ = getClass(pscope+"."+k)
+
                         try:
-                            configEntity = class_(basedir=self.configbasedir,**entity)
+                            configEntity = class_(basedir=self.configbasedir, **entity)
                         except:
                             logger.error("Couldn't create config entity {}, please check config definitions!".format(pscope+k))
                         #configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
                         entities.append(configEntity)
-        
+
         return entities
-    
+
     def __repr__(self):
         repr = "========== MANAGED CONFIGURATION SET ==========\n"
         if len(self.entities) == 0:
             return "No entities have been loaded yet, please check config directory and perform RESET command"
         for e in self.entities:
-            repr += str(e) +"\n"
+            repr += str(e) + "\n"
         return repr[:-1]
-    
+
     def __str__(self):
         repr = "========== MANAGED CONFIGURATION SET ==========\n"
         if len(self.entities) == 0:
             return "No entities have been loaded yet, please check config directory and perform RESET command"
         for e in self.entities:
-            repr += str(e) +"\n"
+            repr += str(e) + "\n"
         return repr[:-1]
 
     '''
@@ -63,7 +74,8 @@ class ConfigSet:
     APPLICATION-<id>
     SYNTHETIC_TEST-<id>
     '''
-    def getStdAppEntityID(self,tenantid,appname):
+
+    def getStdAppEntityID(self, tenantid, appname):
         appid_prefix = "{:0>12}".format(tenantid.encode("utf-8").hex()[-12:]).upper()
         appid_suffix = "{:0>4}".format(appname.encode("utf-8").hex()[-4:]).upper()
         return appid_prefix+appid_suffix
@@ -74,83 +86,82 @@ class ConfigSet:
             unique_types.add(entity.__class__.__name__)
         return unique_types
 
-
     def getConfigEntitiesByType(self, etype):
         filtered = []
         for entity in self.entities:
             if type(entity) is etype:
                 filtered.append(entity)
-                
+
         return filtered
-    
+
     def getConfigEntitiesNamesByType(self, etype):
         filtered = []
         for entity in self.entities:
             if type(entity) is etype:
-                if hasattr(entity,"name"):
+                if hasattr(entity, "name"):
                     filtered.append(entity.name)
                 else:
                     filtered.append(entity.__class__.__name__)
-                
+
         return filtered
-    
+
     def getConfigEntitiesIDsByType(self, etype):
         filtered = []
         for entity in self.entities:
             if type(entity) is etype:
-                if hasattr(entity,"id"):
+                if hasattr(entity, "id"):
                     filtered.append(entity.id)
                 else:
                     filtered.append(entity.__class__.__name__)
-                
+
         return filtered
-    
+
     def getConfigEntityByName(self, name):
         # not very clean but assuming that the list of entities is not huge this is ok
         for entity in self.entities:
-            if entity.__class__.__name__ == name or (hasattr(entity,"name") and entity.name == name):
+            if entity.__class__.__name__ == name or (hasattr(entity, "name") and entity.name == name):
                 return entity
 
     def getConfigEntityByID(self, id):
         # not very clean but assuming that the list of entities is not huge this is ok
         for entity in self.entities:
-            if entity.__class__.__name__ == id or (hasattr(entity,"id") and entity.id == id):
+            if entity.__class__.__name__ == id or (hasattr(entity, "id") and entity.id == id):
                 return entity
-    
+
     def getRequestAttributes(self):
         return self.getConfigEntitiesByType(ConfigTypes.servicerequestAttributes)
-    
+
     def getRequestNamings(self):
         return self.getConfigEntitiesByType(ConfigTypes.servicerequestNaming)
-    
+
     def getRequestAttributesNames(self):
         return self.getConfigEntitiesNamesByType(ConfigTypes.servicerequestAttributes)
-    
+
     def getAutoTags(self):
         return self.getConfigEntitiesByType(ConfigTypes.autoTags)
-    
+
     def getAutoTagsNames(self):
         return self.getConfigEntitiesNamesByType(ConfigTypes.autoTags)
-        
+
     def getCustomJavaServices(self):
         return self.getConfigEntitiesByType(ConfigTypes.customServicesjava)
-    
+
     def getCalculatedMetricsService(self):
         return self.getConfigEntitiesByType(ConfigTypes.calculatedMetricsservice)
-    
+
     def getStandardWebApplications(self):
-        #return self.getConfigEntitiesByType(ConfigTypes.applicationsweb)[0]
+        # return self.getConfigEntitiesByType(ConfigTypes.applicationsweb)[0]
         return list(filter(lambda e: (e.name).startswith("Standard"), self.getConfigEntitiesByType(ConfigTypes.applicationsweb)))
-    
+
     def getStandardApplicationDetectionRule(self):
         return self.getConfigEntitiesByType(ConfigTypes.applicationDetectionRules)[0]
 
     def getStandardApplicationDashboards(self):
-        #return self.getConfigEntitiesByType(ConfigTypes.dashboards)[0]
+        # return self.getConfigEntitiesByType(ConfigTypes.dashboards)[0]
         return list(filter(lambda e: (e.name).startswith("Standard"), self.getConfigEntitiesByType(ConfigTypes.dashboards)))
 
     def getDashboards(self):
-        #return self.getConfigEntitiesByType(ConfigTypes.dashboards)
+        # return self.getConfigEntitiesByType(ConfigTypes.dashboards)
         return list(filter(lambda e: not (e.name).startswith("Standard"), self.getConfigEntitiesByType(ConfigTypes.dashboards)))
 
     def getStandardSyntheticMonitor(self):
@@ -170,6 +181,3 @@ class ConfigSet:
 
     def getAnomalyDetectionServices(self):
         return self.getConfigEntitiesByType(ConfigTypes.anomalyDetectionservices)
-    
-    
-       

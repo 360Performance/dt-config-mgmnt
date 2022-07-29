@@ -19,6 +19,8 @@
         "config_v1.customServicesdotNet": false,
         "config_v1.customServicesgo": false,
         "config_v1.setting.anomalyDetectionapplications": true,
-        "env_v2.settings.dummySetting": false
+        "env_v1.syntheticmonitors": true,
+        "env_v2.settings.dummySetting": false,
+        "config_v1.setting.dataPrivacy": true
     }
 }
