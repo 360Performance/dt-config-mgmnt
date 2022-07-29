@@ -5,11 +5,6 @@
         "clusterid": "360perf",
         "dryrun": true
     },
-    "target": {
-        "mode": "saas",
-        "clusterid": "360perf",
-        "dryrun": true
-    },
     "config": {
         "config_v1.servicerequestAttributes": true,
         "config_v1.servicerequestNaming": true,
