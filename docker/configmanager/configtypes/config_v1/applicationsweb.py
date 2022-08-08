@@ -24,7 +24,10 @@ class applicationsweb(TenantConfigV1Entity):
         return self.name
 
     def setID(self, id):
-        self.id = "APPLICATION-"+id
+        if id.startswith('APPLICATION'):
+            self.id = id
+        else:
+            self.id = "APPLICATION-"+id
         super(applicationsweb, self).setID(self.id)
         self.dto["identifier"] = self.id
 
