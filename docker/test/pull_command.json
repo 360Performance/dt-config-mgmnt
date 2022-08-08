@@ -16,6 +16,8 @@
         "config_v1.setting.anomalyDetectionapplications": true,
         "env_v1.syntheticmonitors": true,
         "env_v2.settings.dummySetting": false,
-        "config_v1.setting.dataPrivacy": true
+        "config_v1.setting.dataPrivacy": true,
+        "config_v1.applicationsweb": true,
+        "config_v1.applicationDetectionRules": true
     }
 }
