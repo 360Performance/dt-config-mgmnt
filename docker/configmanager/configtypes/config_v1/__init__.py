@@ -7,6 +7,9 @@ from .applicationsmobile import *
 from .applicationsmobileAppIdkeyUserActions import *
 from .applicationsmobileAppIduserActionAndSessionProperties import *
 from .applicationsweb import *
+from .applicationswebdataPrivacy import *
+from .applicationsweberrorRules import *
+from .applicationswebkeyUserActions import *
 from .autoTags import *
 from .awscredentials import *
 from .awsiamExternalId import *

@@ -3,8 +3,13 @@ from textwrap import wrap
 
 
 class applicationsweb(TenantConfigV1Entity):
+    """
+    configuration class for webapplications
+    """
+
     entityuri = "/applications/web"
     uri = TenantConfigV1Entity.uri + entityuri
+    id_attr = "id"
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
@@ -32,7 +37,7 @@ class applicationsweb(TenantConfigV1Entity):
         self.dto["identifier"] = self.id
 
     def getID(self):
-        return self.id
+        return self.dto["identifier"]
 
     def addDetectionRule(self, rule):
         rule.dto["applicationIdentifier"] = self.id

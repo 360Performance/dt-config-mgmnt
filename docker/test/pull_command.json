@@ -6,18 +6,19 @@
         "dryrun": true
     },
     "config": {
-        "config_v1.servicerequestAttributes": true,
-        "config_v1.servicerequestNaming": true,
+        "config_v1.servicerequestAttributes": false,
+        "config_v1.servicerequestNaming": false,
         "config_v1.autoTags": true,
-        "config_v1.conditionalNamingprocessGroup": true,
-        "config_v1.customServicesjava": true,
+        "config_v1.conditionalNamingprocessGroup": false,
+        "config_v1.customServicesjava": false,
         "config_v1.customServicesdotNet": false,
         "config_v1.customServicesgo": false,
-        "config_v1.setting.anomalyDetectionapplications": true,
+        "config_v1.setting.anomalyDetectionapplications": false,
         "env_v1.syntheticmonitors": true,
         "env_v2.settings.dummySetting": false,
-        "config_v1.setting.dataPrivacy": true,
+        "config_v1.setting.dataPrivacy": false,
         "config_v1.applicationsweb": true,
+        "config_v1.applicationswebdataPrivacy": true,
         "config_v1.applicationDetectionRules": true
     }
 }

@@ -99,6 +99,9 @@ class ConfigEntity():
 
 
 class TenantConfigV1Entity(ConfigEntity):
+    """
+    Configuration class for V1 API
+    """
     uri = "/e/TENANTID/api/config/v1"
     name_attr = "name"
     id_attr = "id"
@@ -112,7 +115,7 @@ class TenantConfigV1Entity(ConfigEntity):
     def setID(self, id):
         self.id = id
         self.apipath = self.uri+"/"+self.id
-        self.dto["id"] = id
+        self.dto[self.id_attr] = id
 
     def getID(self):
         return self.id
