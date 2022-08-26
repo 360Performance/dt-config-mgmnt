@@ -6,6 +6,6 @@
         "dryrun": false
     },
     "config": {
-        "config_v1.applicationsweb": true
+        "config_v1.applicationswebdataPrivacy": true
     }
 }
