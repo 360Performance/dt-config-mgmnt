@@ -525,7 +525,7 @@ def getApplications(parameters):
             key = "::".join([c_id, t_id, "applications"])
             # we want application IDs to be recognizable for the standard (what has been created through automation)
             # so we format them accordingly
-            std_appid = "{:0>12}".format(t_id.encode("utf-8").hex()[-12:]).upper()
+            std_appid = "{:>16}".format(t_id.encode("utf-8").hex()[-16:]).upper()
             for application in tenant["values"]:
                 a_id = application["id"].split("-")[1]
 
