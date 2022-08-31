@@ -1077,7 +1077,7 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     # list all known config entity types we are aware of
-    logger.info("Supported Configuration Entities:\n\t%s", "\n\t".join(getConfigEntities()))
+    logger.info("Supported Configuration Entities:\n\t%s", "\n\t".join([c.rsplit(".",1)[0] for c in getConfigEntities()]))
     logger.always(stdConfig)
 
     while True:
