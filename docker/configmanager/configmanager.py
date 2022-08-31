@@ -769,8 +769,8 @@ By going one by one tenant this is not a very effective method, but it's require
 
 
 def updateOrCreateConfigEntities(entities, parameters, validateonly):
-    # headers = {"Content-Type": "application/json"}
-    # query = "?"+urlencode(parameters)
+    #headers = {"Content-Type": "application/json"}
+    #query = "?"+urlencode(parameters)
 
     missing = unmatched = matched = 0
 
