@@ -525,7 +525,7 @@ def getApplications(parameters):
             key = "::".join([c_id, t_id, "applications"])
             # we want application IDs to be recognizable for the standard (what has been created through automation)
             # so we format them accordingly
-            std_appid = "{:0>12}".format(t_id.encode("utf-8").hex()[-12:]).upper()
+            std_appid = "{:>16}".format(t_id.encode("utf-8").hex()[-16:]).upper()
             for application in tenant["values"]:
                 a_id = application["id"].split("-")[1]
 
@@ -769,8 +769,8 @@ By going one by one tenant this is not a very effective method, but it's require
 
 
 def updateOrCreateConfigEntities(entities, parameters, validateonly):
-    # headers = {"Content-Type": "application/json"}
-    # query = "?"+urlencode(parameters)
+    #headers = {"Content-Type": "application/json"}
+    #query = "?"+urlencode(parameters)
 
     missing = unmatched = matched = 0
 
@@ -1077,7 +1077,7 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     # list all known config entity types we are aware of
-    logger.info("Supported Configuration Entities:\n\t%s", "\n\t".join(getConfigEntities()))
+    logger.info("Supported Configuration Entities:\n\t%s", "\n\t".join([c.rsplit(".",1)[0] for c in getConfigEntities()]))
     logger.always(stdConfig)
 
     while True:

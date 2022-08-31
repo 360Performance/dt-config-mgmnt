@@ -1,6 +1,9 @@
 import logging
 import os
 import json
+import hashlib
+import uuid
+
 
 # LOG CONFIGURATION
 #FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
@@ -13,8 +16,8 @@ class ConfigEntity():
     entityuri = "/"
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get("id", self.__class__.__name__)
-        self.name = kwargs.get("name", self.__class__.__name__)
+        self.id = kwargs.get("id", "0000")
+        self.name = kwargs.get("name", kwargs.get("file"))
         self.apipath = self.uri+"/"+self.id
         self.file = kwargs.get("file", self.name)
         self.dto = kwargs.get("dto", None)
@@ -27,6 +30,27 @@ class ConfigEntity():
         if self.dto is None:
             raise ValueError(
                 "Unable to load entity definition from config files, please check prior errors!")
+
+        if self.isManagedEntity():
+            print("Is managed entity: {}".format(self.__class__.__name__))
+            self.id = self.generateID()
+            self.setID(self.id)
+
+    def isManagedEntity(self):
+        return self.id.startswith("0000")
+
+    def generateID(self):
+        m = hashlib.md5()
+        idstring = f'{self.__class__.__name__}-{self.name}'.lower()
+        m.update(idstring.encode('utf-8'))
+        id = "0000{}".format(f'{uuid.UUID(m.hexdigest())}'[4:])
+        return id
+
+    def setID(self):
+        pass
+
+    def getID(self):
+        pass
 
     def loadDTO(self, basedir):
         parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]

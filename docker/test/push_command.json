@@ -6,8 +6,11 @@
         "dryrun": false
     },
     "config": {
+        "config_v1.autoTags": true,
+        "config_v1.applicationsweb": true,
         "config_v1.applicationswebdataPrivacy": true,
         "config_v1.applicationsweberrorRules": true,
-        "config_v1.applicationswebkeyUserActions": true
+        "config_v1.applicationswebkeyUserActions": true,
+        "config_v1.servicerequestAttributes": true
     }
 }

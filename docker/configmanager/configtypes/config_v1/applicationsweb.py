@@ -1,5 +1,6 @@
 from ..ConfigTypes import TenantConfigV1Entity
 from textwrap import wrap
+import hashlib
 
 
 class applicationsweb(TenantConfigV1Entity):
@@ -14,6 +15,16 @@ class applicationsweb(TenantConfigV1Entity):
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
         self.detectionrules = []
+
+    def isManagedEntity(self):
+        return self.id.split("-")[1].startswith("0000")
+
+    def generateID(self):
+        m = hashlib.md5()
+        m.update(self.name.encode('utf-8'))
+        id = "APPLICATION-0000{}".format(m.hexdigest()[-12:].upper())
+        self.setID(id)
+        return id
 
     def __str__(self):
         return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id)
