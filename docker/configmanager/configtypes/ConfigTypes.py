@@ -32,7 +32,6 @@ class ConfigEntity():
                 "Unable to load entity definition from config files, please check prior errors!")
 
         if self.isManagedEntity():
-            print("Is managed entity: {}".format(self.__class__.__name__))
             self.id = self.generateID()
             self.setID(self.id)
 

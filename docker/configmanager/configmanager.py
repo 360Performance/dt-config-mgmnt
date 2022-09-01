@@ -1077,7 +1077,7 @@ def main(argv):
     cfgcontrol.subscribe('configcontrol')
 
     # list all known config entity types we are aware of
-    logger.info("Supported Configuration Entities:\n\t%s", "\n\t".join([c.rsplit(".",1)[0] for c in getConfigEntities()]))
+    logger.info("Supported Configuration Entities:\n\t%s", "\n\t".join([c.rsplit(".", 1)[0] for c in getConfigEntities()]))
     logger.always(stdConfig)
 
     while True:
@@ -1172,6 +1172,9 @@ def main(argv):
                 configcache.publish('configresult', 'FINISHED_COPY_CONFIG')
                 logger.always("========== FINISHED CONFIG COPY ==========")
 
+            elif command == 'SHUTDOWN':
+                logger.always("========== SHUTTING DOWN CONFIGMANAGER ==========")
+                break
             else:
                 logger.warning("Received Command: %s which I do not understand", command)
 
