@@ -11,7 +11,7 @@ RUN pip install requests redis dnspython IPy fqdn tldextract pyyaml
 #RUN pip install tldextract
 #RUN pip install pyyaml
 
-COPY configmanager /
+COPY . /
 #COPY config /config
 RUN mkdir /config && mkdir /config_dump
 

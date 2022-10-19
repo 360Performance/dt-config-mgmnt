@@ -8,6 +8,6 @@ RUN pip install redis
 RUN pip install pyyaml
 
 COPY src /dtconfig
-COPY configcontroller/configcontroller.py /
+COPY configcontroller.py /
 
 CMD ["python","configcontroller.py"]

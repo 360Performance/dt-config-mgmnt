@@ -3,8 +3,8 @@ services:
   configmanager:
     image: ${DOCKER_REGISTRY}/configmanager:${TAG}
     build: 
-     context: .
-     dockerfile: ./configmanager/Dockerfile
+     context: ./configmanager
+     dockerfile: Dockerfile
     container_name: "configmanager"
     environment:
       - "PYTHONUNBUFFERED=1"
@@ -26,8 +26,8 @@ services:
   licensemanager:
     image: ${DOCKER_REGISTRY}/licensemanager:${TAG}
     build: 
-     context: .
-     dockerfile: ./licensemanager/Dockerfile
+     context: ./licensemanager
+     dockerfile: Dockerfile
     container_name: "licensemanager"
     environment:
       - "PYTHONUNBUFFERED=1"
@@ -45,8 +45,8 @@ services:
   pluginmanager:
     image: ${DOCKER_REGISTRY}/pluginmanager:${TAG}
     build: 
-     context: .
-     dockerfile: ./pluginmanager/Dockerfile
+     context: ./pluginmanager
+     dockerfile: Dockerfile
     container_name: "pluginmanager"
     environment:
       - "PYTHONUNBUFFERED=1"
@@ -75,8 +75,8 @@ services:
   configcontroller:
     image: ${DOCKER_REGISTRY}/configcontroller:${TAG}
     build: 
-      context: .
-      dockerfile: ./configcontroller/Dockerfile
+      context: ./configcontroller
+      dockerfile: Dockerfile
     container_name: "configcontroller"
     environment:
       - "PYTHONUNBUFFERED=1"

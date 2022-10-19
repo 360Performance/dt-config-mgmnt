@@ -9,6 +9,6 @@ RUN pip install pyyaml
 RUN pip install zipfile2
 
 COPY src /dtconfig
-COPY pluginmanager/pluginmanager.py /
+COPY pluginmanager.py /
 
 CMD ["python","pluginmanager.py"]

@@ -11,7 +11,7 @@ COPY src /dtconfig
 
 # Bundle app source
 #COPY dtconfig /dtconfig
-COPY licensemanager/licensequota.yml /
-COPY licensemanager/licensemanager.py /
+COPY licensequota.yml /
+COPY licensemanager.py /
 
 CMD ["python","licensemanager.py"]
