@@ -26,10 +26,12 @@ pipeline {
             steps {
                 sh label: 'Docker Login', script: 'docker login -u ${DOCKERHUB_LOGIN_USR} -p ${DOCKERHUB_LOGIN_PSW}'
                 dir("${env.WORKSPACE}/docker/configmanager") {
-                    sh label: 'Push Configmanager', script: 'docker push ${DOCKER_REGISTRY}/configmanager:${TAG} ${DOCKER_REGISTRY}/configmanager:latest'
+                    sh label: 'Push Configmanager', script: 'docker push ${DOCKER_REGISTRY}/configmanager:${TAG}'
+                    sh label: 'Push Configmanager', script: 'docker push ${DOCKER_REGISTRY}/configcache:latest'
                 }
                 dir("${env.WORKSPACE}/docker/configcache") {
-                    sh label: 'Push Configcache', script: 'docker push ${DOCKER_REGISTRY}/configcache:${TAG} ${DOCKER_REGISTRY}/configcache:latest'
+                    sh label: 'Push Configcache', script: 'docker push ${DOCKER_REGISTRY}/configcache:${TAG}'
+                    sh label: 'Push Configcache', script: 'docker push ${DOCKER_REGISTRY}/configcache:latest'
                 }
             }   
         }
