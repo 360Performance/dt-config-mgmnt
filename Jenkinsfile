@@ -43,8 +43,8 @@ pipeline {
                 script {
                     if (env.BRANCH_NAME == 'master') {
                         dir("${env.WORKSPACE}/docker/configmanager"){
-                            sh label: 'Push Configmanager', script: 'docker push -t ${DOCKER_REGISTRY}/configmanager:latest'
-                            sh label: 'Push Configmanager', script: 'docker push -t ${DOCKER_REGISTRY}/configmanager:${TAG}'
+                            sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:latest'
+                            sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:${TAG}'
                         }
                     }
                 }
