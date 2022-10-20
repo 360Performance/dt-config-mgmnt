@@ -8,7 +8,7 @@ pipeline {
         BUILD_NUMBER = "${BUILD_NUMBER}"
         TAG = "0.${BUILD_NUMBER}"
         DOCKERHUB_LOGIN = credentials('dockerhub-login')
-        git_branch = ${GIT_BRANCH}
+        git_branch = "${GIT_BRANCH}"
         BRANCH_NAME = git_branch.substring(git_branch.lastIndexOf('/') + 1, git_branch.length())
     }
 
