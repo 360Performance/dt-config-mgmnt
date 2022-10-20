@@ -14,14 +14,14 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 dir("${env.WORKSPACE}/docker/configmanager"){
-                    sh label: 'Build Configmanager', script: 'docker build -t configmanager:${TAG} .'
+                    sh label: 'Build Configmanager', script: 'docker build -t ${DOCKER_REGISTRY}/configmanager:${TAG} .'
                 }
             }
         }
         stage('Push Docker Images') {
             steps {
                 dir("${env.WORKSPACE}/docker/configmanager") {
-                    sh label: 'Push Configmanager', script: 'docker push -t configmanager:${TAG}'
+                    sh label: 'Push Configmanager', script: 'docker push ${DOCKER_REGISTRY}/configmanager:${TAG}'
                 }
             }   
         }
