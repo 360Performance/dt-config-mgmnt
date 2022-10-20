@@ -17,13 +17,19 @@ pipeline {
                 dir("${env.WORKSPACE}/docker/configmanager"){
                     sh label: 'Build Configmanager', script: 'docker build -t ${DOCKER_REGISTRY}/configmanager:${TAG} .'
                 }
+                dir("${env.WORKSPACE}/docker/configcache"){
+                    sh label: 'Build Configcache', script: 'docker build -t ${DOCKER_REGISTRY}/configcache:${TAG} .'
+                }
             }
         }
         stage('Push Docker Images') {
             steps {
+                sh label: 'Docker Login', script: 'docker login -u ${DOCKERHUB_LOGIN_USR} -p ${DOCKERHUB_LOGIN_PSW}'
                 dir("${env.WORKSPACE}/docker/configmanager") {
-                    sh label: 'Docker Login', script: 'docker login -u ${DOCKERHUB_LOGIN_USR} -p ${DOCKERHUB_LOGIN_PSW} '
                     sh label: 'Push Configmanager', script: 'docker push ${DOCKER_REGISTRY}/configmanager:${TAG}'
+                }
+                dir("${env.WORKSPACE}/docker/configcache") {
+                    sh label: 'Push Configcache', script: 'docker push ${DOCKER_REGISTRY}/configcache:${TAG}'
                 }
             }   
         }
