@@ -2,8 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_HOST = ""
-        //DOCKER_HOST = "tcp://192.168.1.123:2375"
+        DOCKER_HOST = "tcp://192.168.1.123:2375"
         DOCKER_REGISTRY = "360performance"
         LOG_LEVEL = "INFO"
         BUILD_NUMBER = "${BUILD_NUMBER}"
@@ -15,10 +14,10 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 dir("${env.WORKSPACE}/docker/configmanager"){
-                    sh label: 'Build Configmanager', script: 'docker build -t ${DOCKER_REGISTRY}/configmanager:${TAG} -t ${DOCKER_REGISTRY}/configmanager:latest .'
+                    sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${TAG} -t ${DOCKER_REGISTRY}/configmanager:latest .'
                 }
                 dir("${env.WORKSPACE}/docker/configcache"){
-                    sh label: 'Build Configcache', script: 'docker build -t ${DOCKER_REGISTRY}/configcache:${TAG} -t ${DOCKER_REGISTRY}/configcache:latest .'
+                    sh label: 'Build Configcache', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configcache:${TAG} -t ${DOCKER_REGISTRY}/configcache:latest .'
                 }
             }
         }
@@ -26,12 +25,12 @@ pipeline {
             steps {
                 sh label: 'Docker Login', script: 'docker login -u ${DOCKERHUB_LOGIN_USR} -p ${DOCKERHUB_LOGIN_PSW}'
                 dir("${env.WORKSPACE}/docker/configmanager") {
-                    sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:${TAG}'
-                    sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:latest'
+                    sh label: 'Push Configmanager', script: 'docker -H ${DOCKER_HOST}  push -q ${DOCKER_REGISTRY}/configmanager:${TAG}'
+                    sh label: 'Push Configmanager', script: 'docker -H ${DOCKER_HOST} push -q ${DOCKER_REGISTRY}/configcache:latest'
                 }
                 dir("${env.WORKSPACE}/docker/configcache") {
-                    sh label: 'Push Configcache', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:${TAG}'
-                    sh label: 'Push Configcache', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:latest'
+                    sh label: 'Push Configcache', script: 'docker -H ${DOCKER_HOST} push -q ${DOCKER_REGISTRY}/configcache:${TAG}'
+                    sh label: 'Push Configcache', script: 'docker -H ${DOCKER_HOST} push -q ${DOCKER_REGISTRY}/configcache:latest'
                 }
             }   
         }
