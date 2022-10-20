@@ -15,10 +15,10 @@ pipeline {
             steps {
                 sh 'printenv'
                 dir("${env.WORKSPACE}/docker/configmanager"){
-                    sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${env.BRANCH_NAME} .'
+                    sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${BRANCH_NAME} .'
                 }
                 dir("${env.WORKSPACE}/docker/configcache"){
-                    sh label: 'Build Configcache', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configcache:${env.BRANCH_NAME} .'
+                    sh label: 'Build Configcache', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configcache:${BRANCH_NAME} .'
                 }
             }
         }
@@ -26,10 +26,10 @@ pipeline {
             steps {
                 sh label: 'Docker Login', script: 'docker login -u ${DOCKERHUB_LOGIN_USR} -p ${DOCKERHUB_LOGIN_PSW}'
                 dir("${env.WORKSPACE}/docker/configmanager") {
-                    sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:${env.BRANCH_NAME}'
+                    sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:${BRANCH_NAME}'
                 }
                 dir("${env.WORKSPACE}/docker/configcache") {
-                    sh label: 'Push Configcache', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:${env.BRANCH_NAME}'
+                    sh label: 'Push Configcache', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:${BRANCH_NAME}'
                 }
             }   
         }
