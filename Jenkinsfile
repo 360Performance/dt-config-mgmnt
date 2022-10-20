@@ -8,6 +8,7 @@ pipeline {
         LOG_LEVEL = "INFO"
         BUILD_NUMBER = "${BUILD_NUMBER}"
         TAG = "0.${BUILD_NUMBER}"
+        DOCKERHUB_LOGIN = credentials('dockerhub-login')
     }
 
     stages {
@@ -21,6 +22,7 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 dir("${env.WORKSPACE}/docker/configmanager") {
+                    sh label: 'Docker Login', script: 'docker login -u ${DOCKERHUB_LOGIN_USR} -p ${DOCKERHUB_LOGIN_PSW} '
                     sh label: 'Push Configmanager', script: 'docker push ${DOCKER_REGISTRY}/configmanager:${TAG}'
                 }
             }   
