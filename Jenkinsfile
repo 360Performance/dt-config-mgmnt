@@ -13,6 +13,7 @@ pipeline {
     stages {
         stage('Build Docker Images') {
             steps {
+                sh 'printenv'
                 dir("${env.WORKSPACE}/docker/configmanager"){
                     sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${TAG} -t ${DOCKER_REGISTRY}/configmanager:latest .'
                 }
