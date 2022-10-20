@@ -23,7 +23,7 @@ pipeline {
                     sh label: 'Build Configcache', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configcache:${BRANCH_NAME} .'
                 }
                 script {
-                    if (${BRANCH_NAME} == 'master') {
+                    if (env.BRANCH_NAME == 'master') {
                         dir("${env.WORKSPACE}/docker/configmanager"){
                             sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${TAG} -t ${DOCKER_REGISTRY}/configmanager:latest .'
                         }
@@ -41,7 +41,7 @@ pipeline {
                     sh label: 'Push Configcache', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:${BRANCH_NAME}'
                 }
                 script {
-                    if (${BRANCH_NAME} == 'master') {
+                    if (BRANCH_NAME == 'master') {
                         dir("${env.WORKSPACE}/docker/configmanager"){
                             sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:latest'
                             sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:${TAG}'
