@@ -2,7 +2,7 @@ pipeline {
     agent { label 'docker-builder' }
     
     environment {
-        DOCKER_HOST = "tcp://192.168.1.123:2375"
+        DOCKER_HOST = "tcp://docker.local:2375"
         DOCKER_REGISTRY = "360performance"
         LOG_LEVEL = "INFO"
         BUILD_NUMBER = "${BUILD_NUMBER}"
