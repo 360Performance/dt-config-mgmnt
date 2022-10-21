@@ -32,6 +32,8 @@ pipeline {
                             sh label: 'GitHub CLI login', script: 'echo ${GITHUB_AUTH_TOKEN} | gh auth login --with-token'
                             sh label: 'GitHub CLI status', script: 'gh auth status'
                             sh label: 'Save docker images', script: 'docker save -o configmanager-${TAG}.tar ${DOCKER_REGISTRY}/configmanager:${TAG}'
+                            sh label: 'Save docker images', script: 'docker save -o configcache-${TAG}.tar ${DOCKER_REGISTRY}/configcache:${TAG}'
+
                         }
                     }
                 }
