@@ -29,7 +29,7 @@ pipeline {
                             sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${TAG} -t ${DOCKER_REGISTRY}/configmanager:latest .'
                         }
                         dir("${env.WORKSPACE}/imageexport") {
-                            sh label: 'GitHub CLI login', script 'gh auth login --with-token && gh auth status'
+                            sh label: 'GitHub CLI login & status', script 'gh auth login --with-token && gh auth status'
                             sh label: 'Save images', script: 'docker save -o configmanager-${TAG}.tar'
                         }
                     }
