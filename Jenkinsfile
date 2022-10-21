@@ -8,7 +8,7 @@ pipeline {
         BUILD_NUMBER = "${BUILD_NUMBER}"
         TAG = "0.${BUILD_NUMBER}"
         DOCKERHUB_LOGIN = credentials('dockerhub-login')
-        GH_TOKEN = credentials('github_auth_token')
+        GITHUB_TOKEN = credentials('github_auth_token')
         git_branch = "${GIT_BRANCH}"
         BRANCH_NAME = git_branch.substring(git_branch.lastIndexOf('/') + 1, git_branch.length())
     }
@@ -29,7 +29,7 @@ pipeline {
                             sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${TAG} -t ${DOCKER_REGISTRY}/configmanager:latest .'
                         }
                         dir("${env.WORKSPACE}/imageexport") {
-                            sh label: 'GitHub CLI login', script: 'gh auth login --with-token'
+                            sh label: 'GitHub CLI login', script: 'echo ${GITHUB_TOKEN} | gh auth login --with-token'
                             sh label: 'GitHub CLI status', script: 'gh auth status'
                             sh label: 'Save images', script: 'docker save -o configmanager-${TAG}.tar'
                         }
