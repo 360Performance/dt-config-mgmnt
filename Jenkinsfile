@@ -34,7 +34,7 @@ pipeline {
                             sh label: 'GitHub CLI status', script: 'gh auth status'
                             sh label: 'Save docker images', script: 'docker save -o configmanager-${TAG}.tar ${DOCKER_REGISTRY}/configmanager:${TAG}'
                             sh label: 'Save docker images', script: 'docker save -o configcache-${TAG}.tar ${DOCKER_REGISTRY}/configcache:${TAG}'
-
+                            sh label: 'Create Release', script: 'gh release create ${TAG} configmanager-${TAG}.tar --generate-notes -t "Release ${TAG}"'
                         }
                     }
                 }
