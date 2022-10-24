@@ -1,8 +1,8 @@
 from ...ConfigTypes import TenantEnvironmentV2Setting
 
 
-class dummySetting(TenantEnvironmentV2Setting):
-    entityuri = "/dummy"
+class objects(TenantEnvironmentV2Setting):
+    entityuri = "/objects"
     uri = TenantEnvironmentV2Setting.uri + entityuri
 
     def __init__(self, **kwargs):

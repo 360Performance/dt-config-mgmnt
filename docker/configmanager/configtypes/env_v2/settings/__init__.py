@@ -1,1 +1,1 @@
-from .dummySetting import *
+from .objects import *

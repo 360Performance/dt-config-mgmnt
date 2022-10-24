@@ -1,12 +1,13 @@
 import sys
+import traceback
 import logging
 import yaml
 
 from configtypes import ConfigTypes
 
 # LOG CONFIGURATION
-#FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
-#logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
+# FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
+# logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("ConfigSet")
 
 
@@ -29,14 +30,14 @@ class ConfigSet:
                 config = yaml.load(definition_file, Loader=yaml.Loader)
                 self.entities = self.load(config, "configtypes", None)
         except:
-            logger.error("Can't load definitions: {}".format(sys.exc_info()))
+            logger.error("Can't load definitions: {}".format(traceback.format_exc()))
 
     def load(self, config, pscope, cscope):
         entities = []
         logger.info("Load: %s.%s", pscope, cscope if cscope else "")
         for k, v in config.items():
             if isinstance(v, dict):
-                #entities = entities + self.load(v, k, pscope)
+                # entities = entities + self.load(v, k, pscope)
                 entities = entities + self.load(v, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
             else:
                 if isinstance(v, list):
@@ -48,7 +49,7 @@ class ConfigSet:
                             configEntity = class_(basedir=self.configbasedir, **entity)
                         except:
                             logger.error("Couldn't create config entity {}, please check config definitions!".format(pscope+k))
-                        #configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
+                        # configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
                         entities.append(configEntity)
 
         return entities
