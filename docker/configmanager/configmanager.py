@@ -1056,7 +1056,10 @@ def getConfig(parameters):
     configtypes = [c for c in [getattr(ConfigTypes, cls.__name__) if len(
         cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantConfigV1Entity.__subclasses__()] if c]
     configtypes = configtypes + [getattr(ConfigTypes, cls.__name__) for cls in ConfigTypes.TenantConfigV1Setting.__subclasses__()]
+    configtypes = configtypes + [c for c in [getattr(ConfigTypes, cls.__name__) if len(
+        cls.__subclasses__()) == 0 else None for cls in ConfigTypes.TenantEnvironmentV2Setting.__subclasses__()] if c]
     # getConfigSettings(configtypes, parameters, dumpconfig)
+
     return configtypes
 
 

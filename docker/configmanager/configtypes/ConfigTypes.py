@@ -208,6 +208,8 @@ In API V2 settings are part of the environment API, while in V1 they were part o
 
 
 class TenantEnvironmentV2Setting(TenantEnvironmentV2Entity):
+    uri = "/e/TENANTID/api/v2/settings"
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.id = self.__class__.__name__
@@ -216,10 +218,13 @@ class TenantEnvironmentV2Setting(TenantEnvironmentV2Entity):
         self.file = kwargs.get("file", self.__class__.__name__)
 
     def __str__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__}'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [schema: {self.dto[0]["schemaId"]}] [externalId: {self.dto[0]["externalId"]}]'
 
     def __repr__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__}'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [schema: {self.dto[0]["schemaId"]}] [externalId: {self.dto[0]["externalId"]}]'
+
+    def getHttpMethod(self):
+        return "POST"
 
 
 class ClusterConfigEntity(ConfigEntity):
