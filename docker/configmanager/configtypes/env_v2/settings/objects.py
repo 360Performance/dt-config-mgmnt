@@ -1,7 +1,7 @@
 from ...ConfigTypes import TenantEnvironmentV2Setting
 
 
-class object(TenantEnvironmentV2Setting):
+class objects(TenantEnvironmentV2Setting):
     entityuri = "/objects"
     uri = TenantEnvironmentV2Setting.uri + entityuri
 

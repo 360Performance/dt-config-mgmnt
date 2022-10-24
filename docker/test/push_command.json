@@ -13,6 +13,6 @@
         "config_v1.applicationswebkeyUserActions": false,
         "config_v1.servicerequestAttributes": false,
         "config_v1.setting.anomalyDetectionservices": true,
-        "env_v2.settings.object": true
+        "env_v2.settings.objects": true
     }
 }
