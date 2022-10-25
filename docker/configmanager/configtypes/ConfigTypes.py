@@ -34,8 +34,8 @@ class ConfigEntity():
                 "Unable to load entity definition from config files, please check prior errors!")
 
         if self.isManagedEntity():
-            self.entiyid = self.generateID()
-            self.setID(self.entiyid)
+            self.entityid = self.generateID()
+            self.setID(self.entityid)
 
     def isManagedEntity(self):
         return self.entityid.startswith("0000")
@@ -77,7 +77,7 @@ class ConfigEntity():
         with open(path, 'w', encoding="utf-8") as outfile:
             json.dump(self.dto, outfile, indent=4, separators=(',', ': '))
 
-        return {"name": self.name, "id": self.entiyid, "file": filename}
+        return {"name": self.name, "id": self.entityid, "file": filename}
 
     def stripDTOMetaData(self, dto):
         if dto is None:
@@ -131,10 +131,10 @@ class TenantConfigV1Entity(ConfigEntity):
     id_attr = "id"
 
     def __str__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entiyid}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
     def __repr__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entiyid}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
     def setID(self, entityid):
         self.entityid = entityid
@@ -171,7 +171,7 @@ class TenantEnvironmentV1Entity(TenantConfigV1Entity):
         return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
     def setID(self, entityid):
-        self.entiyid = entityid
+        self.entityid = entityid
         self.apipath = self.uri+"/"+self.entityid
 
 
