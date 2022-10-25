@@ -2,22 +2,22 @@ import time
 import sys
 import inspect
 import os
-import requests
+import copy
 import json
-import yaml
+import logging
+import traceback
+from textwrap import wrap
+from urllib.parse import urlencode
 import urllib3
 import dns.resolver
 from IPy import IP
 from fqdn import FQDN
 import tldextract
-from urllib.parse import urlencode
 import redis
-import logging
-import traceback
+import yaml
+import requests
 from configtypes import ConfigTypes
 from configset import ConfigSet
-from textwrap import wrap
-import copy
 
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
@@ -187,7 +187,7 @@ def createAppDashboardEntitiesFromApps(applications):
                 prefix = dashboard.getID().split('-', 1)[0]
                 dbid = wrap(stdConfig.getStdAppEntityID(t_id, app.getName()), 4)
                 # dbid = wrap(app.getID().rsplit('-')[1],4)
-                postfix = "{:0>8}".format(1)
+                postfix = f'{1:0>8}'
                 dbid[3] = dbid[3]+postfix
                 id = [prefix]
                 id.extend(dbid)
@@ -287,11 +287,11 @@ def prepareSyntheticMonitors(monitorentities):
                     c_id = parts[0]
                     t_id = parts[1]
                     m_id = configcache.get(key)
-                    logger.info("Synthetic %s monitor %s (%s) exists on %s::%s, it can be updated if necessary, ensuring ID is correct", m_type, m_name, m_id, c_id, t_id)
+                    logger.info(f'Synthetic {m_type} monitor {m_name} ({m_id}) exists on {c_id}::{t_id}, it can be updated if necessary, ensuring ID is correct')
                     monitor.setID(m_id)
                     monitors.append(monitor)
             else:
-                logger.info("No existing %s monitor with name %s found, it can be added (ID will be created)", m_type, m_name)
+                logger.info(f'No existing {m_type} monitor with name {m_name} found, it can be added (ID will be created)')
                 # as a sanity check we'll get the used domains and cross-check with the synthetic monitor
                 # we should only add the synthetic monitor to environments that have traffic to the same domains used by real users
                 logger.warning("Note that this will create the monitor on every tenant that matches you config parameters!")
@@ -525,7 +525,7 @@ def getApplications(parameters):
             key = "::".join([c_id, t_id, "applications"])
             # we want application IDs to be recognizable for the standard (what has been created through automation)
             # so we format them accordingly
-            std_appid = "{:>16}".format(t_id.encode("utf-8").hex()[-16:]).upper()
+            std_appid = f'{t_id.encode("utf-8").hex()[-16:].upper():>16}'
             for application in tenant["values"]:
                 a_id = application["id"].split("-")[1]
 
@@ -1064,7 +1064,7 @@ def getConfig(parameters):
 
 
 def getConfigEntities():
-    modules = [s for s in [m if m.startswith("configtypes") else None for m in sys.modules.keys()] if s]
+    modules = [s for s in [m if m.startswith("configtypes") else None for m in sys.modules] if s]
     for m in modules:
         clsmembers = inspect.getmembers(sys.modules[m], inspect.isclass)
 
@@ -1093,7 +1093,7 @@ def main(argv):
                 logger.warning("Received Command: %s which I do not understand", message["data"])
 
             command = cmd.get("command", None)
-            logger.always("Received Command: {}".format(command))
+            logger.always(f'Received Command: {command}')
             if command == 'RESET':
                 logger.always("========== RELOADING STANDARD CONFIG ==========")
                 stdConfig = ConfigSet.ConfigSet(config_dir)

@@ -1,3 +1,4 @@
+''' Collection of Dynatrace configuration Entity class representations '''
 import logging
 import os
 import json
@@ -12,13 +13,14 @@ logger = logging.getLogger("ConfigTypes")
 
 
 class ConfigEntity():
+    '''Parent class for any Dynatrace configuration entity'''
     uri = ""
     entityuri = "/"
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get("id", "0000")
+        self.entityid = kwargs.get("id", "0000")
         self.name = kwargs.get("name", kwargs.get("file"))
-        self.apipath = self.uri+"/"+self.id
+        self.apipath = self.uri+"/"+self.entityid
         self.file = kwargs.get("file", self.name)
         self.dto = kwargs.get("dto", None)
         basedir = kwargs.get("basedir", "")
@@ -32,20 +34,20 @@ class ConfigEntity():
                 "Unable to load entity definition from config files, please check prior errors!")
 
         if self.isManagedEntity():
-            self.id = self.generateID()
-            self.setID(self.id)
+            self.entiyid = self.generateID()
+            self.setID(self.entiyid)
 
     def isManagedEntity(self):
-        return self.id.startswith("0000")
+        return self.entityid.startswith("0000")
 
     def generateID(self):
         m = hashlib.md5()
         idstring = f'{self.__class__.__name__}-{self.name}'.lower()
         m.update(idstring.encode('utf-8'))
-        id = "0000{}".format(f'{uuid.UUID(m.hexdigest())}'[4:])
-        return id
+        entityid = f'0000{str(uuid.UUID(m.hexdigest()))[4:]}'
+        return entityid
 
-    def setID(self):
+    def setID(self, entityid):
         pass
 
     def getID(self):
@@ -65,7 +67,7 @@ class ConfigEntity():
         return dto
 
     def dumpDTO(self, dumpdir):
-        filename = ((self.name + "-" + self.id) if self.name != self.id else self.name)
+        filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
         #path = dumpdir + self.entityuri + "/" + filename + ".json"
         parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
         path = "/".join([dumpdir]+parts+[f'{filename}.json'])
@@ -75,7 +77,7 @@ class ConfigEntity():
         with open(path, 'w', encoding="utf-8") as outfile:
             json.dump(self.dto, outfile, indent=4, separators=(',', ': '))
 
-        return {"name": self.name, "id": self.id, "file": filename}
+        return {"name": self.name, "id": self.entiyid, "file": filename}
 
     def stripDTOMetaData(self, dto):
         if dto is None:
@@ -122,26 +124,25 @@ class ConfigEntity():
 
 
 class TenantConfigV1Entity(ConfigEntity):
-    """
-    Configuration class for V1 API
-    """
+    '''Class for V1 configuration API entities'''
+
     uri = "/e/TENANTID/api/config/v1"
     name_attr = "name"
     id_attr = "id"
 
     def __str__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entiyid}]'
 
     def __repr__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entiyid}]'
 
-    def setID(self, id):
-        self.id = id
-        self.apipath = self.uri+"/"+self.id
-        self.dto[self.id_attr] = id
+    def setID(self, entityid):
+        self.entityid = entityid
+        self.apipath = self.uri+"/"+self.entityid
+        self.dto[self.id_attr] = entityid
 
     def getID(self):
-        return self.id
+        return self.entityid
 
     # returns the (GET) URI that would return all entities of this config type
     def getEntityListURI(self):
@@ -159,34 +160,40 @@ class TenantConfigV1Entity(ConfigEntity):
 
 
 class TenantEnvironmentV1Entity(TenantConfigV1Entity):
+    '''Class for V1 environment API entities'''
+
     uri = "/e/TENANTID/api/v1"
 
     def __str__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
     def __repr__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
-    def setID(self, id):
-        self.id = id
-        self.apipath = self.uri+"/"+self.id
+    def setID(self, entityid):
+        self.entiyid = entityid
+        self.apipath = self.uri+"/"+self.entityid
 
 
 class TenantEnvironmentV2Entity(TenantConfigV1Entity):
+    '''Class for V2 environment API entities'''
+
     uri = "/e/TENANTID/api/v2"
 
     def __str__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
     def __repr__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.id}]'
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
-    def setID(self, id):
-        self.id = id
-        self.apipath = self.uri+"/"+self.id
+    def setID(self, entityid):
+        self.entityid = entityid
+        self.apipath = self.uri+"/"+self.entityid
 
 
 class TenantConfigV1Setting(TenantConfigV1Entity):
+    '''Class for V1 tenant settings API entities'''
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.id = self.__class__.__name__
@@ -201,13 +208,9 @@ class TenantConfigV1Setting(TenantConfigV1Entity):
         return f'{self.__class__.__base__.__name__}: {type(self).__name__}'
 
 
-'''
-There is a significant change between settings in V1 and V2.
-In API V2 settings are part of the environment API, while in V1 they were part of the config API
-'''
-
-
 class TenantEnvironmentV2Setting(TenantEnvironmentV2Entity):
+    '''Class for V2 settings API entities'''
+
     uri = "/e/TENANTID/api/v2/settings"
 
     def __init__(self, **kwargs):
@@ -228,6 +231,8 @@ class TenantEnvironmentV2Setting(TenantEnvironmentV2Entity):
 
 
 class ClusterConfigEntity(ConfigEntity):
+    '''Class for V1 cluster configuration (DT managed)'''
+
     uri = "/api/v1.0/control/tenantManagement"
 
     def __init__(self, **kwargs):
