@@ -11,7 +11,7 @@ class syntheticmonitors(TenantEnvironmentV1Entity):
     httpmethod = "POST"
 
     def getHttpMethod(self):
-        return "PUT" if self.id != "" else "POST"
+        return "PUT" if self.entityid != "" else "POST"
 
     def setName(self, name):
         self.name = name
@@ -23,15 +23,15 @@ class syntheticmonitors(TenantEnvironmentV1Entity):
     def getType(self):
         return self.dto["type"]
 
-    def setID(self, id):
-        if id == "":
+    def setID(self, entityid):
+        if entityid == "":
             self.apipath = self.uri
             return
 
-        #self.id = "SYNTHETIC_TEST-" + id
+        #self.entityid = "SYNTHETIC_TEST-" + id
         super(syntheticmonitors, self).setID(id)
-        logger.info("Setting monitor ID: %s", self.id)
-        self.dto["entityId"] = "" if id == "" else self.id
+        logger.info("Setting monitor ID: %s", self.entityid)
+        self.dto["entityId"] = "" if entityid == "" else self.entityid
         self.dto["events"][0]["entityId"] = "SYNTHETIC_TEST_STEP-" + \
             id.split("-")[1]
 

@@ -9,33 +9,33 @@ class applicationDetectionRules(TenantConfigV1Entity):
         if self.dto:
             return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
                 self.__class__.__base__.__name__, type(self).__name__, self.dto["applicationIdentifier"],
-                self.id, self.dto["filterConfig"]["applicationMatchTarget"],
+                self.entityid, self.dto["filterConfig"]["applicationMatchTarget"],
                 self.dto["filterConfig"]["applicationMatchType"],
                 self.dto["filterConfig"]["pattern"])
         else:
             return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
-                self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.id, "no applicationMatchTarget",
+                self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.entityid, "no applicationMatchTarget",
                 "no applicationMatchType", "no pattern")
 
     def __repr__(self):
         if self.dto:
             return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
                 self.__class__.__base__.__name__, type(self).__name__, self.dto["applicationIdentifier"],
-                self.id, self.dto["filterConfig"]["applicationMatchTarget"],
+                self.entityid, self.dto["filterConfig"]["applicationMatchTarget"],
                 self.dto["filterConfig"]["applicationMatchType"],
                 self.dto["filterConfig"]["pattern"])
         else:
             return "{}: {} [application: {}] [id: {}] [filter: {} {} {}]".format(
-                self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.id, "no applicationMatchTarget",
+                self.__class__.__base__.__name__, type(self).__name__, "no applicationIdentifier", self.entityid, "no applicationMatchTarget",
                 "no applicationMatchType", "no pattern")
 
     def setApplicationIdentifier(self, appid):
         self.dto["applicationIdentifier"] = appid
 
-    def setID(self, id):
-        self.id = id
-        self.apipath = self.uri+"/"+self.id
-        self.dto["id"] = id
+    def setID(self, entityid):
+        self.entityid = entityid
+        self.apipath = self.uri+"/"+self.entityid
+        self.dto["id"] = entityid
 
     def setFilter(self, pattern="", matchType="EQUALS", matchTarget="DOMAIN"):
         self.dto["filterConfig"]["pattern"] = pattern
