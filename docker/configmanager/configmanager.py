@@ -18,6 +18,7 @@ import yaml
 import requests
 from configtypes import ConfigTypes
 from configset import ConfigSet
+from dtapi import DTConsolidatedAPI
 
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
@@ -268,9 +269,9 @@ def getAllSyntheticMonitors(parameters):
                 try:
                     configcache.set(key, monitor["entityId"])
                 except:
-                    logger.warning("Exception happened: %s", sys.exc_info())
+                    logger.warning(f'Exception: {traceback.format_exc()}')
     except:
-        logger.error("Problem Getting Synthetic Monitors: %s", sys.exc_info())
+        logger.error(f'Problem Getting Synthetic Monitors: {traceback.format_exc()}')
 
 
 def prepareSyntheticMonitors(monitorentities):
@@ -497,7 +498,7 @@ def getServices(parameters):
                                 # logger.info("Service: {} is public".format(service["discoveredName"])))
                                 configcache.sadd(key, svc)
                     except:
-                        logger.warning("Exception happened: %s", sys.exc_info())
+                        logger.warning(f'Exception: {traceback.format_exc()}')
                         continue
 
             configcache.expire(key, 600)
@@ -534,7 +535,7 @@ def getApplications(parameters):
                     try:
                         configcache.sadd(key, std_appid)
                     except:
-                        logger.warning("Exception: %s", sys.exc_info())
+                        logger.warning('Exception: {traceback.format_exc()}')
                 else:
                     logger.info("Application not in standard (%s): %s %s : %s", std_appid, key, application["name"], application["id"])
 
@@ -644,9 +645,9 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
     dumpentities = {}
 
     for ename, enabled in config.items():
-        #entitytype = getattr(ConfigTypes, ename, None)
+        # entitytype = getattr(ConfigTypes, ename, None)
         entitytype = getClass(ename)
-        logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
+        logger.info("++++++++ %s (%s) ++++++++", ".".join([entitytype.__module__, entitytype.__name__]), enabled)
 
         # ensure we only consider config types that are not abstract (that have a entityuri defined)
         if entitytype and enabled and entitytype.entityuri != "/":
@@ -703,7 +704,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                                             definition = centity.dumpDTO(config_dump_dir)
                                             entity_defs.append(definition)
                                     except:
-                                        logger.error("Exception: %s", sys.exc_info())
+                                        logger.error(f'Exception: {traceback.format_exc()}')
 
                         elif issubclass(entitytype, ConfigTypes.TenantConfigV1Setting):
                             # logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
@@ -769,8 +770,8 @@ By going one by one tenant this is not a very effective method, but it's require
 
 
 def updateOrCreateConfigEntities(entities, parameters, validateonly):
-    #headers = {"Content-Type": "application/json"}
-    #query = "?"+urlencode(parameters)
+    # headers = {"Content-Type": "application/json"}
+    # query = "?"+urlencode(parameters)
 
     missing = unmatched = matched = 0
 
@@ -1007,7 +1008,7 @@ def performConfig(entityconfig, parameters):
     specialHandling = ["applicationsweb", "syntheticmonitors", "applicationDashboards"]
 
     for ename, enabled in config.items():
-        #etype = getattr(ConfigTypes, ename, None)
+        # etype = getattr(ConfigTypes, ename, None)
         etype = getClass(ename)
         logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
         if enabled and etype is not None and ename not in specialHandling:
@@ -1110,8 +1111,8 @@ def main(argv):
                         target.update({"dryrun": True})
 
                     logger.always("========== STARTING CONFIG FETCH ==========")
-                    #configtypes = getConfig(target)
-                    #getConfigSettings(configtypes, cmd.get("config"), target, False)
+                    # configtypes = getConfig(target)
+                    # getConfigSettings(configtypes, cmd.get("config"), target, False)
                     source = cmd.get("target", None)
                     if source:
                         logger.info("Source: \n%s", json.dumps(source, indent=2, separators=(',', ': ')))

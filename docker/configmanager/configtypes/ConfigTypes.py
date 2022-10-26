@@ -129,6 +129,7 @@ class TenantConfigV1Entity(ConfigEntity):
     uri = "/e/TENANTID/api/config/v1"
     name_attr = "name"
     id_attr = "id"
+    has_id = True
 
     def __str__(self):
         return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
@@ -193,6 +194,7 @@ class TenantEnvironmentV2Entity(TenantConfigV1Entity):
 
 class TenantConfigV1Setting(TenantConfigV1Entity):
     '''Class for V1 tenant settings API entities'''
+    has_id = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -210,6 +212,7 @@ class TenantConfigV1Setting(TenantConfigV1Entity):
 
 class TenantEnvironmentV2Setting(TenantEnvironmentV2Entity):
     '''Class for V2 settings API entities'''
+    has_id = False
 
     uri = "/e/TENANTID/api/v2/settings"
 

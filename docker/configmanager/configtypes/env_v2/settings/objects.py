@@ -11,3 +11,6 @@ class objects(TenantEnvironmentV2Setting):
     def __init__(self, **kwargs):
         TenantEnvironmentV2Setting.__init__(self, **kwargs)
         self.apipath = self.uri
+
+    def getAll(self, session):
+        pass

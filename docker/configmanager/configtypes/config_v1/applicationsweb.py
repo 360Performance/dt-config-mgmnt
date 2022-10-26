@@ -40,7 +40,7 @@ class applicationsweb(TenantConfigV1Entity):
         return self.name
 
     def setID(self, entityid):
-        if id.startswith('APPLICATION'):
+        if entityid.startswith('APPLICATION'):
             self.entityid = entityid
         else:
             self.entityid = "APPLICATION-"+entityid
