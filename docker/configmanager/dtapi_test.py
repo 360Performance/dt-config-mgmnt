@@ -11,5 +11,5 @@ logging.basicConfig(stream=sys.stdout, level=loglevel, format=FORMAT)
 logger = logging.getLogger("")
 
 with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=("apiuser", "4fzcL*C!A'sHu%:J"), parameters={"clusterid": "360perf"}) as api:
-    result = api.get(dataPrivacy, "1ae28ba8-8724-3d32-86ed-f5d923411e84")
+    result = api.get(applicationsweb, "APPLICATION-0000E94408FA4A17")
     logger.info(result)
