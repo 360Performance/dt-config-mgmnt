@@ -17,11 +17,11 @@ log = logging.getLogger(__name__)
 class dtAPI():
     ''' An API Class that uses the Dynatrace Consolidated API access (multiple clusters,tenants) '''
 
-    def __init__(self, **kwargs):
-        self.host = kwargs.get("host", None)
-        self.auth = kwargs.get("auth", ("apiuser", "apipasswd"))
-        self.verifySSL = kwargs.get("verifySSL", True)
-        self.parameters = kwargs.get("parameters", {})
+    def __init__(self, host, auth=(), verifySSL=True, parameters={}):
+        self.host = host.rstrip("/")
+        self.auth = auth
+        self.verifySSL = verifySSL
+        self.parameters = parameters
 
     def __enter__(self):
         self.session = requests.Session()
@@ -31,24 +31,50 @@ class dtAPI():
         self.session.verify = self.verifySSL
         self.session.mount('http://', adapter)
         self.session.mount('https://', adapter)
-        self.session.headers = {'Accept': 'application/json', 'Connection': 'keep-alive'}
+        self.session.headers = {'Accept': 'application/json; charset=utf-8', 'Connection': 'keep-alive', 'Content-Type': 'application/json; charset=utf-8'}
         self.session.params = self.parameters
         return self
 
     def __exit__(self, type, value, traceback):
         self.session = None
 
-    def authenticate(self):
-        pass
-
-    def post(self, **kwargs):
-        pass
-
-    def get(self, eType, eId):
-        ''' get single entity of a specific type and id'''
+    def post(self, entity, parameters={}, validateOnly=False):
+        params = self.parameters | parameters
         result = None
+        validate = eId = ""
+        if validateOnly:
+            validate = "/validator"
+            eId = f'/{entity.getID()}'
+        url = f'{self.host}/{(entity.uri).strip("/")}{eId}{validate}'
+        log.info(f'POST{validate.upper()} {entity.__class__.__name__}: {url}')
 
-        url = f'{self.host}/{eType.uri}'
+        try:
+            response = self.session.post(url, params=params, json=entity.dto)
+            if response.ok:
+                try:
+                    result = response.json()
+                except:
+                    if response.text == '':
+                        result = {"headers": dict(response.headers)}
+                    else:
+                        result = {"result": response.text}
+            else:
+                log.error(f'Posting {entity.__class__.__name__} returned error [{response.status_code}]: {url}. Response: {response.text}')
+        except Exception as e:
+            log.info(f'Failed posting {entity.__class__.__name__}: {url}')
+            log.exception(e)
+        return result
+
+    def get(self, eType, eId="", parameters={}):
+        ''' get single/all entities of a specific type and id'''
+        ''' Note: 
+            - if an ID is specified (and supported by the entity type) the entity will be fetched
+            - if an ID is not specified and the entity API endpoint supports GETs without ID it will return a list of all
+              entities
+        '''
+        params = self.parameters | parameters
+        result = None
+        url = f'{self.host}/{(eType.uri).strip("/")}'
 
         # if this entity type supports multiple instances (defined by ID) we will consider the specified
         # entity ID to get the instance of this entity (e.g. autoTags)
@@ -57,27 +83,77 @@ class dtAPI():
             if eType.has_id:
                 url = f'{url}/{eId}'
 
-        log.info(f'Getting {eType.__name__}: {url}')
+        log.info(f'GET {eType.__name__}: {url}')
 
         try:
-            response = self.session.get(url)
+            response = self.session.get(url, params=params)
             if response.ok:
                 try:
-                    result = dict(response.json())
+                    result = response.json()
                 except:
                     if response.text == '':
                         result = {"headers": dict(response.headers)}
                     else:
                         result = {"result": response.text}
             else:
-                log.error("URL: " + url + ". Response: " + response.text)
+                log.error(f'Getting {eType.__name__} returned error [{response.status_code}]: {url}. Response: {response.text}')
         except Exception as e:
             log.info(f'Failed getting {eType.__name__}: {url}')
             log.exception(e)
         return result
 
-    def put(self, **kwargs):
-        pass
+    def put(self, entity, eId="", parameters={}, validateOnly=False):
+        params = self.parameters | parameters
+        result = None
+        validate = ""
+        if validateOnly:
+            validate = "/validator"
+        if eId == "":
+            eId = entity.getID()
+        url = f'{self.host}/{(entity.uri).strip("/")}/{eId}{validate}'
+        log.info(f'PUT{validate.upper()} {entity.__class__.__name__}: {url}')
+
+        try:
+            response = self.session.put(url, params=params, json=entity.dto)
+            if response.ok:
+                try:
+                    result = response.json()
+                except:
+                    if response.text == '':
+                        result = {"headers": dict(response.headers)}
+                    else:
+                        result = {"result": response.text}
+            else:
+                log.error(f'Putting {entity.__class__.__name__} returned error [{response.status_code}]: {url}. Response: {response.text}')
+        except Exception as e:
+            log.info(f'Failed putting {entity.__class__.__name__}: {url}')
+            log.exception(e)
+        return result
+
+    def delete(self, entity, eId="", parameters={}):
+        params = self.parameters | parameters
+        result = None
+        if eId == "":
+            eId = entity.getID()
+        url = f'{self.host}/{(entity.uri).strip("/")}/{eId}'
+        log.info(f'DELETE {entity}: {url}')
+
+        try:
+            response = self.session.delete(url, params=params)
+            if response.ok:
+                try:
+                    result = response.json()
+                except:
+                    if response.text == '':
+                        result = {"headers": dict(response.headers)}
+                    else:
+                        result = {"result": response.text}
+            else:
+                log.error(f'Deleting {entity} returned error [{response.status_code}]: {url}. Response: {response.text}')
+        except Exception as e:
+            log.info(f'Failed deleting {entity}: {url}')
+            log.exception(e)
+        return result
 
 
 class DTEntityDTO(object):

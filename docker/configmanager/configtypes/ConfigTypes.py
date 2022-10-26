@@ -7,8 +7,8 @@ import uuid
 
 
 # LOG CONFIGURATION
-#FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
-#logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
+# FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
+# logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("ConfigTypes")
 
 
@@ -68,7 +68,7 @@ class ConfigEntity():
 
     def dumpDTO(self, dumpdir):
         filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
-        #path = dumpdir + self.entityuri + "/" + filename + ".json"
+        # path = dumpdir + self.entityuri + "/" + filename + ".json"
         parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
         path = "/".join([dumpdir]+parts+[f'{filename}.json'])
 
@@ -121,6 +121,34 @@ class ConfigEntity():
     # needed for identifying if entities are considered when dumping and transporting configuration
     def isShared(self):
         return True
+
+    '''
+    Using class methods for generic calls to the Dynatrace API to perform entity specific requests
+    '''
+    @classmethod
+    def get(cls, dtapi, eId="", parameters={}):
+        #logger.info(f'GET entity {cls.__qualname__}')
+        return dtapi.get(cls, eId=eId, parameters=parameters)
+
+    def post(self, dtapi, parameters={}):
+        savedto = self.dto.copy()
+        self.dto = self.stripDTOMetaData(self.dto)
+        logger.info(f'POST {self}')
+        result = dtapi.post(self, parameters=parameters)
+        self.dto = savedto
+        return result
+
+    def put(self, dtapi, parameters={}):
+        logger.info(f'PUT {self}')
+        return dtapi.put(self, parameters=parameters)
+
+    def validate(self, dtapi, parameters={}):
+        logger.info(f'VALIDATE {self}')
+        return dtapi.post(self, parameters=parameters, validateOnly=True)
+
+    def delete(self, dtapi, parameters={}):
+        logger.info(f'DELETE {self}')
+        return dtapi.delete(self, parameters=parameters)
 
 
 class TenantConfigV1Entity(ConfigEntity):
@@ -212,7 +240,7 @@ class TenantConfigV1Setting(TenantConfigV1Entity):
 
 class TenantEnvironmentV2Setting(TenantEnvironmentV2Entity):
     '''Class for V2 settings API entities'''
-    has_id = False
+    has_id = True
 
     uri = "/e/TENANTID/api/v2/settings"
 
