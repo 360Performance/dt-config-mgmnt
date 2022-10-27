@@ -1,11 +1,13 @@
+'''
+Collection of convenience classes and functions to access the 360Performance Dynatrace consolidated API
+'''
+
 import os
 import sys
-import json
+import logging
+import inspect
 import requests
 from requests.adapters import HTTPAdapter
-import logging
-import copy
-import inspect
 from requests.packages.urllib3.util.retry import Retry
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
@@ -17,11 +19,12 @@ log = logging.getLogger(__name__)
 class dtAPI():
     ''' An API Class that uses the Dynatrace Consolidated API access (multiple clusters,tenants) '''
 
-    def __init__(self, host, auth=(), verifySSL=True, parameters={}):
+    def __init__(self, host, auth=(), verifySSL=True, parameters=None):
         self.host = host.rstrip("/")
         self.auth = auth
         self.verifySSL = verifySSL
         self.parameters = parameters
+        self.session = None
 
     def __enter__(self):
         self.session = requests.Session()
@@ -36,38 +39,12 @@ class dtAPI():
         return self
 
     def __exit__(self, type, value, traceback):
+        self.session.close()
         self.session = None
-
-    def post(self, entity, parameters={}, validateOnly=False):
-        params = self.parameters | parameters
-        result = None
-        validate = eId = ""
-        if validateOnly:
-            validate = "/validator"
-            eId = f'/{entity.getID()}'
-        url = f'{self.host}/{(entity.uri).strip("/")}{eId}{validate}'
-        log.info(f'POST{validate.upper()} {entity.__class__.__name__}: {url}')
-
-        try:
-            response = self.session.post(url, params=params, json=entity.dto)
-            if response.ok:
-                try:
-                    result = response.json()
-                except:
-                    if response.text == '':
-                        result = {"headers": dict(response.headers)}
-                    else:
-                        result = {"result": response.text}
-            else:
-                log.error(f'Posting {entity.__class__.__name__} returned error [{response.status_code}]: {url}. Response: {response.text}')
-        except Exception as e:
-            log.info(f'Failed posting {entity.__class__.__name__}: {url}')
-            log.exception(e)
-        return result
 
     def get(self, eType, eId="", parameters={}):
         ''' get single/all entities of a specific type and id'''
-        ''' Note: 
+        ''' Note:
             - if an ID is specified (and supported by the entity type) the entity will be fetched
             - if an ID is not specified and the entity API endpoint supports GETs without ID it will return a list of all
               entities
@@ -79,11 +56,11 @@ class dtAPI():
         # if this entity type supports multiple instances (defined by ID) we will consider the specified
         # entity ID to get the instance of this entity (e.g. autoTags)
         # if there is no entity support then it is likely a singular configuration setting (e.g. anomalyDetection/services)
-        if "has_id" in [a[0] for a in inspect.getmembers(eType, lambda a:not(inspect.isroutine(a)))]:
+        if "has_id" in [a[0] for a in inspect.getmembers(eType, lambda a:not inspect.isroutine(a))]:
             if eType.has_id:
                 url = f'{url}/{eId}'
 
-        log.info(f'GET {eType.__name__}: {url}')
+        log.info("GET %s: %s", eType.__name__, url)
 
         try:
             response = self.session.get(url, params=params)
@@ -96,38 +73,34 @@ class dtAPI():
                     else:
                         result = {"result": response.text}
             else:
-                log.error(f'Getting {eType.__name__} returned error [{response.status_code}]: {url}. Response: {response.text}')
+                log.error("GET %s [%s]: %s. Response: %s", eType.__name__, response.status_code, url, response.text)
         except Exception as e:
-            log.info(f'Failed getting {eType.__name__}: {url}')
+            log.error("GET %s: %s", eType.__name__, url)
             log.exception(e)
         return result
 
-    def put(self, entity, eId="", parameters={}, validateOnly=False):
+    def post(self, entity, parameters={}, validateOnly=False):
         params = self.parameters | parameters
         result = None
-        validate = ""
+        validate = eId = ""
         if validateOnly:
             validate = "/validator"
+            eId = f'/{entity.getID()}'
+        url = f'{self.host}/{(entity.uri).strip("/")}{eId}{validate}'
+        log.info("POST%s %s: %s", validate.upper(), entity, url)
+
+        result = self.request("POST", url, entity=entity, parameters=params, payload=entity.dto)
+        return result
+
+    def put(self, entity, eId="", parameters={}):
+        params = self.parameters | parameters
+        result = None
         if eId == "":
             eId = entity.getID()
-        url = f'{self.host}/{(entity.uri).strip("/")}/{eId}{validate}'
-        log.info(f'PUT{validate.upper()} {entity.__class__.__name__}: {url}')
+        url = f'{self.host}/{(entity.uri).strip("/")}/{eId}'
+        log.info("PUT %s: %s", entity, url)
 
-        try:
-            response = self.session.put(url, params=params, json=entity.dto)
-            if response.ok:
-                try:
-                    result = response.json()
-                except:
-                    if response.text == '':
-                        result = {"headers": dict(response.headers)}
-                    else:
-                        result = {"result": response.text}
-            else:
-                log.error(f'Putting {entity.__class__.__name__} returned error [{response.status_code}]: {url}. Response: {response.text}')
-        except Exception as e:
-            log.info(f'Failed putting {entity.__class__.__name__}: {url}')
-            log.exception(e)
+        result = self.request("PUT", url, entity=entity, parameters=params, payload=entity.dto)
         return result
 
     def delete(self, entity, eId="", parameters={}):
@@ -136,10 +109,15 @@ class dtAPI():
         if eId == "":
             eId = entity.getID()
         url = f'{self.host}/{(entity.uri).strip("/")}/{eId}'
-        log.info(f'DELETE {entity}: {url}')
+        log.info("DELETE %s: %s", entity, url)
 
+        result = self.request("DELETE", url, entity=entity, parameters=params)
+        return result
+
+    def request(self, method, url, entity, parameters={}, payload=None):
+        result = None
         try:
-            response = self.session.delete(url, params=params)
+            response = self.session.request(method, url, params=parameters, json=payload)
             if response.ok:
                 try:
                     result = response.json()
@@ -149,9 +127,9 @@ class dtAPI():
                     else:
                         result = {"result": response.text}
             else:
-                log.error(f'Deleting {entity} returned error [{response.status_code}]: {url}. Response: {response.text}')
+                log.error("%s %s [%s]: %s. Response: %s", method, entity, response.status_code, url, response.text)
         except Exception as e:
-            log.info(f'Failed deleting {entity}: {url}')
+            log.error("%s %s: %s", method, entity, url)
             log.exception(e)
         return result
 
@@ -169,7 +147,7 @@ class DTEntityDTO(object):
         newdto = self.dto.copy()
         for attr in self.dto:
             if attr in ['clusterid', 'clusterhost', 'tenantid', 'metadata', 'responsecode', 'id']:
-                log.debug("Strip attribute '{attr}' from DTO", attr)
+                log.debug("Strip attribute %s from DTO", attr)
                 newdto.pop(attr, None)
         self.dto = newdto
         return self.dto

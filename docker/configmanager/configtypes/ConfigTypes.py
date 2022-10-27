@@ -37,6 +37,12 @@ class ConfigEntity():
             self.entityid = self.generateID()
             self.setID(self.entityid)
 
+    def __str__(self):
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
+
+    def __repr__(self):
+        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
+
     def isManagedEntity(self):
         return self.entityid.startswith("0000")
 
@@ -123,31 +129,32 @@ class ConfigEntity():
         return True
 
     '''
-    Using class methods for generic calls to the Dynatrace API to perform entity specific requests
+    Using class method for generic calls to the Dynatrace API to perform entity specific requests
+    For GET requests this allows us to fetch either a entity list or a specific entity 
     '''
     @classmethod
     def get(cls, dtapi, eId="", parameters={}):
-        #logger.info(f'GET entity {cls.__qualname__}')
+        logger.info("GET %s %s", cls.__qualname__, eId)
         return dtapi.get(cls, eId=eId, parameters=parameters)
 
     def post(self, dtapi, parameters={}):
         savedto = self.dto.copy()
         self.dto = self.stripDTOMetaData(self.dto)
-        logger.info(f'POST {self}')
+        logger.info("POST %s", self)
         result = dtapi.post(self, parameters=parameters)
         self.dto = savedto
         return result
 
     def put(self, dtapi, parameters={}):
-        logger.info(f'PUT {self}')
+        logger.info("PUT %s", self)
         return dtapi.put(self, parameters=parameters)
 
     def validate(self, dtapi, parameters={}):
-        logger.info(f'VALIDATE {self}')
+        logger.info("VALIDATE %s", self)
         return dtapi.post(self, parameters=parameters, validateOnly=True)
 
     def delete(self, dtapi, parameters={}):
-        logger.info(f'DELETE {self}')
+        logger.info("DELETE %s", self)
         return dtapi.delete(self, parameters=parameters)
 
 
@@ -158,12 +165,6 @@ class TenantConfigV1Entity(ConfigEntity):
     name_attr = "name"
     id_attr = "id"
     has_id = True
-
-    def __str__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
-
-    def __repr__(self):
-        return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
 
     def setID(self, entityid):
         self.entityid = entityid

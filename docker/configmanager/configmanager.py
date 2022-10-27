@@ -583,7 +583,7 @@ def merge(a, b, path=None):
             elif a[key] == b[key]:
                 pass  # same leaf value
             else:
-                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+                raise Exception(f'Conflict at {".".join(path + [str(key)])}')
         else:
             a[key] = b[key]
     return a
