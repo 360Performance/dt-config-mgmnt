@@ -636,6 +636,18 @@ clusterid::tenantid::entitytype::entityname => id | missing
 
 
 def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
+    config = getControlSettings(entityconfig)
+    dumpentities = {}
+
+    with DTConsolidatedAPI.dtAPI(host=server, auth=(apiuser, apipwd), parameters=parameters) as api:
+        for ename, enabled in config.items():
+            entitytype = getClass(ename)
+            logger.info("++++++++ %s (%s) ++++++++", ".".join([entitytype.__module__, entitytype.__name__]), enabled)
+            result = entitytype.get(api)
+            logger.info(result)
+
+
+def getConfigSettings_old(entitytypes, entityconfig, parameters, dumpconfig):
 
     config = getControlSettings(entityconfig)
     # query = "?"+urlencode(parameters)

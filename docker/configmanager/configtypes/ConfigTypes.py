@@ -128,14 +128,43 @@ class ConfigEntity():
     def isShared(self):
         return True
 
+    @classmethod
+    def isValidID(cls, idstr):
+        try:
+            uuid_obj = uuid.UUID(idstr)
+        except ValueError:
+            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            return False
+        return str(uuid_obj) == idstr
+
     '''
     Using class method for generic calls to the Dynatrace API to perform entity specific requests
     For GET requests this allows us to fetch either a entity list or a specific entity 
     '''
     @classmethod
-    def get(cls, dtapi, eId="", parameters={}):
-        logger.info("GET %s %s", cls.__qualname__, eId)
-        return dtapi.get(cls, eId=eId, parameters=parameters)
+    def get(cls, dtapi, eId=None, parameters={}):
+        if eId is None:
+            fetchtype = "list"
+        elif not cls.isValidID(eId):
+            fetchtype = "all"
+        else:
+            fetchtype = eId
+        entities = []
+        logger.info("GET %s %s", cls.__qualname__, fetchtype)
+        if eId is None or cls.isValidID(eId):
+            # gets either the global setting or the specific entity setting
+            return dtapi.get(cls, eId=eId, parameters=parameters)
+        else:
+            # first need to get all applications and their IDs
+            result = dtapi.get(cls, parameters=parameters)
+            if result and len(result) > 0:
+                for tenant in result:
+                    if "values" in tenant:
+                        for entity in tenant["values"]:
+                            eId = entity["id"]
+                            entities.append(dtapi.get(cls, eId=eId, parameters=parameters))
+
+        return entities
 
     def post(self, dtapi, parameters={}):
         savedto = self.dto.copy()

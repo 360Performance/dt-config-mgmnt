@@ -42,22 +42,30 @@ class dtAPI():
         self.session.close()
         self.session = None
 
-    def get(self, eType, eId="", parameters={}):
+    def get(self, eType, eId=None, parameters={}):
         ''' get single/all entities of a specific type and id'''
         ''' Note:
-            - if an ID is specified (and supported by the entity type) the entity will be fetched
-            - if an ID is not specified and the entity API endpoint supports GETs without ID it will return a list of all
-              entities
+            - if an ID string is specified (and supported by the entity type) the entity will be fetched
+            - if an ID is specified but not a valid ID string (for this entitytype) it will try to iterate through all entities
+              and return the respective setting per entity
+              e.g. get applicationswebdataPrivacy for eID="" or eID="all" will first get all applicationsweb and then fetch
+              the settin for every application and return an result array
+            - if an ID is not specified (or None) and the Dynatrace API provides a global setting (independent of ID) it will return
+              the global configuration (e.g. applicationswebdataPrivacy exists on global and application level)
         '''
         params = self.parameters | parameters
         result = None
-        url = f'{self.host}/{(eType.uri).strip("/")}'
+        if eId is None:
+            uri = eType.uri.replace("/{id}/", "/")
+        else:
+            uri = eType.uri.replace("{id}", eId)
+        url = f'{self.host}/{uri.strip("/")}'
 
         # if this entity type supports multiple instances (defined by ID) we will consider the specified
         # entity ID to get the instance of this entity (e.g. autoTags)
         # if there is no entity support then it is likely a singular configuration setting (e.g. anomalyDetection/services)
         if "has_id" in [a[0] for a in inspect.getmembers(eType, lambda a:not inspect.isroutine(a))]:
-            if eType.has_id:
+            if eType.has_id and eId is not None and eId not in url:
                 url = f'{url}/{eId}'
 
         log.info("GET %s: %s", eType.__name__, url)

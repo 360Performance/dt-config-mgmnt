@@ -43,12 +43,40 @@ class Test_00_Get(unittest.TestCase):
             # get list of autoTags
             result = autoTags.get(api)
             self.assertTrue(len(result[0]["values"]) > 1)
+            logger.info(result)
             autotagId = result[0]["values"][0]["id"]
 
             # get specific autoTag
             result = autoTags.get(api, autotagId)
             self.assertIsNotNone(result)
             self.assertTrue("name" in result[0])
+
+            # get all configured autoTag entities
+            result = autoTags.get(api, eId="all")
+            self.assertIsNotNone(result)
+            logger.info(result)
+
+            # get general applicationswebdataPrivacy
+            result = applicationswebdataPrivacy.get(api)
+            self.assertIsNotNone(result)
+
+            # get a applicationswebdataPrivacy setting with invalid ID, should result in all
+            result = applicationswebdataPrivacy.get(api, eId="my-wrong-entity-id")
+            self.assertIsNotNone(result)
+            logger.info(result)
+
+            # get all applicationswebdataPrivacy
+            result = applicationswebdataPrivacy.get(api, eId="all")
+            self.assertIsNotNone(result)
+            logger.info(result)
+
+            # get a specific application's applicationswebdataPrivacy
+            result = applicationsweb.get(api)
+            self.assertIsNotNone(result)
+            self.assertTrue("id" in result[0]["values"][0])
+            appid = result[0]["values"][0]["id"]
+            result = applicationswebdataPrivacy.get(api, eId=appid)
+            self.assertIsNotNone(result)
 
             # get v1 setting
             result = dataPrivacy.get(api)
