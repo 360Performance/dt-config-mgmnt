@@ -641,10 +641,21 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
 
     with DTConsolidatedAPI.dtAPI(host=server, auth=(apiuser, apipwd), parameters=parameters) as api:
         for ename, enabled in config.items():
-            entitytype = getClass(ename)
-            logger.info("++++++++ %s (%s) ++++++++", ".".join([entitytype.__module__, entitytype.__name__]), enabled)
-            result = entitytype.get(api)
-            logger.info(result)
+            eType = getClass(ename)
+            logger.info("++++++++ %s (%s) ++++++++", ".".join([eType.__module__, eType.__name__]), enabled)
+            result = eType.get(api, eId="all")
+            logger.info(f'Found {len(result)} {eType.__name__} entities in the result.')
+
+            # we used get "all", so we received an array of responses
+            for r in result:
+                # the individual entities of this type
+                for entity in r:
+                    c_id = entity["clusterid"]
+                    t_id = entity["tenantid"]
+
+                    centity = eType(id=entity[eType.id_attr], name=entity[eType.name_attr], dto=entity)
+                    logger.info(
+                        f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
 
 
 def getConfigSettings_old(entitytypes, entityconfig, parameters, dumpconfig):

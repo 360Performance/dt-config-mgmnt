@@ -10,7 +10,9 @@ class applicationsweb(TenantConfigV1Entity):
 
     entityuri = "/applications/web"
     uri = TenantConfigV1Entity.uri + entityuri
-    id_attr = "id"
+    id_attr = "identifier"
+    list_id_attr = "id"
+    list_attr = "values"
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)

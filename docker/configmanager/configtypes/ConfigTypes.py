@@ -16,7 +16,10 @@ class ConfigEntity():
     '''Parent class for any Dynatrace configuration entity'''
     uri = ""
     entityuri = "/"
-    id_attr = "id"
+    list_attr = "values"    # the attribute name used for the list of entities in get all/list responses
+    list_id_attr = "id"     # the attribute name used to get the ID of an entity in get all/list responses for an entitytype
+    id_attr = "id"          # the attribute name used for the individual entity's ID in a dedicaated entity response
+    name_attr = "name"      # the attribute name used for the individual entity's NAME in a dedicaated entity response
 
     def __init__(self, **kwargs):
         self.entityid = kwargs.get("id", "0000")
@@ -160,9 +163,9 @@ class ConfigEntity():
             result = dtapi.get(cls, parameters=parameters)
             if result and len(result) > 0:
                 for tenant in result:
-                    if "values" in tenant:
-                        for entity in tenant["values"]:
-                            eId = entity["id"]
+                    if cls.list_attr in tenant:
+                        for entity in tenant[cls.list_attr]:
+                            eId = entity[cls.list_id_attr]
                             entities.append(dtapi.get(cls, eId=eId, parameters=parameters))
 
         return entities
@@ -197,8 +200,6 @@ class TenantConfigV1Entity(ConfigEntity):
     '''Class for V1 configuration API entities'''
 
     uri = "/e/TENANTID/api/config/v1"
-    name_attr = "name"
-    id_attr = "id"
     has_id = True
 
     def setID(self, entityid):

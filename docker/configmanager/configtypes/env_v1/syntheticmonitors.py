@@ -9,6 +9,9 @@ class syntheticmonitors(TenantEnvironmentV1Entity):
     entityuri = "/synthetic/monitors"
     uri = TenantEnvironmentV1Entity.uri + entityuri
     httpmethod = "POST"
+    list_id_attr = "entityId"
+    id_attr = "entityId"
+    list_attr = "monitors"
 
     def getHttpMethod(self):
         return "PUT" if self.entityid != "" else "POST"

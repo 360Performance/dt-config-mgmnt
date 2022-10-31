@@ -14,6 +14,7 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
     entityuri = "/applications/web/{id}/dataPrivacy"
     uri = TenantConfigV1Entity.uri + entityuri
     id_attr = "identifier"
+    name_attr = "identifier"
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)

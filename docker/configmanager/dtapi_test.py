@@ -28,9 +28,9 @@ class Test_00_Get(unittest.TestCase):
     def list_type(self, api, eType):
         '''get a list of all configured entity types - returns id of first one'''
         result = eType.list(api)
-        self.assertTrue(len(result[0]["values"]) > 1)
-        logger.info(f'List of {eType.__name__}: {[a[eType.id_attr] for a in result[0]["values"]]}')
-        tId = result[0]["values"][0][eType.id_attr]
+        self.assertTrue(len(result[0][eType.list_attr]) > 1)
+        logger.info(f'List of {eType.__name__}: {[a[eType.list_id_attr] for a in result[0][eType.list_attr]]}')
+        tId = result[0][eType.list_attr][0][eType.list_id_attr]
         return tId
 
     def get_one_of_type(self, api, eType, eId):
@@ -56,8 +56,8 @@ class Test_00_Get(unittest.TestCase):
             ''' use the dtapi directly'''
             # get list of autoTags
             result = api.get(autoTags)
-            self.assertTrue(len(result[0]["values"]) > 1)
-            autotagId = result[0]["values"][0][autoTags.id_attr]
+            self.assertTrue(len(result[0][autoTags.list_attr]) > 1)
+            autotagId = result[0][autoTags.list_attr][0][autoTags.id_attr]
 
             # get specific autoTag
             result = api.get(autoTags, autotagId)
