@@ -16,6 +16,7 @@ class ConfigEntity():
     '''Parent class for any Dynatrace configuration entity'''
     uri = ""
     entityuri = "/"
+    id_attr = "id"
 
     def __init__(self, **kwargs):
         self.entityid = kwargs.get("id", "0000")
@@ -133,7 +134,7 @@ class ConfigEntity():
         try:
             uuid_obj = uuid.UUID(idstr)
         except ValueError:
-            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            #logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
             return False
         return str(uuid_obj) == idstr
 
@@ -143,19 +144,19 @@ class ConfigEntity():
     '''
     @classmethod
     def get(cls, dtapi, eId=None, parameters={}):
+        entities = []
         if eId is None:
             fetchtype = "list"
-        elif not cls.isValidID(eId):
-            fetchtype = "all"
+        elif not cls.isValidID(eId) and eId is not "all":
+            return entities
         else:
             fetchtype = eId
-        entities = []
-        logger.info("GET %s %s", cls.__qualname__, fetchtype)
+
+        logger.info("GET %s (%s)", cls.__qualname__, fetchtype)
         if eId is None or cls.isValidID(eId):
             # gets either the global setting or the specific entity setting
             return dtapi.get(cls, eId=eId, parameters=parameters)
         else:
-            # first need to get all applications and their IDs
             result = dtapi.get(cls, parameters=parameters)
             if result and len(result) > 0:
                 for tenant in result:
@@ -165,6 +166,11 @@ class ConfigEntity():
                             entities.append(dtapi.get(cls, eId=eId, parameters=parameters))
 
         return entities
+
+    @classmethod
+    def list(cls, dtapi, parameters={}):
+        result = cls.get(dtapi, eId=None, parameters=parameters)
+        return result
 
     def post(self, dtapi, parameters={}):
         savedto = self.dto.copy()

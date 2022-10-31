@@ -49,7 +49,7 @@ class dtAPI():
             - if an ID is specified but not a valid ID string (for this entitytype) it will try to iterate through all entities
               and return the respective setting per entity
               e.g. get applicationswebdataPrivacy for eID="" or eID="all" will first get all applicationsweb and then fetch
-              the settin for every application and return an result array
+              the setting for every application and return an result array
             - if an ID is not specified (or None) and the Dynatrace API provides a global setting (independent of ID) it will return
               the global configuration (e.g. applicationswebdataPrivacy exists on global and application level)
         '''
