@@ -646,6 +646,8 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
             result = eType.get(api, eId="all")
             logger.info(f'Found {len(result)} {eType.__name__} entities in the result.')
 
+            entity_defs = []
+
             # we used get "all", so we received an array of responses
             for r in result:
                 # the individual entities of this type
@@ -656,6 +658,26 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                     centity = eType(id=entity[eType.id_attr], name=entity[eType.name_attr], dto=entity)
                     logger.info(
                         f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
+                    if dumpconfig:
+                        definition = centity.dumpDTO(config_dump_dir)
+                        entity_defs.append(definition)
+
+            # build datastructure for dumping the entities.yml file properly
+            if dumpconfig:
+                parts = eType.entityuri.strip("/").split('/')
+                parts = f'{eType.__module__}.{eType.__class__.__qualname__}'.split(".")[1:-1]
+                parts.reverse()
+                if len(entity_defs) > 0:
+                    for i in parts:
+                        entity_defs = {i: entity_defs}
+
+                dumpentities = merge(dumpentities, entity_defs)
+
+        # write out the stdConfig definition (entities.yml)
+        if dumpconfig:
+            path = config_dump_dir + "/entities.yml"
+            with open(path, 'w', encoding="utf-8") as file:
+                documents = yaml.dump(dumpentities, file)
 
 
 def getConfigSettings_old(entitytypes, entityconfig, parameters, dumpconfig):
