@@ -1,10 +1,11 @@
+
 ''' Dynatrace Settings V2 API Support '''
 from ...ConfigTypes import TenantEnvironmentV2Setting
 
 
 class objects(TenantEnvironmentV2Setting):
     ''' Dynatrace Settings V2 API'''
-
+    
     entityuri = "/objects"
     uri = TenantEnvironmentV2Setting.uri + entityuri
 
