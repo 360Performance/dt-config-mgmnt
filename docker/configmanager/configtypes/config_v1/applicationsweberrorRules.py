@@ -14,10 +14,10 @@ class applicationsweberrorRules(TenantConfigV1Entity):
         self.apipath = self.uri
 
     def __str__(self):
-        return "{}: {} [application error rules: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id)
+        return "{}: {} [application error rules: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def __repr__(self):
-        return "{}: {} [application error rules: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id)
+        return "{}: {} [application error rules: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def setName(self, name):
         self.name = name
@@ -26,14 +26,14 @@ class applicationsweberrorRules(TenantConfigV1Entity):
     def getName(self):
         return self.name
 
-    def setID(self, id):
-        if id.startswith('APPLICATION'):
-            self.id = id
+    def setID(self, entityid):
+        if entityid.startswith('APPLICATION'):
+            self.entityid = entityid
         else:
-            self.id = "APPLICATION-"+id
-        super(applicationsweberrorRules, self).setID(self.id)
-        self.dto[self.id_attr] = self.id
-        self.entityuri = f'/applications/web/{self.id}/errorRules'
+            self.entityid = "APPLICATION-"+entityid
+        super(applicationsweberrorRules, self).setID(self.entityid)
+        self.dto[self.id_attr] = self.entityid
+        self.entityuri = f'/applications/web/{self.entityid}/errorRules'
         self.apipath = self.uri
 
     def getID(self):

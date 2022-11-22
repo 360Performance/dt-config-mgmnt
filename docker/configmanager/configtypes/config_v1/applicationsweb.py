@@ -10,14 +10,16 @@ class applicationsweb(TenantConfigV1Entity):
 
     entityuri = "/applications/web"
     uri = TenantConfigV1Entity.uri + entityuri
-    id_attr = "id"
+    id_attr = "identifier"
+    list_id_attr = "id"
+    list_attr = "values"
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
         self.detectionrules = []
 
     def isManagedEntity(self):
-        return self.id.split("-")[1].startswith("0000")
+        return self.entityid.split("-")[1].startswith("0000")
 
     def generateID(self):
         m = hashlib.md5()
@@ -27,10 +29,10 @@ class applicationsweb(TenantConfigV1Entity):
         return id
 
     def __str__(self):
-        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id)
+        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def __repr__(self):
-        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id)
+        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def setName(self, name):
         self.name = name
@@ -39,26 +41,26 @@ class applicationsweb(TenantConfigV1Entity):
     def getName(self):
         return self.name
 
-    def setID(self, id):
-        if id.startswith('APPLICATION'):
-            self.id = id
+    def setID(self, entityid):
+        if entityid.startswith('APPLICATION'):
+            self.entityid = entityid
         else:
-            self.id = "APPLICATION-"+id
-        super(applicationsweb, self).setID(self.id)
-        self.dto["identifier"] = self.id
+            self.entityid = "APPLICATION-"+entityid
+        super(applicationsweb, self).setID(self.entityid)
+        self.dto["identifier"] = self.entityid
 
     def getID(self):
         return self.dto["identifier"]
 
     def addDetectionRule(self, rule):
-        rule.dto["applicationIdentifier"] = self.id
+        rule.dto["applicationIdentifier"] = self.entityid
         ruleprefix = rule.id.split('-', 1)[0]
-        appid = wrap(self.id.rsplit('-')[1], 4)
+        appid = wrap(self.entityid.rsplit('-')[1], 4)
         rulepostfix = "{:0>8}".format(len(self.detectionrules)+1)
         appid[3] = appid[3]+rulepostfix
-        id = [ruleprefix]
-        id.extend(appid)
-        newid = "-".join(id)
+        eid = [ruleprefix]
+        eid.extend(appid)
+        newid = "-".join(eid)
         rule.setID(newid)
         self.detectionrules.append(rule)
 

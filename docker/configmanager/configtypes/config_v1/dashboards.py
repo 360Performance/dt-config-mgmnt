@@ -8,16 +8,18 @@ class dashboards(TenantConfigV1Entity):
     def __str__(self):
         if self.dto:
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
-                self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid, self.dto["dashboardMetadata"]["name"])
         else:
-            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, "no title")
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid, "no title")
 
     def __repr__(self):
         if self.dto:
             return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
-                self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, self.dto["dashboardMetadata"]["name"])
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid, self.dto["dashboardMetadata"]["name"])
         else:
-            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.id, "no title")
+            return "{}: {} [dashboard: {}] [id: {}] [title: {}]".format(
+                self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid, "no title")
 
     def setName(self, name):
         self.dto["dashboardMetadata"]["name"] = name
@@ -26,14 +28,14 @@ class dashboards(TenantConfigV1Entity):
         metadata = self.dto["dashboardMetadata"]
         return metadata["name"]
 
-    def setID(self, id):
-        self.id = id
-        self.apipath = self.uri+"/"+self.id
-        self.dto["id"] = id
+    def setID(self, entityid):
+        self.entityid = entityid
+        self.apipath = self.uri+"/"+self.entityid
+        self.dto["id"] = entityid
         #logger.info("SETTING Dashboard ID to: {}".format(id))
 
     def getID(self):
-        return self.id
+        return self.entityid
 
     def isShared(self):
         metadata = self.dto["dashboardMetadata"]

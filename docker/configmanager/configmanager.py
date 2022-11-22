@@ -2,22 +2,23 @@ import time
 import sys
 import inspect
 import os
-import requests
+import copy
 import json
-import yaml
+import logging
+import traceback
+from textwrap import wrap
+from urllib.parse import urlencode
 import urllib3
 import dns.resolver
 from IPy import IP
 from fqdn import FQDN
 import tldextract
-from urllib.parse import urlencode
 import redis
-import logging
-import traceback
+import yaml
+import requests
 from configtypes import ConfigTypes
 from configset import ConfigSet
-from textwrap import wrap
-import copy
+from dtapi import DTConsolidatedAPI
 
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
@@ -187,7 +188,7 @@ def createAppDashboardEntitiesFromApps(applications):
                 prefix = dashboard.getID().split('-', 1)[0]
                 dbid = wrap(stdConfig.getStdAppEntityID(t_id, app.getName()), 4)
                 # dbid = wrap(app.getID().rsplit('-')[1],4)
-                postfix = "{:0>8}".format(1)
+                postfix = f'{1:0>8}'
                 dbid[3] = dbid[3]+postfix
                 id = [prefix]
                 id.extend(dbid)
@@ -268,9 +269,9 @@ def getAllSyntheticMonitors(parameters):
                 try:
                     configcache.set(key, monitor["entityId"])
                 except:
-                    logger.warning("Exception happened: %s", sys.exc_info())
+                    logger.warning(f'Exception: {traceback.format_exc()}')
     except:
-        logger.error("Problem Getting Synthetic Monitors: %s", sys.exc_info())
+        logger.error(f'Problem Getting Synthetic Monitors: {traceback.format_exc()}')
 
 
 def prepareSyntheticMonitors(monitorentities):
@@ -287,11 +288,11 @@ def prepareSyntheticMonitors(monitorentities):
                     c_id = parts[0]
                     t_id = parts[1]
                     m_id = configcache.get(key)
-                    logger.info("Synthetic %s monitor %s (%s) exists on %s::%s, it can be updated if necessary, ensuring ID is correct", m_type, m_name, m_id, c_id, t_id)
+                    logger.info(f'Synthetic {m_type} monitor {m_name} ({m_id}) exists on {c_id}::{t_id}, it can be updated if necessary, ensuring ID is correct')
                     monitor.setID(m_id)
                     monitors.append(monitor)
             else:
-                logger.info("No existing %s monitor with name %s found, it can be added (ID will be created)", m_type, m_name)
+                logger.info(f'No existing {m_type} monitor with name {m_name} found, it can be added (ID will be created)')
                 # as a sanity check we'll get the used domains and cross-check with the synthetic monitor
                 # we should only add the synthetic monitor to environments that have traffic to the same domains used by real users
                 logger.warning("Note that this will create the monitor on every tenant that matches you config parameters!")
@@ -497,7 +498,7 @@ def getServices(parameters):
                                 # logger.info("Service: {} is public".format(service["discoveredName"])))
                                 configcache.sadd(key, svc)
                     except:
-                        logger.warning("Exception happened: %s", sys.exc_info())
+                        logger.warning(f'Exception: {traceback.format_exc()}')
                         continue
 
             configcache.expire(key, 600)
@@ -525,7 +526,7 @@ def getApplications(parameters):
             key = "::".join([c_id, t_id, "applications"])
             # we want application IDs to be recognizable for the standard (what has been created through automation)
             # so we format them accordingly
-            std_appid = "{:>16}".format(t_id.encode("utf-8").hex()[-16:]).upper()
+            std_appid = f'{t_id.encode("utf-8").hex()[-16:].upper():>16}'
             for application in tenant["values"]:
                 a_id = application["id"].split("-")[1]
 
@@ -534,7 +535,7 @@ def getApplications(parameters):
                     try:
                         configcache.sadd(key, std_appid)
                     except:
-                        logger.warning("Exception: %s", sys.exc_info())
+                        logger.warning('Exception: {traceback.format_exc()}')
                 else:
                     logger.info("Application not in standard (%s): %s %s : %s", std_appid, key, application["name"], application["id"])
 
@@ -582,7 +583,7 @@ def merge(a, b, path=None):
             elif a[key] == b[key]:
                 pass  # same leaf value
             else:
-                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+                raise Exception(f'Conflict at {".".join(path + [str(key)])}')
         else:
             a[key] = b[key]
     return a
@@ -635,6 +636,51 @@ clusterid::tenantid::entitytype::entityname => id | missing
 
 
 def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
+    config = getControlSettings(entityconfig)
+    dumpentities = {}
+
+    with DTConsolidatedAPI.dtAPI(host=server, auth=(apiuser, apipwd), parameters=parameters) as api:
+        for ename, enabled in config.items():
+            eType = getClass(ename)
+            logger.info("++++++++ %s (%s) ++++++++", ".".join([eType.__module__, eType.__name__]), enabled)
+            result = eType.get(api, eId="all")
+            logger.info(f'Found {len(result)} {eType.__name__} entities in the result.')
+
+            entity_defs = []
+
+            # we used get "all", so we received an array of responses
+            for r in result:
+                # the individual entities of this type
+                for entity in r:
+                    c_id = entity["clusterid"]
+                    t_id = entity["tenantid"]
+
+                    centity = eType(id=entity[eType.id_attr], name=entity[eType.name_attr], dto=entity)
+                    logger.info(
+                        f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
+                    if dumpconfig:
+                        definition = centity.dumpDTO(config_dump_dir)
+                        entity_defs.append(definition)
+
+            # build datastructure for dumping the entities.yml file properly
+            if dumpconfig:
+                parts = eType.entityuri.strip("/").split('/')
+                parts = f'{eType.__module__}.{eType.__class__.__qualname__}'.split(".")[1:-1]
+                parts.reverse()
+                if len(entity_defs) > 0:
+                    for i in parts:
+                        entity_defs = {i: entity_defs}
+
+                dumpentities = merge(dumpentities, entity_defs)
+
+        # write out the stdConfig definition (entities.yml)
+        if dumpconfig:
+            path = config_dump_dir + "/entities.yml"
+            with open(path, 'w', encoding="utf-8") as file:
+                documents = yaml.dump(dumpentities, file)
+
+
+def getConfigSettings_old(entitytypes, entityconfig, parameters, dumpconfig):
 
     config = getControlSettings(entityconfig)
     # query = "?"+urlencode(parameters)
@@ -644,9 +690,9 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
     dumpentities = {}
 
     for ename, enabled in config.items():
-        #entitytype = getattr(ConfigTypes, ename, None)
+        # entitytype = getattr(ConfigTypes, ename, None)
         entitytype = getClass(ename)
-        logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
+        logger.info("++++++++ %s (%s) ++++++++", ".".join([entitytype.__module__, entitytype.__name__]), enabled)
 
         # ensure we only consider config types that are not abstract (that have a entityuri defined)
         if entitytype and enabled and entitytype.entityuri != "/":
@@ -703,7 +749,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                                             definition = centity.dumpDTO(config_dump_dir)
                                             entity_defs.append(definition)
                                     except:
-                                        logger.error("Exception: %s", sys.exc_info())
+                                        logger.error(f'Exception: {traceback.format_exc()}')
 
                         elif issubclass(entitytype, ConfigTypes.TenantConfigV1Setting):
                             # logger.info("{} type is a {} without any entities - comparison not implemented yet".format(configtype,entitytype.__base__.__name__))
@@ -769,8 +815,8 @@ By going one by one tenant this is not a very effective method, but it's require
 
 
 def updateOrCreateConfigEntities(entities, parameters, validateonly):
-    #headers = {"Content-Type": "application/json"}
-    #query = "?"+urlencode(parameters)
+    # headers = {"Content-Type": "application/json"}
+    # query = "?"+urlencode(parameters)
 
     missing = unmatched = matched = 0
 
@@ -900,7 +946,7 @@ def putConfigEntities(entities, parameters, validateonly):
             httpmeth = 'POST'
 
         status = {"200": 0, "204": 0, "201": 0, "400": 0, "401": 0, "404": 0}
-        url = server + entity.apipath + validator + query
+        url = server + entity.apipath + validator
         configtype = type(entity).__name__
         prefix = "DRYRUN - " if validateonly else ""
         logger.info("%s%s %s: %s", prefix, httpmeth, entity, entity.apipath+validator+query)
@@ -911,7 +957,7 @@ def putConfigEntities(entities, parameters, validateonly):
                 entity.setID(entity.getID())
 
         try:
-            req = requests.Request(httpmeth, url, json=entity.dto, auth=(apiuser, apipwd))
+            req = requests.Request(httpmeth, url, json=entity.dto, params=parameters | entity.parameters, auth=(apiuser, apipwd))
             prep = session.prepare_request(req)
             resp = session.send(prep)
             # resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
@@ -931,7 +977,6 @@ def putConfigEntities(entities, parameters, validateonly):
 
 def postConfigEntities(entities, parameters, validateonly):
     headers = {"Content-Type": "application/json"}
-    query = "?"+urlencode(parameters)
 
     session = requests.Session()
     validator = prefix = ""
@@ -943,12 +988,12 @@ def postConfigEntities(entities, parameters, validateonly):
             validator = "/" + entity.id + "/validator"
             prefix = "DRYRUN - "
 
-        url = server + entity.uri + validator + query
+        url = server + entity.uri + validator
         configtype = type(entity).__name__
         logger.info("%sPOST %s: %s", prefix, configtype, url)
 
         try:
-            resp = session.post(url, json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
+            resp = session.post(url, json=entity.dto, params=parameters | entity.parameters, auth=(apiuser, apipwd), verify=SSLVerify)
             if len(resp.content) > 0:
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
@@ -1007,7 +1052,7 @@ def performConfig(entityconfig, parameters):
     specialHandling = ["applicationsweb", "syntheticmonitors", "applicationDashboards"]
 
     for ename, enabled in config.items():
-        #etype = getattr(ConfigTypes, ename, None)
+        # etype = getattr(ConfigTypes, ename, None)
         etype = getClass(ename)
         logger.info("++++++++ %s (%s) ++++++++", ename.upper(), enabled)
         if enabled and etype is not None and ename not in specialHandling:
@@ -1064,7 +1109,7 @@ def getConfig(parameters):
 
 
 def getConfigEntities():
-    modules = [s for s in [m if m.startswith("configtypes") else None for m in sys.modules.keys()] if s]
+    modules = [s for s in [m if m.startswith("configtypes") else None for m in sys.modules] if s]
     for m in modules:
         clsmembers = inspect.getmembers(sys.modules[m], inspect.isclass)
 
@@ -1093,7 +1138,7 @@ def main(argv):
                 logger.warning("Received Command: %s which I do not understand", message["data"])
 
             command = cmd.get("command", None)
-            logger.always("Received Command: {}".format(command))
+            logger.always(f'Received Command: {command}')
             if command == 'RESET':
                 logger.always("========== RELOADING STANDARD CONFIG ==========")
                 stdConfig = ConfigSet.ConfigSet(config_dir)
@@ -1110,8 +1155,8 @@ def main(argv):
                         target.update({"dryrun": True})
 
                     logger.always("========== STARTING CONFIG FETCH ==========")
-                    #configtypes = getConfig(target)
-                    #getConfigSettings(configtypes, cmd.get("config"), target, False)
+                    # configtypes = getConfig(target)
+                    # getConfigSettings(configtypes, cmd.get("config"), target, False)
                     source = cmd.get("target", None)
                     if source:
                         logger.info("Source: \n%s", json.dumps(source, indent=2, separators=(',', ': ')))

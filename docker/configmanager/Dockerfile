@@ -4,6 +4,7 @@ FROM python:3.10-alpine
 WORKDIR /
 
 RUN pip install requests redis dnspython IPy fqdn tldextract pyyaml
+RUN pip install coverage
 #RUN pip install redis && \
 #RUN pip install dnspython && \
 #RUN pip install IPy

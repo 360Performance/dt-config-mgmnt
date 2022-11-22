@@ -7,7 +7,7 @@ class hostsIdautoupdate(TenantConfigV1Entity):
     entityuri = "/hosts/{id}/autoupdate"
     uri = TenantConfigV1Entity.uri + entityuri
 
-    def setID(self, id):
-        self.id = id
-        self.apipath = self.uri.replace("{id}", self.id)
-        self.dto["id"] = id
+    def setID(self, entityid):
+        self.entityid = entityid
+        self.apipath = self.uri.replace("{id}", self.entityid)
+        self.dto["id"] = entityid

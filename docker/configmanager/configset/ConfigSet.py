@@ -1,8 +1,9 @@
-import sys
+''' Wrapper Class to manage a Dynatrace Configuration set '''
 import traceback
 import logging
 import yaml
 
+#from configtypes import ConfigTypes
 from configtypes import ConfigTypes
 
 # LOG CONFIGURATION
@@ -20,6 +21,7 @@ def getClass(kls):
 
 
 class ConfigSet:
+    ''' Wrapper Class to manage a Dynatrace Configuration set '''
 
     def __init__(self, basedir):
         self.entities = []
@@ -30,7 +32,7 @@ class ConfigSet:
                 config = yaml.load(definition_file, Loader=yaml.Loader)
                 self.entities = self.load(config, "configtypes", None)
         except:
-            logger.error("Can't load definitions: {}".format(traceback.format_exc()))
+            logger.error(f"Can't load definitions: {traceback.format_exc()}")
 
     def load(self, config, pscope, cscope):
         entities = []
@@ -43,14 +45,16 @@ class ConfigSet:
                 if isinstance(v, list):
                     for entity in v:
                         logger.info("Load: %s.%s.%s", pscope, cscope, k)
-                        class_ = getClass(pscope+"."+k)
+                        #class_ = getClass(pscope+"."+k)
+                        class_ = getClass(pscope+"."+cscope+"."+k)
 
                         try:
                             configEntity = class_(basedir=self.configbasedir, **entity)
-                        except:
-                            logger.error("Couldn't create config entity {}, please check config definitions!".format(pscope+k))
+                            entities.append(configEntity)
+                        except Exception as e:
+                            logger.exception(e)
+                            logger.error(f"Couldn't create config entity {pscope}.{cscope}.{k}, please check config definitions!")
                         # configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
-                        entities.append(configEntity)
 
         return entities
 
@@ -110,8 +114,8 @@ class ConfigSet:
         filtered = []
         for entity in self.entities:
             if type(entity) is etype:
-                if hasattr(entity, "id"):
-                    filtered.append(entity.id)
+                if hasattr(entity, "entityid"):
+                    filtered.append(entity.entityid)
                 else:
                     filtered.append(entity.__class__.__name__)
 
@@ -123,10 +127,10 @@ class ConfigSet:
             if entity.__class__.__name__ == name or (hasattr(entity, "name") and entity.name == name):
                 return entity
 
-    def getConfigEntityByID(self, id):
+    def getConfigEntityByID(self, entityid):
         # not very clean but assuming that the list of entities is not huge this is ok
         for entity in self.entities:
-            if entity.__class__.__name__ == id or (hasattr(entity, "id") and entity.id == id):
+            if entity.__class__.__name__ == entityid or (hasattr(entity, "entityid") and entity.entityid == entityid):
                 return entity
 
     def getRequestAttributes(self):
