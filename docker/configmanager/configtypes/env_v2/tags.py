@@ -5,7 +5,7 @@ from ..ConfigTypes import TenantEnvironmentV2Entity
 class tags(TenantEnvironmentV2Entity):
     '''  Custom entity tags '''
     has_id = False
-
+    httpmethod = "POST"
     entityuri = "/tags"
     uri = TenantEnvironmentV2Entity.uri + entityuri
 
@@ -26,3 +26,6 @@ class tags(TenantEnvironmentV2Entity):
     def list(self, dtapi, parameters={}):
         result = self.__class__.get(dtapi, eId=None, parameters=self.parameters | parameters)
         return result
+
+    def getHttpMethod(self):
+        return self.httpmethod

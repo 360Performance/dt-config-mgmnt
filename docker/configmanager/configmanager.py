@@ -946,7 +946,7 @@ def putConfigEntities(entities, parameters, validateonly):
             httpmeth = 'POST'
 
         status = {"200": 0, "204": 0, "201": 0, "400": 0, "401": 0, "404": 0}
-        url = server + entity.apipath + validator + query
+        url = server + entity.apipath + validator
         configtype = type(entity).__name__
         prefix = "DRYRUN - " if validateonly else ""
         logger.info("%s%s %s: %s", prefix, httpmeth, entity, entity.apipath+validator+query)
@@ -957,7 +957,7 @@ def putConfigEntities(entities, parameters, validateonly):
                 entity.setID(entity.getID())
 
         try:
-            req = requests.Request(httpmeth, url, json=entity.dto, auth=(apiuser, apipwd))
+            req = requests.Request(httpmeth, url, json=entity.dto, params=parameters | entity.parameters, auth=(apiuser, apipwd))
             prep = session.prepare_request(req)
             resp = session.send(prep)
             # resp = requests.put(url,json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
@@ -977,7 +977,6 @@ def putConfigEntities(entities, parameters, validateonly):
 
 def postConfigEntities(entities, parameters, validateonly):
     headers = {"Content-Type": "application/json"}
-    query = "?"+urlencode(parameters)
 
     session = requests.Session()
     validator = prefix = ""
@@ -989,12 +988,12 @@ def postConfigEntities(entities, parameters, validateonly):
             validator = "/" + entity.id + "/validator"
             prefix = "DRYRUN - "
 
-        url = server + entity.uri + validator + query
+        url = server + entity.uri + validator
         configtype = type(entity).__name__
         logger.info("%sPOST %s: %s", prefix, configtype, url)
 
         try:
-            resp = session.post(url, json=entity.dto, auth=(apiuser, apipwd), verify=SSLVerify)
+            resp = session.post(url, json=entity.dto, params=parameters | entity.parameters, auth=(apiuser, apipwd), verify=SSLVerify)
             if len(resp.content) > 0:
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})

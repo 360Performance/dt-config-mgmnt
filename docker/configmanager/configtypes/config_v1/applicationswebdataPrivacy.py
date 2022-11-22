@@ -19,8 +19,8 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
         logger.info("Creating %s", self.__class__.__name__)
-        self.entityuri = applicationswebdataPrivacy.entityuri.replace("/{id}/", self.dto["identifier"])
-        self.uri = TenantConfigV1Entity.uri + applicationswebdataPrivacy.entityuri.replace("/{id}/", self.dto["identifier"])
+        self.entityuri = f'/applications/web/{self.dto["identifier"]}/dataPrivacy'
+        self.uri = TenantConfigV1Entity.uri + self.entityuri
         self.apipath = self.uri
 
     def __str__(self):
