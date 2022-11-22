@@ -1,7 +1,7 @@
 from ..ConfigTypes import TenantConfigV1Entity
 
 
-class applicationskeyUserActions(TenantConfigV1Entity):
+class applicationswebkeyUserActions(TenantConfigV1Entity):
     """
     configuration class for error rules settings of web applications
     """
@@ -27,7 +27,7 @@ class applicationskeyUserActions(TenantConfigV1Entity):
         return self.name
 
     def setID(self, entityid):
-        if id.startswith('APPLICATION'):
+        if entityid.startswith('APPLICATION'):
             self.entityid = entityid
         else:
             self.entityid = "APPLICATION-"+entityid

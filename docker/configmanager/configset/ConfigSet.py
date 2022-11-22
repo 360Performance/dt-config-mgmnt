@@ -3,6 +3,7 @@ import traceback
 import logging
 import yaml
 
+#from configtypes import ConfigTypes
 from configtypes import ConfigTypes
 
 # LOG CONFIGURATION
@@ -44,14 +45,16 @@ class ConfigSet:
                 if isinstance(v, list):
                     for entity in v:
                         logger.info("Load: %s.%s.%s", pscope, cscope, k)
-                        class_ = getClass(pscope+"."+k)
+                        #class_ = getClass(pscope+"."+k)
+                        class_ = getClass(pscope+"."+cscope+"."+k)
 
                         try:
                             configEntity = class_(basedir=self.configbasedir, **entity)
-                        except:
-                            logger.error(f"Couldn't create config entity {pscope+k}, please check config definitions!")
+                            entities.append(configEntity)
+                        except Exception as e:
+                            logger.exception(e)
+                            logger.error(f"Couldn't create config entity {pscope}.{cscope}.{k}, please check config definitions!")
                         # configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
-                        entities.append(configEntity)
 
         return entities
 

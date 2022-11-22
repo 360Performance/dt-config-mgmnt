@@ -25,6 +25,7 @@ class ConfigEntity():
         self.entityid = kwargs.get("id", "0000")
         self.name = kwargs.get("name", kwargs.get("file"))
         self.apipath = self.uri+"/"+self.entityid
+        self.parameters = {}
         self.file = kwargs.get("file", self.name)
         self.dto = kwargs.get("dto", None)
         basedir = kwargs.get("basedir", "")
@@ -39,7 +40,7 @@ class ConfigEntity():
 
         if self.isManagedEntity():
             self.entityid = self.generateID()
-            self.setID(self.entityid)
+        self.setID(self.entityid)
 
     def __str__(self):
         return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [id: {self.entityid}]'
@@ -150,7 +151,7 @@ class ConfigEntity():
         entities = []
         if eId is None:
             fetchtype = "list"
-        elif not cls.isValidID(eId) and eId is not "all":
+        elif not cls.isValidID(eId) and eId != "all":
             return entities
         else:
             fetchtype = eId
@@ -179,21 +180,21 @@ class ConfigEntity():
         savedto = self.dto.copy()
         self.dto = self.stripDTOMetaData(self.dto)
         logger.info("POST %s", self)
-        result = dtapi.post(self, parameters=parameters)
+        result = dtapi.post(self, parameters=self.parameters | parameters)
         self.dto = savedto
         return result
 
     def put(self, dtapi, parameters={}):
         logger.info("PUT %s", self)
-        return dtapi.put(self, parameters=parameters)
+        return dtapi.put(self, parameters=self.parameters | parameters)
 
     def validate(self, dtapi, parameters={}):
         logger.info("VALIDATE %s", self)
-        return dtapi.post(self, parameters=parameters, validateOnly=True)
+        return dtapi.post(self, parameters=self.parameters | parameters, validateOnly=True)
 
     def delete(self, dtapi, parameters={}):
         logger.info("DELETE %s", self)
-        return dtapi.delete(self, parameters=parameters)
+        return dtapi.delete(self, parameters=self.parameters | parameters)
 
 
 class TenantConfigV1Entity(ConfigEntity):

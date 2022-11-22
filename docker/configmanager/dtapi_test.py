@@ -169,5 +169,20 @@ class Test_04_Delete(unittest.TestCase):
             self.assertIsNone(result)
 
 
+class Test_05_CustomTag(unittest.TestCase):
+    '''
+    Test creating an custom tag in Dynatrace via POST request and deleting it afterwards
+    '''
+
+    def test_Post(self):
+        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=("apiuser", "4fzcL*C!A'sHu%:J"), parameters={"clusterid": "360perf"}) as api:
+            tag = tags(id="entityId(APPLICATION-0000E94408FA4A17)", name="customtag", dto={"tags": [{"key": "solution", "value": 42}]})
+            result = tag.post(api)
+            self.assertTrue(len(result) == 1)
+            self.assertTrue("matchedEntitiesCount" in result[0])
+            # tag.delete(api)
+            # expecting an ERROR when trying to get the same entity now
+
+
 if __name__ == '__main__':
     unittest.main()

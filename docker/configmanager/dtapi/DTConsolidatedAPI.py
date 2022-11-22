@@ -9,6 +9,7 @@ import inspect
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import urllib.parse
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
 FORMAT = '%(asctime)s:%(levelname)s: %(message)s'
@@ -68,7 +69,7 @@ class dtAPI():
             if eType.has_id and eId is not None and eId not in url:
                 url = f'{url}/{eId}'
 
-        log.info("GET %s: %s", eType.__name__, url)
+        log.info("GET %s: %s?%s", eType.__name__, url, urllib.parse.urlencode(params))
 
         try:
             response = self.session.get(url, params=params)
@@ -95,7 +96,7 @@ class dtAPI():
             validate = "/validator"
             eId = f'/{entity.getID()}'
         url = f'{self.host}/{(entity.uri).strip("/")}{eId}{validate}'
-        log.info("POST%s %s: %s", validate.upper(), entity, url)
+        log.info("POST%s %s: %s?%s", validate.upper(), entity, url, urllib.parse.urlencode(params))
 
         result = self.request("POST", url, entity=entity, parameters=params, payload=entity.dto)
         return result
@@ -117,7 +118,7 @@ class dtAPI():
         if eId == "":
             eId = entity.getID()
         url = f'{self.host}/{(entity.uri).strip("/")}/{eId}'
-        log.info("DELETE %s: %s", entity, url)
+        log.info("DELETE %s: %s?%s", entity, url, urllib.parse.urlencode(params))
 
         result = self.request("DELETE", url, entity=entity, parameters=params)
         return result

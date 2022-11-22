@@ -18,6 +18,7 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
+        logger.info("Creating %s", self.__class__.__name__)
         self.entityuri = applicationswebdataPrivacy.entityuri.replace("/{id}/", self.dto["identifier"])
         self.uri = TenantConfigV1Entity.uri + applicationswebdataPrivacy.entityuri.replace("/{id}/", self.dto["identifier"])
         self.apipath = self.uri
@@ -36,7 +37,7 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
         return self.name
 
     def setID(self, entityid):
-        if id.startswith('APPLICATION'):
+        if entityid.startswith('APPLICATION'):
             self.entityid = entityid
         else:
             self.entityid = "APPLICATION-"+entityid
