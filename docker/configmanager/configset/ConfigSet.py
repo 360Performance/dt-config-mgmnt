@@ -52,7 +52,6 @@ class ConfigSet:
                             configEntity = class_(basedir=self.configbasedir, **entity)
                             entities.append(configEntity)
                         except Exception as e:
-                            logger.exception(e)
                             logger.error(f"Couldn't create config entity {pscope}.{cscope}.{k}, please check config definitions!")
                         # configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
 

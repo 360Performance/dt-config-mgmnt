@@ -66,7 +66,11 @@ class ConfigEntity():
 
     def loadDTO(self, basedir):
         parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
-        path = "/".join([basedir]+parts+[f'{self.file}.json'])
+        if (self.file).endswith(".json"):
+            filename = self.file
+        else:
+            filename = f'{self.file}.json'
+        path = "/".join([basedir]+parts+[filename])
 
         dto = None
         try:
@@ -308,3 +312,7 @@ class ClusterConfigEntity(ConfigEntity):
         super().__init__(**kwargs)
         self.name = kwargs.get("name")
         self.apipath = self.uri + "/TENANTID"
+
+
+class EntityConfigException(Exception):
+    pass

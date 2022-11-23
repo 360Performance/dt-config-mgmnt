@@ -1,4 +1,5 @@
 from ..ConfigTypes import TenantConfigV1Entity
+from ..ConfigTypes import EntityConfigException
 
 
 class applicationswebkeyUserActions(TenantConfigV1Entity):
@@ -9,15 +10,20 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
-        self.entityuri = f'/applications/web/{self.dto["identifier"]}/keyUserActions'
+        applicationid = kwargs.get("id")
+        if applicationid:
+            self.entityuri = f'/applications/web/{kwargs["id"]}/keyUserActions'
+        else:
+            raise EntityConfigException("Configuration is missing mandatory property 'id'!")
+
         self.uri = TenantConfigV1Entity.uri + self.entityuri
         self.apipath = self.uri
 
     def __str__(self):
-        return "{}: {} [key user actions: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
+        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def __repr__(self):
-        return "{}: {} [key user actions: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
+        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def setName(self, name):
         self.name = name

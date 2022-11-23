@@ -1,4 +1,5 @@
 from ..ConfigTypes import TenantConfigV1Entity
+from ..ConfigTypes import EntityConfigException
 from .applicationsweb import applicationsweb
 from textwrap import wrap
 import logging
@@ -18,16 +19,20 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
-        logger.info("Creating %s", self.__class__.__name__)
-        self.entityuri = f'/applications/web/{self.dto["identifier"]}/dataPrivacy'
+        applicationid = kwargs.get("id")
+        if applicationid:
+            self.entityuri = f'/applications/web/{kwargs["id"]}/dataPrivacy'
+        else:
+            raise EntityConfigException("Configuration is missing mandatory property 'id'!")
+
         self.uri = TenantConfigV1Entity.uri + self.entityuri
         self.apipath = self.uri
 
     def __str__(self):
-        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
+        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def __repr__(self):
-        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
+        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def setName(self, name):
         self.name = name
