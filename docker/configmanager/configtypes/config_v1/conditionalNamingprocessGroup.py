@@ -8,4 +8,3 @@ class conditionalNamingprocessGroup(TenantConfigV1Entity):
 
     def setName(self, name):
         self.dto["displayName"] = self.name
-    pass
