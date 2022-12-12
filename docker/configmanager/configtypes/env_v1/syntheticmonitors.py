@@ -35,8 +35,7 @@ class syntheticmonitors(TenantEnvironmentV1Entity):
         super(syntheticmonitors, self).setID(entityid)
         logger.info("Setting monitor ID: %s", self.entityid)
         self.dto["entityId"] = "" if entityid == "" else self.entityid
-        self.dto["events"][0]["entityId"] = "SYNTHETIC_TEST_STEP-" + \
-            id.split("-")[1]
+        self.dto["events"][0]["entityId"] = "SYNTHETIC_TEST_STEP-" + entityid.split("-")[1]
 
     def setManuallyAssignedApps(self, appid):
         self.dto["manuallyAssignedApps"] = [appid]
