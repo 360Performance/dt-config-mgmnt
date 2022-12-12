@@ -13,8 +13,7 @@ class applicationsweberrorRules(TenantConfigV1Entity):
     entityuri = "/applications/web/{id}/errorRules"
     uri = TenantConfigV1Entity.uri + entityuri
     has_id = False
-    id_attr = "identifier"
-    name_attr = ""
+    id_attr = name_attr = "identifier"
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)

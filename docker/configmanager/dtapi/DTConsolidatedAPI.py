@@ -76,6 +76,10 @@ class dtAPI():
             if response.ok:
                 try:
                     result = response.json()
+                    # fixing onconsistency on Dynatrace application subsettings, where some return an identifier in the payload and some don'e :-(
+                    if not eType.has_id and eType.id_attr != "":
+                        for r in result:
+                            r[eType.id_attr] = ""
                 except:
                     if response.text == '':
                         result = {"headers": dict(response.headers)}
