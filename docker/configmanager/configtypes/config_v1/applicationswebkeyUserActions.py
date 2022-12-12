@@ -1,5 +1,9 @@
 from ..ConfigTypes import TenantConfigV1Entity
 from ..ConfigTypes import EntityConfigException
+from .applicationsweb import applicationsweb
+import logging
+
+logger = logging.getLogger("applicationsweberrorRules")
 
 
 class applicationswebkeyUserActions(TenantConfigV1Entity):
@@ -7,6 +11,7 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
     configuration class for error rules settings of web applications
     """
     id_attr = "identifier"
+    name_attr = "identifier"
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
@@ -47,3 +52,40 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
 
     def getHttpMethod(self):
         return "POST"
+
+    @classmethod
+    def isValidID(cls, idstr):
+        if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
+            return (len(idstr.split("-")[1]) == 16)
+        else:
+            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            return False
+
+    '''
+    Using class method for generic calls to the Dynatrace API to perform entity specific requests
+    For GET requests this allows us to fetch either a entity list or a specific entity
+    '''
+    @classmethod
+    def get(cls, dtapi, eId=None, parameters={}):
+        if eId is None:
+            fetchtype = "global"
+        elif not cls.isValidID(eId):
+            fetchtype = "all"
+        else:
+            fetchtype = eId
+        logger.info("GET %s %s", cls.__qualname__, fetchtype)
+        entities = []
+        if eId is None or cls.isValidID(eId):
+            # gets either the global setting or the specific entity setting
+            return dtapi.get(cls, eId=eId, parameters=parameters)
+        else:
+            # first need to get all applications and their IDs
+            result = dtapi.get(applicationsweb, parameters=parameters)
+            if result and len(result) > 0:
+                for tenant in result:
+                    if "values" in tenant:
+                        for application in tenant["values"]:
+                            appid = application["id"]
+                            entities.append(dtapi.get(cls, eId=appid, parameters=parameters))
+
+        return entities

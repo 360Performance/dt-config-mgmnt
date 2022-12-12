@@ -1,7 +1,6 @@
 from ..ConfigTypes import TenantConfigV1Entity
 from ..ConfigTypes import EntityConfigException
 from .applicationsweb import applicationsweb
-from textwrap import wrap
 import logging
 
 logger = logging.getLogger("applicationswebdataPrivacy")
