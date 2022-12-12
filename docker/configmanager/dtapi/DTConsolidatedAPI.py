@@ -80,7 +80,7 @@ class dtAPI():
                     if not eType.has_id and eType.id_attr != "":
                         log.warning("THIS ENTITY DOESNT HAVE AN ID ATTRIBUTE, infusing one")
                         for r in result:
-                            r[eType.id_attr] = ""
+                            r[eType.id_attr] = eId
                 except:
                     if response.text == '':
                         result = {"headers": dict(response.headers)}
