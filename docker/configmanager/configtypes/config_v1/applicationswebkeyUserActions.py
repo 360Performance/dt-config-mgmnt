@@ -10,10 +10,12 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
     """
     configuration class for error rules settings of web applications
     """
-    entityuri = "/applications/web/{id}/dataPrivacy"
+
+    entityuri = "/applications/web/{id}/keyUserActions"
     uri = TenantConfigV1Entity.uri + entityuri
+    has_id = False
     id_attr = "identifier"
-    name_attr = "identifier"
+    name_attr = ""
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
