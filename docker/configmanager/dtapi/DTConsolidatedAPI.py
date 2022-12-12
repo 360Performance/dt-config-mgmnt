@@ -78,6 +78,7 @@ class dtAPI():
                     result = response.json()
                     # fixing onconsistency on Dynatrace application subsettings, where some return an identifier in the payload and some don'e :-(
                     if not eType.has_id and eType.id_attr != "":
+                        log.warning("THIS ENTITY DOESNT HAVE AN ID ATTRIBUTE, infusing one")
                         for r in result:
                             r[eType.id_attr] = ""
                 except:
