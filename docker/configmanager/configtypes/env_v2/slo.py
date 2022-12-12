@@ -1,6 +1,6 @@
 
 ''' Dynatrace Settings V2 API Support '''
-from ...ConfigTypes import TenantEnvironmentV2Setting
+from ..ConfigTypes import TenantEnvironmentV2Setting
 
 
 class slo(TenantEnvironmentV2Setting):
