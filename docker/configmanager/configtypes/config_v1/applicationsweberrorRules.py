@@ -10,6 +10,8 @@ class applicationsweberrorRules(TenantConfigV1Entity):
     """
     configuration class for error rules settings of web applications
     """
+    entityuri = "/applications/web/{id}/errorRules"
+    uri = TenantConfigV1Entity.uri + entityuri
     id_attr = "identifier"
     name_attr = "identifier"
 
