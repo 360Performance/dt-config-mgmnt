@@ -29,8 +29,9 @@ class ConfigEntity():
         self.file = kwargs.get("file", self.name)
         self.dto = kwargs.get("dto", None)
         basedir = kwargs.get("basedir", "")
+        self.leafdir = kwargs.get("leafdir", "")
         if basedir != "":
-            self.dto = self.loadDTO(basedir)
+            self.dto = self.loadDTO(basedir=basedir)
 
         # in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
         self.dto = self.stripDTOMetaData(self.dto)
@@ -64,16 +65,22 @@ class ConfigEntity():
     def getID(self):
         pass
 
-    def loadDTO(self, basedir):
+    def loadDTO(self, basedir, leafdir=""):
         parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
         if (self.file).endswith(".json"):
             filename = self.file
         else:
             filename = f'{self.file}.json'
+
+        # this allows to store entities in custom "leaf" directories under the class-name based directory
+        if self.leafdir not in parts:
+            parts.append(self.leafdir)
+
         path = "/".join([basedir]+parts+[filename])
 
         dto = None
         try:
+            logger.info("Loading DTO from %s", path)
             with open(path, "r", encoding="utf-8") as dtofile:
                 dto = json.load(dtofile)
         except OSError as e:
@@ -85,6 +92,11 @@ class ConfigEntity():
         filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
         # path = dumpdir + self.entityuri + "/" + filename + ".json"
         parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+
+        # this allows to store entities in custom "leaf" directories under the class-name based directory
+        if self.leafdir not in parts:
+            parts.append(self.leafdir)
+
         path = "/".join([dumpdir]+parts+[f'{filename}.json'])
 
         logger.info("Dumping %s Entity to: %s", self.__class__.__name__, path)
