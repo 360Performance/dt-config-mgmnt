@@ -176,8 +176,7 @@ class Test_05_CustomTag(unittest.TestCase):
 
     def test_Post(self):
         with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=(apiuser, apipwd), parameters={"clusterid": "360perf"}) as api:
-            tag = tags(id="entityId(APPLICATION-0000E94408FA4A17)", name="customtag",
-                       entitySelector="entityId(APPLICATION-0000E94408FA4A17)", dto={"tags": [{"key": "solution", "value": 42}]})
+            tag = tags(name="customtag", entitySelector="entityId(APPLICATION-0000E94408FA4A17)", dto={"tags": [{"key": "solution", "value": 42}]})
             result = tag.post(api)
             self.assertTrue(len(result) == 1)
             self.assertTrue("matchedEntitiesCount" in result[0])
