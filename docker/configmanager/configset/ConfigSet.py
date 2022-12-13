@@ -13,11 +13,22 @@ logger = logging.getLogger("ConfigSet")
 
 
 def getClass(kls):
+    logger.debug("Getting Class for: %s", kls)
     parts = kls.split('.')
-    module = ".".join(parts[:-1])
-    m = __import__(module)
-    obj = getattr(m, parts[-1])
-    return obj
+    idx = -1
+    while True:
+        module = ".".join(parts[:idx])
+        try:
+            m = __import__(module)
+            logger.debug("Getting module for %s", module)
+            try:
+                obj = getattr(m, parts[-1])
+                return obj
+            except:
+                return getClass(module)
+        except:
+            logger.debug("No module exists for %s", module)
+            return getClass(module)
 
 
 class ConfigSet:
@@ -39,20 +50,24 @@ class ConfigSet:
         logger.info("Load: %s.%s", pscope, cscope if cscope else "")
         for k, v in config.items():
             if isinstance(v, dict):
-                # entities = entities + self.load(v, k, pscope)
                 entities = entities + self.load(v, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
             else:
                 if isinstance(v, list):
                     for entity in v:
-                        logger.info("Load: %s.%s.%s", pscope, cscope, k)
-                        #class_ = getClass(pscope+"."+k)
+                        logger.info("Load: %s.%s.%s (%s)", pscope, cscope, k, entity)
                         class_ = getClass(pscope+"."+cscope+"."+k)
 
                         try:
-                            configEntity = class_(basedir=self.configbasedir, **entity)
-                            entities.append(configEntity)
+                            if "file" not in entity:
+                                logger.debug("Entity in custom leaf directory: %s", entity)
+                                entities = entities + self.load(entity, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
+                            else:
+                                logger.debug("The leaf directory is: %s", k)
+                                configEntity = class_(basedir=self.configbasedir, leafdir=k, **entity)
+                                entities.append(configEntity)
                         except Exception as e:
-                            logger.error(f"Couldn't create config entity {pscope}.{cscope}.{k}, please check config definitions!")
+                            logger.error(f"Couldn't create config entity {pscope}.{cscope}.{k} ({next(iter(entity))}), please check config definitions!")
+                            logger.error(traceback.format_exc())
                         # configEntity = class_(basedir=self.configbasedir,id=entity["id"],name=entity["name"])
 
         return entities
