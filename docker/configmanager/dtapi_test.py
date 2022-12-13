@@ -110,7 +110,7 @@ class Test_02_Post(unittest.TestCase):
     '''
 
     def test_Post(self):
-        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=("apiuser", "4fzcL*C!A'sHu%:J"), parameters={"clusterid": "360perf"}) as api:
+        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=(apiuser, apipwd), parameters={"clusterid": "360perf"}) as api:
             autoTag = autoTags(id="00000", name="testTag", dto={"name": "testTag", "rules": [], "description": "DummyTag"})
             result = autoTag.post(api)
             self.assertTrue(len(result) == 1)
@@ -130,7 +130,7 @@ class Test_03_Put(unittest.TestCase):
     '''
 
     def test_Put(self):
-        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=("apiuser", "4fzcL*C!A'sHu%:J"), parameters={"clusterid": "360perf"}) as api:
+        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=(apiuser, apipwd), parameters={"clusterid": "360perf"}) as api:
             autoTag = autoTags(id="00000", name="testTag", dto={"name": "testTag", "rules": [], "description": "DummyTag"})
             result = autoTag.put(api)
             self.assertTrue(len(result) == 1)
@@ -146,7 +146,7 @@ class Test_01_Validate(unittest.TestCase):
     '''
 
     def test_Validate(self):
-        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=("apiuser", "4fzcL*C!A'sHu%:J"), parameters={"clusterid": "360perf"}) as api:
+        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=(apiuser, apipwd), parameters={"clusterid": "360perf"}) as api:
             entityId = "000015e3-9241-0676-8225-e8aabc325227"
             autoTag = autoTags(id=entityId, name="testTag", dto={"name": "testTag", "rules": [], "description": "DummyTag"})
             result = autoTag.validate(api)
@@ -160,7 +160,7 @@ class Test_04_Delete(unittest.TestCase):
     '''
 
     def test_Delete(self):
-        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=("apiuser", "4fzcL*C!A'sHu%:J"), parameters={"clusterid": "360perf"}) as api:
+        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=(apiuser, apipwd), parameters={"clusterid": "360perf"}) as api:
             entityId = "000015e3-9241-0676-8225-e8aabc325227"
             autoTag = autoTags(id=entityId, name="testTag", dto={"name": "testTag", "rules": [], "description": "DummyTag"})
             autoTag.delete(api)
@@ -175,8 +175,9 @@ class Test_05_CustomTag(unittest.TestCase):
     '''
 
     def test_Post(self):
-        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=("apiuser", "4fzcL*C!A'sHu%:J"), parameters={"clusterid": "360perf"}) as api:
-            tag = tags(id="entityId(APPLICATION-0000E94408FA4A17)", name="customtag", dto={"tags": [{"key": "solution", "value": 42}]})
+        with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=(apiuser, apipwd), parameters={"clusterid": "360perf"}) as api:
+            tag = tags(id="entityId(APPLICATION-0000E94408FA4A17)", name="customtag",
+                       entitySelector="entityId(APPLICATION-0000E94408FA4A17)", dto={"tags": [{"key": "solution", "value": 42}]})
             result = tag.post(api)
             self.assertTrue(len(result) == 1)
             self.assertTrue("matchedEntitiesCount" in result[0])
