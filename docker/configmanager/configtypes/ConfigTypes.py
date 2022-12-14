@@ -22,16 +22,16 @@ class ConfigEntity():
     name_attr = "name"      # the attribute name used for the individual entity's NAME in a dedicaated entity response
 
     def __init__(self, **kwargs):
-        self.entityid = kwargs.get("id", "0000")
-        self.name = kwargs.get("name", kwargs.get("file"))
-        self.apipath = self.uri+"/"+self.entityid
-        self.parameters = {}
-        self.file = kwargs.get("file", self.name)
-        self.dto = kwargs.get("dto", None)
         basedir = kwargs.get("basedir", "")
+        self.dto = kwargs.get("dto", None)
+        self.file = kwargs.get("file")
         self.leafdir = kwargs.get("leafdir", "")
         if basedir != "":
             self.dto = self.loadDTO(basedir=basedir)
+        self.entityid = kwargs.get("id", "0000")
+        self.name = kwargs.get("name", self.getName())
+        self.apipath = self.uri+"/"+self.entityid
+        self.parameters = {}
 
         # in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
         self.dto = self.stripDTOMetaData(self.dto)
@@ -41,6 +41,12 @@ class ConfigEntity():
 
         if self.isManagedEntity():
             self.entityid = self.generateID()
+            if self.name:
+                self.setName(self.name)
+            else:
+                logger.info("No name specified, getting from DTO or fallback: %s", self.getName())
+                self.setName(self.getName())
+
         self.setID(self.entityid)
 
     def __str__(self):
@@ -59,8 +65,21 @@ class ConfigEntity():
         entityid = f'0000{str(uuid.UUID(m.hexdigest()))[4:]}'
         return entityid
 
+    def setName(self, name):
+        self.name = name
+        if isinstance(self.dto, dict):
+            self.dto[self.__class__.name_attr] = name
+
+    def getName(self):
+        # get from DTO
+        if isinstance(self.dto, dict):
+            return self.dto.get(self.__class__.name_attr, self.file)
+        return self.__class__.__name__
+
     def setID(self, entityid):
-        pass
+        self.entityid = entityid
+        if isinstance(self.dto, dict):
+            self.dto[self.__class__.id_attr] = entityid
 
     def getID(self):
         pass
@@ -117,9 +136,6 @@ class ConfigEntity():
                     "Strip attribute %s from configtype %s, maybe cleanup your JSON definition to remove this warning", attr, self.__class__.__name__)
                 newdto.pop(attr, None)
         return newdto
-
-    def setName(self, name):
-        self.name = name
 
     # helper function to allow comparison of dto representation of a config entity with another
     def ordered(self, obj):

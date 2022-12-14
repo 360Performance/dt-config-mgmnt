@@ -33,12 +33,14 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
     def __repr__(self):
         return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
+    '''
     def setName(self, name):
         self.name = name
         self.dto["name"] = self.name
 
     def getName(self):
         return self.name
+    '''
 
     def setID(self, entityid):
         if entityid.startswith('APPLICATION'):

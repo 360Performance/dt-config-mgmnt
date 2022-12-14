@@ -17,3 +17,9 @@ class objects(TenantEnvironmentV2Setting):
         # in such a case we cannot store the DTO in a custom leaf directory, but we will do this in case only one object is defined
         if isinstance(self.dto, list) and len(self.dto) == 1:
             self.leafdir = self.dto[0]["schemaId"]
+
+    def setName(self, name):
+        pass
+
+    def setID(self, entityid):
+        pass

@@ -2,6 +2,8 @@
 import traceback
 import logging
 import yaml
+from .ConfigSchema import config_schema
+from schema import SchemaError
 
 #from configtypes import ConfigTypes
 from configtypes import ConfigTypes
@@ -41,13 +43,20 @@ class ConfigSet:
         try:
             with open(definitions) as definition_file:
                 config = yaml.load(definition_file, Loader=yaml.Loader)
+                # validating against schema
+                try:
+                    config_schema.validate(config)
+                    logger.info("Validated entities configuration against schema: OK")
+                except SchemaError as se:
+                    logger.error("Validation entities configuration against schema failed, please check your entities.yml!")
+                    raise se
                 self.entities = self.load(config, "configtypes", None)
         except:
             logger.error(f"Can't load definitions: {traceback.format_exc()}")
 
     def load(self, config, pscope, cscope):
         entities = []
-        logger.info("Load: %s.%s", pscope, cscope if cscope else "")
+        #logger.info("Load: %s.%s", pscope, cscope if cscope else "")
         for k, v in config.items():
             if isinstance(v, dict):
                 entities = entities + self.load(v, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
