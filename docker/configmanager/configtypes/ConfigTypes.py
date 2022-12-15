@@ -123,7 +123,7 @@ class ConfigEntity():
         with open(path, 'w', encoding="utf-8") as outfile:
             json.dump(self.dto, outfile, indent=4, separators=(',', ': '))
 
-        return {"name": self.name, "id": self.entityid, "file": filename}
+        # return {"name": self.name, "id": self.entityid, "file": filename}
 
     def stripDTOMetaData(self, dto):
         if dto is None:
@@ -137,7 +137,12 @@ class ConfigEntity():
                 newdto.pop(attr, None)
         return newdto
 
+    def getConfigDefinition(self):
+        filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
+        return {"id": self.entityid, "file": filename}
+
     # helper function to allow comparison of dto representation of a config entity with another
+
     def ordered(self, obj):
         if isinstance(obj, dict):
             # some dtos have randomly generated IDs these are not relevant for functional comparison, so remove them

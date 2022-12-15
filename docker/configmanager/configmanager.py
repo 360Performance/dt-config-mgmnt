@@ -659,8 +659,9 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                     logger.info(
                         f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
                     if dumpconfig:
-                        definition = centity.dumpDTO(config_dump_dir)
-                        entity_defs.append(definition)
+                        centity.dumpDTO(config_dump_dir)
+                        config_definition = centity.getConfigDefinition()
+                        entity_defs.append(config_definition)
 
             # build datastructure for dumping the entities.yml file properly
             if dumpconfig:
