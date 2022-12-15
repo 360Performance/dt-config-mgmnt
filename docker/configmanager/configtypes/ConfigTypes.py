@@ -137,6 +137,9 @@ class ConfigEntity():
                 newdto.pop(attr, None)
         return newdto
 
+    # returns the attributes and values that are relevant for the configuration set definition (entities.yml)
+    # The default values are name and file
+    # this can be overridden in a specific entities class
     def getConfigDefinition(self):
         filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
         return {"id": self.entityid, "file": filename}
