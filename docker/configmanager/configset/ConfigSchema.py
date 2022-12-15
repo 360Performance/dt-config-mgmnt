@@ -108,11 +108,7 @@ config_schema = Schema({
         }
     },
     Optional("env_v1"): {
-        Optional("syntheticmonitors"): {
-            "file": str,
-            "id": str,
-            "name": str
-        }
+        Optional("syntheticmonitors"): [{"file": str, Optional("name"): str, "id": str}]
     },
     Optional("env_v2"): {
         Optional("settings"): {
