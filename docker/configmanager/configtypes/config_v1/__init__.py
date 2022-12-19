@@ -4,7 +4,7 @@ from .allowedBeaconOriginsForCors import *
 from .applicationDetectionRules import *
 from .applicationDetectionRuleshostDetection import *
 from .applicationsmobile import *
-from .applicationsmobileAppIdkeyUserActions import *
+from .applicationsmobilekeyUserActions import *
 from .applicationsmobileAppIduserActionAndSessionProperties import *
 from .applicationsweb import *
 from .applicationswebdataPrivacy import *

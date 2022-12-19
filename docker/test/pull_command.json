@@ -18,7 +18,9 @@
         "env_v2.settings.dummySetting": false,
         "config_v1.setting.dataPrivacy": false,
         "config_v1.applicationsweb": true,
+        "config_v1.applicationsmobile": true,
         "config_v1.applicationswebdataPrivacy": true,
-        "config_v1.applicationDetectionRules": true
+        "config_v1.applicationDetectionRules": true,
+        "config_v1.applicationDetectionRuleshostDetection": true
     }
 }

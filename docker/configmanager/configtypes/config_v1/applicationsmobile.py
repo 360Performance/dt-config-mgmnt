@@ -7,3 +7,6 @@ from ..ConfigTypes import TenantConfigV1Entity
 class applicationsmobile(TenantConfigV1Entity):
     entityuri = "/applications/mobile"
     uri = TenantConfigV1Entity.uri + entityuri
+    id_attr = "identifier"
+    list_id_attr = "id"
+    list_attr = "values"

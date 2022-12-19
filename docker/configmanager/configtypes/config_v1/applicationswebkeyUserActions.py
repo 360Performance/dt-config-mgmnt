@@ -63,7 +63,7 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
         if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
             return (len(idstr.split("-")[1]) == 16)
         else:
-            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            #logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
             return False
 
     '''

@@ -26,11 +26,11 @@ class ConfigEntity():
         self.dto = kwargs.get("dto", None)
         self.file = kwargs.get("file")
         self.leafdir = kwargs.get("leafdir", "")
+        self.entityid = kwargs.get("id", "0000")
+        self.apipath = self.uri+"/"+self.entityid
         if basedir != "":
             self.dto = self.loadDTO(basedir=basedir)
-        self.entityid = kwargs.get("id", "0000")
         self.name = kwargs.get("name", self.getName())
-        self.apipath = self.uri+"/"+self.entityid
         self.parameters = {}
 
         # in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
@@ -85,15 +85,27 @@ class ConfigEntity():
         pass
 
     def loadDTO(self, basedir, leafdir=""):
-        parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+        #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]):
+            parts = parts[:-1]
+
         if (self.file).endswith(".json"):
             filename = self.file
         else:
             filename = f'{self.file}.json'
 
         # this allows to store entities in custom "leaf" directories under the class-name based directory
-        if self.leafdir not in parts:
+        if self.leafdir not in parts and self.leafdir != self.__class__.__name__:
             parts.append(self.leafdir)
+
+        # in case this is an entity with an API-Path containing the entity ID the leaf directory specified in the config should be the ID
+        try:
+            idx = parts.index("{id}")
+            parts[idx] = self.leafdir if self.__class__.isValidID(self.leafdir) else self.entityid
+        except ValueError:
+            pass
 
         path = "/".join([basedir]+parts+[filename])
 
@@ -110,7 +122,10 @@ class ConfigEntity():
     def dumpDTO(self, dumpdir):
         filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
         # path = dumpdir + self.entityuri + "/" + filename + ".json"
-        parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+        #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]):
+            parts = parts[:-1]
 
         # this allows to store entities in custom "leaf" directories under the class-name based directory
         if self.leafdir not in parts:
@@ -142,7 +157,19 @@ class ConfigEntity():
     # this can be overridden in a specific entities class
     def getConfigDefinition(self):
         filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
-        return {"id": self.entityid, "file": filename}
+        definition = [{"id": self.entityid, "file": filename}]
+
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]):
+            parts = parts[:-1]
+
+        logger.info(parts)
+        parts.reverse()
+
+        for p in parts:
+            definition = {p: definition}
+
+        return definition
 
     # helper function to allow comparison of dto representation of a config entity with another
 

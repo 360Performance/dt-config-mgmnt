@@ -578,8 +578,23 @@ def merge(a, b, path=None):
         path = []
     for key in b:
         if key in a:
+            logger.info(f'Merging:\n{json.dumps(a[key], indent=2, separators=(",", ": "))}\n{json.dumps(b[key], indent=2, separators=(",", ": "))}')
             if isinstance(a[key], dict) and isinstance(b[key], dict):
                 merge(a[key], b[key], path + [str(key)])
+            elif isinstance(a[key], list) and isinstance(b[key], list):
+                a[key] = a[key] + b[key]
+            elif isinstance(a[key], list) and isinstance(b[key], dict):
+                # check if same list entry type or if first key in b is in a list
+                eKey = next(iter(b[key]))
+                found = False
+                for k in a[key]:
+                    kKey = next(iter(k))
+                    if kKey == eKey:
+                        found = True
+                        merge(k[kKey], b[key][kKey], [kKey])
+                        break
+                if not found:
+                    a[key] = a[key] + [b[key]]
             elif a[key] == b[key]:
                 pass  # same leaf value
             else:
@@ -647,6 +662,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
             logger.info(f'Found {len(result)} {eType.__name__} entities in the result.')
 
             entity_defs = []
+            definitions = {}
 
             # we used get "all", so we received an array of responses
             for r in result:
@@ -660,25 +676,28 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                         f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
                     if dumpconfig:
                         centity.dumpDTO(config_dump_dir)
-                        config_definition = centity.getConfigDefinition()
-                        entity_defs.append(config_definition)
+                        entity_definition = centity.getConfigDefinition()
+                        entity_defs.append(entity_definition)
 
             # build datastructure for dumping the entities.yml file properly
             if dumpconfig:
+                '''
                 parts = eType.entityuri.strip("/").split('/')
                 parts = f'{eType.__module__}.{eType.__class__.__qualname__}'.split(".")[1:-1]
                 parts.reverse()
                 if len(entity_defs) > 0:
                     for i in parts:
                         entity_defs = {i: entity_defs}
-
-                dumpentities = merge(dumpentities, entity_defs)
+                '''
+                for d in entity_defs:
+                    logger.info(dumpentities)
+                    dumpentities = merge(dumpentities, d)
 
         # write out the stdConfig definition (entities.yml)
         if dumpconfig:
             path = config_dump_dir + "/entities.yml"
             with open(path, 'w', encoding="utf-8") as file:
-                documents = yaml.dump(dumpentities, file)
+                documents = yaml.dump(definitions, file)
 
 
 def getConfigSettings_old(entitytypes, entityconfig, parameters, dumpconfig):

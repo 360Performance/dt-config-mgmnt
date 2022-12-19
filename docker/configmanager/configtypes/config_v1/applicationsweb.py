@@ -1,6 +1,9 @@
 from ..ConfigTypes import TenantConfigV1Entity
 from textwrap import wrap
 import hashlib
+import logging
+
+logger = logging.getLogger("applicationsweb")
 
 
 class applicationsweb(TenantConfigV1Entity):
@@ -35,7 +38,7 @@ class applicationsweb(TenantConfigV1Entity):
         return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def setID(self, entityid):
-        if entityid.startswith('APPLICATION'):
+        if entityid.startswith('APPLICATION-'):
             self.entityid = entityid
         else:
             self.entityid = "APPLICATION-"+entityid
@@ -44,6 +47,14 @@ class applicationsweb(TenantConfigV1Entity):
 
     def getID(self):
         return self.dto["identifier"]
+
+    @classmethod
+    def isValidID(cls, idstr):
+        if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
+            return (len(idstr.split("-")[1]) == 16)
+        else:
+            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            return False
 
     def addDetectionRule(self, rule):
         rule.dto["applicationIdentifier"] = self.entityid
