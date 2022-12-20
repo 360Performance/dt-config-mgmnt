@@ -18,7 +18,7 @@ def getClass(kls):
     logger.debug("Getting Class for: %s", kls)
     parts = kls.split('.')
     idx = -1
-    while True:
+    while True and len(parts) > 0:
         module = ".".join(parts[:idx])
         try:
             m = __import__(module)
@@ -54,22 +54,40 @@ class ConfigSet:
         except:
             logger.error(f"Can't load definitions: {traceback.format_exc()}")
 
+    '''Quick and Dirty during migration'''
+
+    def fixClasspath(self, classpath):
+        classpath = classpath.replace("..", ".")
+        classpath = classpath.replace(".config.v1.", ".config_v1.")
+        classpath = classpath.replace(".v1.", ".env_v1.")
+        classpath = classpath.replace(".v2.", ".env_v2.")
+        parts = classpath.split(".")
+        parts = [x for x in parts if "-" not in x and x != "0000"]
+        post = parts[2:]
+        classpath = ".".join(parts[:2]) + "." + "".join(post)
+        return classpath
+
     def load(self, config, pscope, cscope):
         entities = []
         #logger.info("Load: %s.%s", pscope, cscope if cscope else "")
+        # TODO: fix classpath combination for new API path format (ugly replace!!)
         for k, v in config.items():
             if isinstance(v, dict):
-                entities = entities + self.load(v, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
+                classpath = ".".join([s for s in [pscope, cscope if cscope else None] if s])
+                entities = entities + self.load(v, self.fixClasspath(classpath), k)
             else:
                 if isinstance(v, list):
                     for entity in v:
-                        logger.info("Load: %s.%s.%s (%s)", pscope, cscope, k, entity)
-                        class_ = getClass(pscope+"."+cscope+"."+k)
+
+                        classpath = self.fixClasspath(pscope+"."+cscope+"."+k)
+                        logger.info("Load: %s (%s)", classpath, entity)
+                        class_ = getClass(classpath)
 
                         try:
                             if "file" not in entity:
                                 logger.debug("Entity in custom leaf directory: %s", entity)
-                                entities = entities + self.load(entity, ".".join([s for s in [pscope, cscope if cscope else None] if s]), k)
+                                classpath = ".".join([s for s in [pscope, cscope if cscope else None] if s])
+                                entities = entities + self.load(entity, self.fixClasspath(classpath), k)
                             else:
                                 logger.debug("The leaf directory is: %s", k)
                                 configEntity = class_(basedir=self.configbasedir, leafdir=k, **entity)

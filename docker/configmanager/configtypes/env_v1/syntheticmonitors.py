@@ -51,3 +51,13 @@ class syntheticmonitors(TenantEnvironmentV1Entity):
 
     def setTags(self, taglist):
         self.dto["tags"] = taglist
+
+    @classmethod
+    def isValidID(cls, idstr):
+        if idstr is not None and idstr.startswith("HTTP_CHECK") and "-" in idstr:
+            return (len(idstr.split("-")[1]) == 16)
+        elif idstr is not None and idstr.startswith("SYNTHETIC_TEST") and "-" in idstr:
+            return (len(idstr.split("-")[1]) == 16)
+        else:
+            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            return False

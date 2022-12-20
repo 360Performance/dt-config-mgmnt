@@ -697,7 +697,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
         if dumpconfig:
             path = config_dump_dir + "/entities.yml"
             with open(path, 'w', encoding="utf-8") as file:
-                documents = yaml.dump(definitions, file)
+                documents = yaml.dump(dumpentities, file)
 
 
 def getConfigSettings_old(entitytypes, entityconfig, parameters, dumpconfig):
@@ -985,14 +985,14 @@ def putConfigEntities(entities, parameters, validateonly):
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
-                        logger.error("%s%s failed on tenant: %s HTTP%s (%s)", prefix, httpmeth, tenant["tenantid"], tenant["responsecode"], tenant["error"])
+                        logger.error("%s%s failed on tenant: %s HTTP%s", prefix, httpmeth, tenant["tenantid"], tenant["responsecode"])
                         # logger.debug("{} Payload: {}".format(httpmeth, json.dumps(entity.dto)))
                         logger.debug("%s Response: %s", httpmeth, json.dumps(tenant))
                 logger.info("Status Summary (Dryrun: %s): %s %s", validateonly, len(resp.json()), status)
             if validateonly and len(resp.content) == 0:
                 logger.info("All target tenants have sucessfully validated the payload: HTTP%s", resp.status_code)
         except:
-            logger.error("Problem putting %s: %s", configtype, sys.exc_info())
+            logger.error("Problem putting %s: %s", configtype, traceback.format_exc())
 
 
 def postConfigEntities(entities, parameters, validateonly):

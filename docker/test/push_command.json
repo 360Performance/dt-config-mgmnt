@@ -7,10 +7,11 @@
     },
     "config": {
         "config_v1.autoTags": true,
-        "config_v1.applicationsweb": false,
+        "config_v1.applicationsweb": true,
+        "config_v1.applicationsmobile": true,
         "config_v1.applicationswebdataPrivacy": true,
         "config_v1.applicationsweberrorRules": true,
-        "config_v1.applicationswebkeyUserActions": false,
+        "config_v1.applicationswebkeyUserActions": true,
         "config_v1.servicerequestAttributes": true,
         "config_v1.setting.anomalyDetectionservices": true,
         "env_v2.settings.objects": true,

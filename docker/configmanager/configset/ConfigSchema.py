@@ -1,6 +1,55 @@
 from schema import *
 
 config_schema = Schema({
+    Optional("config"): {
+        Optional("v1"): {
+            Optional("applications"): {
+                Optional("web"): [
+                    {
+                        "file": str,
+                        Optional("name"): str,
+                        Optional("id"): str
+                    },
+                    {
+                        Optional(lambda fp: fp.startswith("APPLICATION-")): {
+                            Optional("dataPrivacy"): [{"file": str, Optional("id"): str}],
+                            Optional("keyUserActions"): [{"file": str, Optional("id"): str}],
+                            Optional("errorRules"): [{"file": str, Optional("id"): str}]
+                        }
+                    }
+                ],
+                Optional("mobile"): [
+                    {
+                        "file": str,
+                        Optional("name"): str,
+                        Optional("id"): str
+                    },
+                    {
+                        Optional(lambda fp: fp.startswith("MOBILE_APPLICATION-")): {
+                            Optional("keyUserActions"): [{"file": str, Optional("id"): str}]
+                        }
+                    }
+                ],
+            },
+            Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("autoTags"): [{"file": str, Optional("name"): str, Optional("id"): str}]
+        }
+    },
+    Optional("v1"): {
+        Optional("synthetic"): {
+            Optional("monitors"): [
+                {
+                    "file": str, Optional("name"): str, "id": str
+                },
+                {
+                    Optional(lambda fp: fp.startswith("HTTP_CHECK-")): {"file": str, Optional("name"): str, "id": str}
+                },
+                {
+                    Optional(lambda fp: fp.startswith("SYNTHETIC_TEST-")): [{"file": str, Optional("name"): str, "id": str}]
+                }
+            ]
+        }
+    },
     Optional("config_v1"): {
         Optional("alertingProfiles"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("allowedBeaconOriginsForCors"): [{"file": str, Optional("name"): str, Optional("id"): str}],
@@ -53,16 +102,16 @@ config_schema = Schema({
         Optional("servicerequestNaming"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("applicationswebdataPrivacy"): [
             {
+                "file": str,
+                "id": lambda fp: fp.startswith("APPLICATION-")
+            },
+            {
                 Optional(lambda fp: fp.startswith("APPLICATION-")): [
                     {
                         "file": str,
                         "id": lambda fp: fp.startswith("APPLICATION-")
                     }
                 ]
-            },
-            {
-                "file": str,
-                "id": lambda fp: fp.startswith("APPLICATION-")
             }
         ],
         Optional("applicationsweberrorRules"): [

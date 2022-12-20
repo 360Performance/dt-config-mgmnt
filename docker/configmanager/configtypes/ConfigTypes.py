@@ -88,7 +88,7 @@ class ConfigEntity():
         #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
 
         parts = self.apipath.split('/')[4:]
-        if self.__class__.isValidID(parts[-1]):
+        if self.__class__.isValidID(parts[-1]) or "0000" == parts[-1]:
             parts = parts[:-1]
 
         if (self.file).endswith(".json"):
@@ -163,7 +163,6 @@ class ConfigEntity():
         if self.__class__.isValidID(parts[-1]):
             parts = parts[:-1]
 
-        logger.info(parts)
         parts.reverse()
 
         for p in parts:

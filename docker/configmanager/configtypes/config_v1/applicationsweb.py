@@ -19,10 +19,11 @@ class applicationsweb(TenantConfigV1Entity):
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
+        self.entityid = kwargs.get("id", "APPLICATION-0000")
         self.detectionrules = []
 
     def isManagedEntity(self):
-        return self.entityid.split("-")[1].startswith("0000")
+        return self.entityid.startswith("0000") or self.entityid.split("-")[1].startswith("0000")
 
     def generateID(self):
         m = hashlib.md5()
