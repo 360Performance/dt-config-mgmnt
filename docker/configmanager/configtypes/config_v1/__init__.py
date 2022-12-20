@@ -25,10 +25,10 @@ from .conditionalNaminghost import *
 from .conditionalNamingprocessGroup import *
 from .conditionalNamingservice import *
 from .contentResources import *
-from .customServicesdotNet import *
-from .customServicesgo import *
-from .customServicesjava import *
-from .customServicesphp import *
+from .servicecustomServicesdotNet import *
+from .servicecustomServicesgo import *
+from .servicecustomServicesjava import *
+from .servicecustomServicesphp import *
 from .dashboards import *
 from .geographicRegionsipAddressMappings import *
 from .geographicRegionsipDetectionHeaders import *

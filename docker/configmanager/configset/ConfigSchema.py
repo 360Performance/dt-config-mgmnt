@@ -5,11 +5,7 @@ config_schema = Schema({
         Optional("v1"): {
             Optional("applications"): {
                 Optional("web"): [
-                    {
-                        "file": str,
-                        Optional("name"): str,
-                        Optional("id"): str
-                    },
+                    {"file": str, Optional("name"): str, Optional("id"): str},
                     {
                         Optional(lambda fp: fp.startswith("APPLICATION-")): {
                             Optional("dataPrivacy"): [{"file": str, Optional("id"): str}],
@@ -19,11 +15,7 @@ config_schema = Schema({
                     }
                 ],
                 Optional("mobile"): [
-                    {
-                        "file": str,
-                        Optional("name"): str,
-                        Optional("id"): str
-                    },
+                    {"file": str, Optional("name"): str, Optional("id"): str},
                     {
                         Optional(lambda fp: fp.startswith("MOBILE_APPLICATION-")): {
                             Optional("keyUserActions"): [{"file": str, Optional("id"): str}]
@@ -32,15 +24,48 @@ config_schema = Schema({
                 ],
             },
             Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("autoTags"): [{"file": str, Optional("name"): str, Optional("id"): str}]
+            Optional("autoTags"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("calculatedMetrics"): {
+                Optional("log"): [{"file": str, Optional("id"): str}],
+                Optional("rum"): [{"file": str, Optional("id"): str}],
+                Optional("mobile"): [{"file": str, Optional("id"): str}],
+                Optional("service"): [{"file": str, Optional("id"): str}],
+                Optional("synthetic"): [{"file": str, Optional("id"): str}]
+            },
+            Optional("conditionalNaming"): {
+                Optional("host"): [{"file": str, Optional("id"): str, Optional("name"): str}],
+                Optional("service"): [{"file": str, Optional("id"): str, Optional("name"): str}],
+                Optional("processGroup"): [{"file": str, Optional("id"): str, Optional("name"): str}],
+            },
+            Optional("service"): {
+                Optional("customServices"): {
+                    Optional("go"): [{"file": str, Optional("id"): str, Optional("name"): str}],
+                    Optional("java"): [{"file": str, Optional("id"): str, Optional("name"): str}],
+                    Optional("dotNet"): [{"file": str, Optional("id"): str, Optional("name"): str}],
+                    Optional("php"): [{"file": str, Optional("id"): str, Optional("name"): str}]
+                },
+                Optional("requestAttributes"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("requestNaming"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("detectionRulesFullWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("detectionRulesFullWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("detectionRulesOpaqueAndExternalWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("detectionRulesOpaqueAndExternalWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("failureDetection"): {
+                    "parameterSelection": {
+                        Optional("parameterSets"): [{"file": str, Optional("id"): str}],
+                        Optional("rules"): [{"file": str, Optional("id"): str}],
+                    }
+                }
+            },
+            Optional("managementZones"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("maintenanceWindows"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("notifications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         }
     },
     Optional("v1"): {
         Optional("synthetic"): {
             Optional("monitors"): [
-                {
-                    "file": str, Optional("name"): str, "id": str
-                },
+                {"file": str, Optional("name"): str, "id": str},
                 {
                     Optional(lambda fp: fp.startswith("HTTP_CHECK-")): {"file": str, Optional("name"): str, "id": str}
                 },
@@ -55,29 +80,18 @@ config_schema = Schema({
         Optional("allowedBeaconOriginsForCors"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("applicationDetectionRuleshostDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("applicationsmobile"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("applicationsmobileAppIdkeyUserActions"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("applicationsmobileAppIduserActionAndSessionProperties"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("applicationsweb"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("autoTags"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("awscredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("awsiamExternalId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("awsprivateLink"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("azurecredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("calculatedMetricslog"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("calculatedMetricsmobile"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("calculatedMetricsrum"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("calculatedMetricsservice"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("calculatedMetricssynthetic"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
+
+
         Optional("cloudFoundry"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("conditionalNaminghost"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("conditionalNamingprocessGroup"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("conditionalNamingservice"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
         Optional("contentResources"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("customServicesdotNet"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("customServicesgo"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("customServicesjava"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("customServicesphp"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
         Optional("dashboards"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("geographicRegionsipAddressMappings"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("geographicRegionsipDetectionHeaders"): [{"file": str, Optional("name"): str, Optional("id"): str}],
@@ -87,19 +101,12 @@ config_schema = Schema({
         Optional("hostsIdmonitoring"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("hostsautoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("kubernetescredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("maintenanceWindows"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("managementZones"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
+
         Optional("notifications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("remoteEnvironments"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("reports"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicedetectionRulesFullWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicedetectionRulesFullWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicedetectionRulesOpaqueAndExternalWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicedetectionRulesOpaqueAndExternalWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicefailureDetectionparameterSelectionparameterSets"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicefailureDetectionparameterSelectionrules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicerequestAttributes"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("servicerequestNaming"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
         Optional("applicationswebdataPrivacy"): [
             {
                 "file": str,

@@ -54,8 +54,7 @@ class ConfigSet:
         except:
             logger.error(f"Can't load definitions: {traceback.format_exc()}")
 
-    '''Quick and Dirty during migration'''
-
+    # Quick and Dirty during migration
     def fixClasspath(self, classpath):
         classpath = classpath.replace("..", ".")
         classpath = classpath.replace(".config.v1.", ".config_v1.")

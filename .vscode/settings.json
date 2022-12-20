@@ -20,7 +20,7 @@
             {
                 "match": ".*",
                 "shell": "$PWD/docker",
-                "cmd": "cd docker; docker-compose build configmanager && docker-compose up -d configmanager"
+                "cmd": "cd docker; /usr/local/bin/docker-compose build configmanager && /usr/local/bin/docker-compose up -d configmanager"
             }
         ]
     }
