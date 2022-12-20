@@ -14,5 +14,14 @@
         "-d missing-function-docstring",
         "-d dangerous-default-value",
         "--class-naming-style=PascalCase"
-    ]
+    ],
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": ".*",
+                "shell": "$PWD/docker",
+                "cmd": "cd docker; /usr/local/bin/docker-compose build configmanager && /usr/local/bin/docker-compose up -d configmanager"
+            }
+        ]
+    }
 }

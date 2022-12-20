@@ -33,15 +33,6 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
     def __repr__(self):
         return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
-    '''
-    def setName(self, name):
-        self.name = name
-        self.dto["name"] = self.name
-
-    def getName(self):
-        return self.name
-    '''
-
     def setID(self, entityid):
         if entityid.startswith('APPLICATION'):
             self.entityid = entityid
@@ -60,7 +51,7 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
         if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
             return (len(idstr.split("-")[1]) == 16)
         else:
-            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            #logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
             return False
 
     '''

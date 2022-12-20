@@ -1,16 +1,17 @@
 from ..ConfigTypes import TenantConfigV1Entity
 from ..ConfigTypes import EntityConfigException
-from .applicationsweb import applicationsweb
+from .applicationsmobile import applicationsmobile
 import logging
 
-logger = logging.getLogger("applicationsweberrorRules")
+logger = logging.getLogger("applicationsmobilekeyUserActions")
 
 
-class applicationsweberrorRules(TenantConfigV1Entity):
+class applicationsmobilekeyUserActions(TenantConfigV1Entity):
     """
-    configuration class for error rules settings of web applications
+    configuration class for data privacy settings of web applications
     """
-    entityuri = "/applications/web/{id}/errorRules"
+
+    entityuri = "/applications/mobile/{id}/keyUserActions"
     uri = TenantConfigV1Entity.uri + entityuri
     has_id = False
     id_attr = name_attr = "identifier"
@@ -19,7 +20,7 @@ class applicationsweberrorRules(TenantConfigV1Entity):
         TenantConfigV1Entity.__init__(self, **kwargs)
         applicationid = kwargs.get("id")
         if applicationid:
-            self.entityuri = f'/applications/web/{kwargs["id"]}/errorRules'
+            self.entityuri = f'/applications/mobile/{kwargs["id"]}/keyUserActions'
         else:
             raise EntityConfigException("Configuration is missing mandatory property 'id'!")
 
@@ -27,28 +28,19 @@ class applicationsweberrorRules(TenantConfigV1Entity):
         self.apipath = self.uri
 
     def __str__(self):
-        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
+        return "{}: {} [definition: {}] [moboile application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def __repr__(self):
-        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
-
-    '''
-    def setName(self, name):
-        self.name = name
-        self.dto["name"] = self.name
-
-    def getName(self):
-        return self.name
-    '''
+        return "{}: {} [definition: {}] [mobile application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def setID(self, entityid):
-        if entityid.startswith('APPLICATION'):
+        if entityid.startswith('MOBILE_APPLICATION'):
             self.entityid = entityid
         else:
-            self.entityid = "APPLICATION-"+entityid
-        super(applicationsweberrorRules, self).setID(self.entityid)
+            self.entityid = "MOBILE_APPLICATION-"+entityid
+        super(applicationsmobilekeyUserActions, self).setID(self.entityid)
         self.dto[self.id_attr] = self.entityid
-        self.entityuri = f'/applications/web/{self.entityid}/errorRules'
+        self.entityuri = f'/applications/mobile/{self.entityid}/keyUserActions'
         self.apipath = self.uri
 
     def getID(self):
@@ -56,7 +48,7 @@ class applicationsweberrorRules(TenantConfigV1Entity):
 
     @classmethod
     def isValidID(cls, idstr):
-        if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
+        if idstr is not None and idstr.startswith("MOBILE_APPLICATION") and "-" in idstr:
             return (len(idstr.split("-")[1]) == 16)
         else:
             #logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
@@ -81,7 +73,7 @@ class applicationsweberrorRules(TenantConfigV1Entity):
             return dtapi.get(cls, eId=eId, parameters=parameters)
         else:
             # first need to get all applications and their IDs
-            result = dtapi.get(applicationsweb, parameters=parameters)
+            result = dtapi.get(applicationsmobile, parameters=parameters)
             if result and len(result) > 0:
                 for tenant in result:
                     if "values" in tenant:

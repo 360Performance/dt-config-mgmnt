@@ -77,6 +77,15 @@ def getClass(kls):
     #    m = getattr(module, comp)
     return obj
 
+# Quick and Dirty during migration
+
+
+def fixClasspath(classpath):
+    parts = classpath.split(".")
+    post = parts[1:]
+    classpath = ".".join(parts[:1]) + "." + "".join(post)
+    return classpath
+
 
 '''
 - collects (all, maybe only tagged ones) http services from a tenant
@@ -578,8 +587,23 @@ def merge(a, b, path=None):
         path = []
     for key in b:
         if key in a:
+            #logger.debug(f'Merging:\n{json.dumps(a[key], indent=2, separators=(",", ": "))}\n{json.dumps(b[key], indent=2, separators=(",", ": "))}')
             if isinstance(a[key], dict) and isinstance(b[key], dict):
                 merge(a[key], b[key], path + [str(key)])
+            elif isinstance(a[key], list) and isinstance(b[key], list):
+                a[key] = a[key] + b[key]
+            elif isinstance(a[key], list) and isinstance(b[key], dict):
+                # check if same list entry type or if first key in b is in a list
+                eKey = next(iter(b[key]))
+                found = False
+                for k in a[key]:
+                    kKey = next(iter(k))
+                    if kKey == eKey:
+                        found = True
+                        merge(k[kKey], b[key][kKey], [kKey])
+                        break
+                if not found:
+                    a[key] = a[key] + [b[key]]
             elif a[key] == b[key]:
                 pass  # same leaf value
             else:
@@ -647,6 +671,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
             logger.info(f'Found {len(result)} {eType.__name__} entities in the result.')
 
             entity_defs = []
+            definitions = {}
 
             # we used get "all", so we received an array of responses
             for r in result:
@@ -655,24 +680,32 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                     c_id = entity["clusterid"]
                     t_id = entity["tenantid"]
 
-                    centity = eType(id=entity[eType.id_attr], name=entity[eType.name_attr], dto=entity)
+                    try:
+                        centity = eType(id=entity[eType.id_attr], name=entity[eType.name_attr], dto=entity)
+                    except:
+                        logger.error("Failed to create an %s entity object with the provided DTO", eType.__name__)
+                        logger.debug(json.dumps(entity, indent=2, separators=(",", ": ")))
+                        logger.error(traceback.print_exc())
                     logger.info(
                         f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
                     if dumpconfig:
                         centity.dumpDTO(config_dump_dir)
-                        config_definition = centity.getConfigDefinition()
-                        entity_defs.append(config_definition)
+                        entity_definition = centity.getConfigDefinition()
+                        entity_defs.append(entity_definition)
 
             # build datastructure for dumping the entities.yml file properly
             if dumpconfig:
+                '''
                 parts = eType.entityuri.strip("/").split('/')
                 parts = f'{eType.__module__}.{eType.__class__.__qualname__}'.split(".")[1:-1]
                 parts.reverse()
                 if len(entity_defs) > 0:
                     for i in parts:
                         entity_defs = {i: entity_defs}
-
-                dumpentities = merge(dumpentities, entity_defs)
+                '''
+                for d in entity_defs:
+                    # logger.debug(dumpentities)
+                    dumpentities = merge(dumpentities, d)
 
         # write out the stdConfig definition (entities.yml)
         if dumpconfig:
@@ -966,14 +999,14 @@ def putConfigEntities(entities, parameters, validateonly):
                 for tenant in resp.json():
                     status.update({str(tenant["responsecode"]): status[str(tenant["responsecode"])]+1})
                     if tenant["responsecode"] >= 400:
-                        logger.error("%s%s failed on tenant: %s HTTP%s (%s)", prefix, httpmeth, tenant["tenantid"], tenant["responsecode"], tenant["error"])
+                        logger.error("%s%s failed on tenant: %s HTTP%s", prefix, httpmeth, tenant["tenantid"], tenant["responsecode"])
                         # logger.debug("{} Payload: {}".format(httpmeth, json.dumps(entity.dto)))
                         logger.debug("%s Response: %s", httpmeth, json.dumps(tenant))
                 logger.info("Status Summary (Dryrun: %s): %s %s", validateonly, len(resp.json()), status)
             if validateonly and len(resp.content) == 0:
                 logger.info("All target tenants have sucessfully validated the payload: HTTP%s", resp.status_code)
         except:
-            logger.error("Problem putting %s: %s", configtype, sys.exc_info())
+            logger.error("Problem putting %s: %s", configtype, traceback.format_exc())
 
 
 def postConfigEntities(entities, parameters, validateonly):
@@ -1008,33 +1041,13 @@ def postConfigEntities(entities, parameters, validateonly):
 
 
 def getControlSettings(cmdsettings):
-    stdSettings = {
-        "servicerequestAttributes": True,
-        "servicerequestNaming": True,
-        "autoTags": True,
-        "customServicesjava": True,
-        "calculatedMetricsservice": True,
-        "conditionalNamingprocessGroup": True,
-        "conditionalNaminghost": True,
-        "conditionalNamingservice": True,
-        "anomalyDetectionapplications": True,
-        "anomalyDetectionservices": True,
-        "applicationsweb": False,
-        "applicationDetectionRules": False,
-        "alertingProfiles": False,
-        "notifications": False,
-        "dataPrivacy": True,
-        "dashboards": True,
-        "syntheticmonitors": False,
-        "applicationDashboards": False,
-    }
-
     supportedEntities = getConfigEntities()
 
     result = {}
     for entity, enabled in cmdsettings.items():
         if enabled:
             for definition in supportedEntities:
+                entity = fixClasspath(entity)
                 if entity in definition:
                     result.update({definition: True})
 
