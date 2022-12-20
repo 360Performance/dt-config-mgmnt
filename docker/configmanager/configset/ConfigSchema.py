@@ -60,6 +60,10 @@ config_schema = Schema({
             Optional("managementZones"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("maintenanceWindows"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("notifications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("alertingProfiles"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("kubernetes"): {
+                "credentials": [{"file": str, Optional("name"): str, Optional("id"): str}]
+            }
         }
     },
     Optional("v1"): {
@@ -76,7 +80,7 @@ config_schema = Schema({
         }
     },
     Optional("config_v1"): {
-        Optional("alertingProfiles"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
         Optional("allowedBeaconOriginsForCors"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         Optional("applicationDetectionRuleshostDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}],

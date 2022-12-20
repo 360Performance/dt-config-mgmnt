@@ -6,7 +6,7 @@
         "dryrun": true
     },
     "config": {
-        "config_v1.alertingProfiles": false,
+        "config_v1.alertingProfiles": true,
         "config_v1.allowedBeaconOriginsForCors": true,
         "config_v1.applicationDetectionRules": true,
         "config_v1.applicationDetectionRules.hostDetection": true,
@@ -40,7 +40,7 @@
         "config_v1.hostsIdautoupdate": true,
         "config_v1.hostsIdmonitoring": true,
         "config_v1.hostsautoupdate": true,
-        "config_v1.kubernetescredentials": false,
+        "config_v1.kubernetescredentials": true,
         "config_v1.maintenanceWindows": true,
         "config_v1.managementZones": true,
         "config_v1.notifications": true,
