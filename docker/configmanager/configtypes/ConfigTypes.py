@@ -60,7 +60,7 @@ class ConfigEntity():
 
     def generateID(self):
         m = hashlib.md5()
-        idstring = f'{self.__class__.__name__}-{self.name}'.lower()
+        idstring = f'{self.__class__.__name__}-{self.name}'
         m.update(idstring.encode('utf-8'))
         entityid = f'0000{str(uuid.UUID(m.hexdigest()))[4:]}'
         return entityid

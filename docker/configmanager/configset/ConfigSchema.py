@@ -79,6 +79,33 @@ config_schema = Schema({
             ]
         }
     },
+    Optional("v2"): {
+        Optional("settings"): {
+            "objects": [
+                {
+                    Optional(lambda fp: fp.startswith("builtin:")): [
+                        {
+                            Or("file", "name"): str
+                        }
+                    ]
+                },
+                Optional({
+                    Or("file", "name"): str
+                }),
+            ]
+        },
+        Optional("slo"): [
+            {
+                Or("file", "name"): str
+            }
+        ],
+        Optional("tags"): [
+            {
+                Or("file", "name"): str,
+                "entitySelector": str
+            }
+        ]
+    },
     Optional("config_v1"): {
 
         Optional("allowedBeaconOriginsForCors"): [{"file": str, Optional("name"): str, Optional("id"): str}],
@@ -166,35 +193,5 @@ config_schema = Schema({
             Optional("anomalyDetectionvmware"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("frequentIssueDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         }
-    },
-    Optional("env_v1"): {
-        Optional("syntheticmonitors"): [{"file": str, Optional("name"): str, "id": str}]
-    },
-    Optional("env_v2"): {
-        Optional("settings"): {
-            "objects": [
-                {
-                    Optional(lambda fp: fp.startswith("builtin:")): [
-                        {
-                            Or("file", "name"): str
-                        }
-                    ]
-                },
-                Optional({
-                    Or("file", "name"): str
-                }),
-            ]
-        },
-        Optional("slo"): [
-            {
-                Or("file", "name"): str
-            }
-        ],
-        Optional("tags"): [
-            {
-                Or("file", "name"): str,
-                "entitySelector": str
-            }
-        ]
     }
 })
