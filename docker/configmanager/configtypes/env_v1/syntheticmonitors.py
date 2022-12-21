@@ -33,7 +33,7 @@ class syntheticmonitors(TenantEnvironmentV1Entity):
 
         #self.entityid = "SYNTHETIC_TEST-" + id
         super(syntheticmonitors, self).setID(entityid)
-        logger.info("Setting monitor ID: %s", self.entityid)
+        logger.debug("Setting monitor ID: %s", self.entityid)
         self.dto["entityId"] = "" if entityid == "" else self.entityid
         if "events" in self.dto:
             self.dto["events"][0]["entityId"] = "SYNTHETIC_TEST_STEP-" + entityid.split("-")[1]

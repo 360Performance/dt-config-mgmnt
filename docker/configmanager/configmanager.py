@@ -686,7 +686,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                         logger.error("Failed to create an %s entity object with the provided DTO", eType.__name__)
                         logger.debug(json.dumps(entity, indent=2, separators=(",", ": ")))
                         logger.error(traceback.print_exc())
-                    logger.info(
+                    logger.debug(
                         f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
                     if dumpconfig:
                         centity.dumpDTO(config_dump_dir)
