@@ -1,5 +1,4 @@
 config/**
-config_dump/**
 **/*.pyc
 *.zip
 .env

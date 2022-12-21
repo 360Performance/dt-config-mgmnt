@@ -2,6 +2,8 @@ from ..ConfigTypes import TenantConfigV1Entity
 from ..ConfigTypes import EntityConfigException
 from .applicationsweb import applicationsweb
 import logging
+import os
+import json
 
 logger = logging.getLogger("applicationsweberrorRules")
 
@@ -33,15 +35,6 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
     def __repr__(self):
         return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
-    '''
-    def setName(self, name):
-        self.name = name
-        self.dto["name"] = self.name
-
-    def getName(self):
-        return self.name
-    '''
-
     def setID(self, entityid):
         if entityid.startswith('APPLICATION'):
             self.entityid = entityid
@@ -58,12 +51,75 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
     def getHttpMethod(self):
         return "POST"
 
+    '''
+    Application key User Actions are special. The get returns a list of keyuser action definitions but
+    posting them to Dynatrace is only allowed one by one. So for a proper dump we need to split the result into multiple
+    single config files ...
+    '''
+
+    def dumpDTO(self, dumpdir):
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]):
+            parts = parts[:-1]
+
+        # this allows to store entities in custom "leaf" directories under the class-name based directory
+        if self.leafdir not in parts:
+            parts.append(self.leafdir)
+
+        if "keyUserActionList" in self.dto and self.dto["keyUserActionList"]:
+            for keyUA in self.dto["keyUserActionList"]:
+                path = "/".join([dumpdir]+parts+[f'{keyUA["meIdentifier"]}.json'])
+                logger.info("Dumping %s Entity to: %s", self.__class__.__name__, path)
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+                with open(path, 'w', encoding="utf-8") as outfile:
+                    json.dump(self.stripDTOMetaData(keyUA), outfile, indent=4, separators=(',', ': '))
+
+    '''
+    Dumping applicationsmobile data from a tenant contains readonlu fields that must not be present when pushing the definition,
+    so we remove them
+    '''
+
+    def stripDTOMetaData(self, dto):
+        dto = super(applicationswebkeyUserActions, self).stripDTOMetaData(dto)
+        if dto is None:
+            logger.error("DTO is none, likely a result from previous errors!")
+            return None
+        newdto = dto.copy()
+        for attr in dto:
+            if attr in ['meIdentifier']:
+                logger.debug(
+                    "Strip attribute %s from configtype %s, maybe cleanup your JSON definition to remove this warning", attr, self.__class__.__name__)
+                newdto.pop(attr, None)
+        return newdto
+
+    '''
+    Overriding config definition since this entity's get method retruns a list of separate entities for pushing
+    So we cannot use the normal file name but need to find something individual (the meIdentifier)
+    '''
+
+    def getConfigDefinition(self):
+        definition = []
+        if "keyUserActionList" in self.dto and self.dto["keyUserActionList"]:
+            for keyUA in self.dto["keyUserActionList"]:
+                definition += [{"id": self.entityid, "file": keyUA["meIdentifier"]}]
+
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]):
+            parts = parts[:-1]
+
+        parts.reverse()
+
+        for p in parts:
+            definition = {p: definition}
+
+        return definition
+
     @classmethod
     def isValidID(cls, idstr):
         if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
             return (len(idstr.split("-")[1]) == 16)
         else:
-            #logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            # logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
             return False
 
     '''

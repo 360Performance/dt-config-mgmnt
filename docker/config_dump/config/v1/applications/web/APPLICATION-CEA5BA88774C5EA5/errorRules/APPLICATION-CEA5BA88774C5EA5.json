@@ -1,0 +1,107 @@
+{
+    "customErrorRules": [
+        {
+            "capture": true,
+            "customAlerting": false,
+            "impactApdex": false,
+            "keyMatcher": null,
+            "keyPattern": null,
+            "valueMatcher": null,
+            "valuePattern": null
+        }
+    ],
+    "httpErrorRules": [
+        {
+            "capture": false,
+            "considerBlockedRequests": false,
+            "considerForAi": false,
+            "considerUnknownErrorCode": false,
+            "errorCodes": "401",
+            "filter": null,
+            "filterByUrl": false,
+            "impactApdex": false,
+            "url": null
+        },
+        {
+            "capture": false,
+            "considerBlockedRequests": false,
+            "considerForAi": false,
+            "considerUnknownErrorCode": false,
+            "errorCodes": "404",
+            "filter": "ENDS_WITH",
+            "filterByUrl": true,
+            "impactApdex": false,
+            "url": "favicon.ico"
+        },
+        {
+            "capture": true,
+            "considerBlockedRequests": false,
+            "considerForAi": true,
+            "considerUnknownErrorCode": false,
+            "errorCodes": "404",
+            "filter": "ENDS_WITH",
+            "filterByUrl": true,
+            "impactApdex": true,
+            "url": ".js"
+        },
+        {
+            "capture": true,
+            "considerBlockedRequests": false,
+            "considerForAi": true,
+            "considerUnknownErrorCode": false,
+            "errorCodes": "404",
+            "filter": "ENDS_WITH",
+            "filterByUrl": true,
+            "impactApdex": true,
+            "url": ".css"
+        },
+        {
+            "capture": true,
+            "considerBlockedRequests": false,
+            "considerForAi": false,
+            "considerUnknownErrorCode": false,
+            "errorCodes": "400-499",
+            "filter": null,
+            "filterByUrl": false,
+            "impactApdex": true,
+            "url": null
+        },
+        {
+            "capture": true,
+            "considerBlockedRequests": false,
+            "considerForAi": true,
+            "considerUnknownErrorCode": false,
+            "errorCodes": "500-599",
+            "filter": null,
+            "filterByUrl": false,
+            "impactApdex": true,
+            "url": null
+        },
+        {
+            "capture": true,
+            "considerBlockedRequests": false,
+            "considerForAi": false,
+            "considerUnknownErrorCode": true,
+            "errorCodes": null,
+            "filter": null,
+            "filterByUrl": false,
+            "impactApdex": false,
+            "url": null
+        },
+        {
+            "capture": true,
+            "considerBlockedRequests": true,
+            "considerForAi": false,
+            "considerUnknownErrorCode": false,
+            "errorCodes": null,
+            "filter": null,
+            "filterByUrl": false,
+            "impactApdex": false,
+            "url": null
+        }
+    ],
+    "ignoreCustomErrorsInApdexCalculation": false,
+    "ignoreHttpErrorsInApdexCalculation": false,
+    "ignoreJavaScriptErrorsInApdexCalculation": false,
+    "identifier": "APPLICATION-CEA5BA88774C5EA5"
+}

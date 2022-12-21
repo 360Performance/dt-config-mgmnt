@@ -58,7 +58,7 @@ class applicationsmobile(TenantConfigV1Entity):
     def getHttpMethod(self):
         return "POST"
 
-    # Dumping applicationsmobile data from a tenant contains readonlu fields that must not be present when pushing the definition,
+    # Dumping applicationsmobile data from a tenant contains readonly fields that must not be present when pushing the definition,
     # so we remove them
     def stripDTOMetaData(self, dto):
         dto = super(applicationsmobile, self).stripDTOMetaData(dto)
