@@ -1,0 +1,23 @@
+{
+    "displayName": "Nextcloud on speicher",
+    "enabled": true,
+    "nameFormat": "Nginx {DockerContainerGroupInstance:StrippedImageName}",
+    "rules": [
+        {
+            "comparisonInfo": {
+                "negate": false,
+                "operator": "EQUALS",
+                "type": "SIMPLE_TECH",
+                "value": {
+                    "type": "NGINX"
+                }
+            },
+            "key": {
+                "attribute": "PROCESS_GROUP_TECHNOLOGY",
+                "type": "STATIC"
+            }
+        }
+    ],
+    "type": "PROCESS_GROUP",
+    "id": "de795895-fcd9-4b3f-988e-b01032003df9"
+}

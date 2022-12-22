@@ -342,6 +342,18 @@ def deleteConfigEntities(entities, parameters, validateonly):
 
 
 def putConfigEntities(entities, parameters, validateonly):
+
+    with DTConsolidatedAPI.dtAPI(host=server, auth=(apiuser, apipwd), parameters=parameters) as api:
+        for entity in entities:
+            method = entity.getHttpMethod()
+            if validateonly:
+                method = 'VALIDATE'
+            request = getattr(entity, method.lower())
+
+            result = request(dtapi=api, parameters=parameters)
+
+
+def putConfigEntities_old(entities, parameters, validateonly):
     headers = {"Content-Type": "application/json"}
     query = "?"+urlencode(parameters)
 

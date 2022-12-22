@@ -1,0 +1,75 @@
+{
+    "anomalyDetection": {
+        "loadingTimeThresholds": {
+            "enabled": true,
+            "thresholds": []
+        },
+        "outageHandling": {
+            "globalOutage": true,
+            "globalOutagePolicy": {
+                "consecutiveRuns": 1
+            },
+            "localOutage": false,
+            "localOutagePolicy": {
+                "affectedLocations": null,
+                "consecutiveRuns": null
+            }
+        }
+    },
+    "automaticallyAssignedApps": [],
+    "createdFrom": "API",
+    "enabled": true,
+    "entityId": "HTTP_CHECK-6B4F93E2E306B208",
+    "frequencyMin": 0,
+    "locations": [
+        "GEOLOCATION-45AB48D9D6925ECC"
+    ],
+    "managementZones": [],
+    "manuallyAssignedApps": [],
+    "name": "Mail SPC",
+    "requests": [
+        {
+            "entityId": "HTTP_CHECK_STEP-6B4F93E2E306B208",
+            "name": "astaro.klaus-prexl-spc.at:993",
+            "sequenceNumber": 1
+        }
+    ],
+    "script": {
+        "requests": [
+            {
+                "configuration": {
+                    "acceptAnyCertificate": true,
+                    "followRedirects": true,
+                    "shouldNotPersistSensitiveData": false
+                },
+                "description": "astaro.klaus-prexl-spc.at:993",
+                "method": "GET",
+                "url": "https://astaro.klaus-prexl-spc.at:993",
+                "validation": {
+                    "rules": [
+                        {
+                            "passIfFound": false,
+                            "type": "httpStatusesList",
+                            "value": ">=400"
+                        }
+                    ]
+                }
+            }
+        ],
+        "version": "1.0"
+    },
+    "tags": [
+        {
+            "context": "CONTEXTLESS",
+            "key": "sslcheck",
+            "source": "USER"
+        },
+        {
+            "context": "CONTEXTLESS",
+            "key": "SSLCheckExpire",
+            "source": "USER",
+            "value": "30"
+        }
+    ],
+    "type": "HTTP"
+}

@@ -1,0 +1,14 @@
+{
+    "active": true,
+    "alertingProfile": "e3de4a00-1a13-4bc6-ba59-b4ae1b4038bd",
+    "bccReceivers": [],
+    "body": "{ProblemDetailsHTML}",
+    "ccReceivers": [],
+    "name": "Email Torsten",
+    "receivers": [
+        "torsten.hellwig@360performance.net"
+    ],
+    "subject": "{State} Problem {ProblemID}: {ImpactedEntity}",
+    "type": "EMAIL",
+    "id": "95433737-a7b4-45ba-a7de-071f71c692cd"
+}

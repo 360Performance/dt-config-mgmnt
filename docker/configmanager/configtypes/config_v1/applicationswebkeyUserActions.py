@@ -150,3 +150,7 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
                             entities.append(dtapi.get(cls, eId=appid, parameters=parameters))
 
         return entities
+
+    def validate(self, dtapi, parameters={}):
+        logger.info("VALIDATE %s", self)
+        return {"result": f'{self.__class__.__name__} API has no validator endpoint'}

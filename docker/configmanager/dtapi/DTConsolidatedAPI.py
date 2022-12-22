@@ -102,6 +102,8 @@ class dtAPI():
         if validateOnly:
             validate = "/validator"
             eId = f'/{entity.getID()}'
+            if eId in entity.uri:
+                eId = ""
         url = f'{self.host}/{(entity.uri).strip("/")}{eId}{validate}'
         log.info("POST%s %s: %s?%s", validate.upper(), entity, url, urllib.parse.urlencode(params))
 

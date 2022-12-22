@@ -1,0 +1,20 @@
+{
+    "aggregation": "FIRST",
+    "confidential": false,
+    "dataSources": [
+        {
+            "enabled": true,
+            "source": "CLIENT_IP",
+            "valueProcessing": {
+                "splitAt": "",
+                "trim": false
+            }
+        }
+    ],
+    "dataType": "STRING",
+    "enabled": true,
+    "name": "UserIP",
+    "normalization": "ORIGINAL",
+    "skipPersonalDataMasking": false,
+    "id": "00009b29-595d-de94-4de5-dda6b1f63a8f"
+}

@@ -1,0 +1,81 @@
+{
+    "anomalyDetection": {
+        "loadingTimeThresholds": {
+            "enabled": false,
+            "thresholds": []
+        },
+        "outageHandling": {
+            "globalOutage": true,
+            "globalOutagePolicy": {
+                "consecutiveRuns": 1
+            },
+            "localOutage": false,
+            "localOutagePolicy": {
+                "affectedLocations": null,
+                "consecutiveRuns": null
+            }
+        }
+    },
+    "automaticallyAssignedApps": [],
+    "createdFrom": "API",
+    "enabled": true,
+    "entityId": "HTTP_CHECK-7506D0BAAB202595",
+    "frequencyMin": 0,
+    "locations": [
+        "GEOLOCATION-45AB48D9D6925ECC"
+    ],
+    "managementZones": [],
+    "manuallyAssignedApps": [],
+    "name": "Dynatrace Consolidation API",
+    "requests": [
+        {
+            "entityId": "HTTP_CHECK_STEP-7506D0BAAB202595",
+            "name": "api.dy.natrace.it:8443",
+            "sequenceNumber": 1
+        }
+    ],
+    "script": {
+        "requests": [
+            {
+                "configuration": {
+                    "acceptAnyCertificate": true,
+                    "followRedirects": true,
+                    "shouldNotPersistSensitiveData": false
+                },
+                "description": "api.dy.natrace.it:8443",
+                "method": "GET",
+                "url": "https://api.dy.natrace.it:8443",
+                "validation": {
+                    "rules": [
+                        {
+                            "passIfFound": true,
+                            "type": "httpStatusesList",
+                            "value": "401"
+                        }
+                    ]
+                }
+            }
+        ],
+        "version": "1.0"
+    },
+    "tags": [
+        {
+            "context": "CONTEXTLESS",
+            "key": "sslcheck",
+            "source": "USER"
+        },
+        {
+            "context": "CONTEXTLESS",
+            "key": "SSLCheckExpire",
+            "source": "USER",
+            "value": "30"
+        },
+        {
+            "context": "CONTEXTLESS",
+            "key": "SSLCheckProxy",
+            "source": "USER",
+            "value": "proxy.local:3128"
+        }
+    ],
+    "type": "HTTP"
+}

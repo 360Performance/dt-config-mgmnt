@@ -67,7 +67,7 @@ class applicationsmobile(TenantConfigV1Entity):
             return None
         newdto = dto.copy()
         for attr in dto:
-            if attr in ['applicationId', 'identifier']:
+            if attr in ['applicationId', 'identifier', 'applicationType']:
                 logger.debug(
                     "Strip attribute %s from configtype %s, maybe cleanup your JSON definition to remove this warning", attr, self.__class__.__name__)
                 newdto.pop(attr, None)
