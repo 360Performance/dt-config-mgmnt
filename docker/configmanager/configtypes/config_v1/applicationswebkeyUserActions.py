@@ -101,7 +101,7 @@ class applicationswebkeyUserActions(TenantConfigV1Entity):
         definition = []
         if "keyUserActionList" in self.dto and self.dto["keyUserActionList"]:
             for keyUA in self.dto["keyUserActionList"]:
-                definition += [{"id": self.entityid, "file": keyUA["meIdentifier"]}]
+                definition += [{"id": self.entityid, "file": keyUA["meIdentifier"] + ".json"}]
 
         parts = self.apipath.split('/')[4:]
         if self.__class__.isValidID(parts[-1]):

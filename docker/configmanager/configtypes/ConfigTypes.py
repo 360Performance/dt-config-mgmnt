@@ -120,7 +120,8 @@ class ConfigEntity():
         return dto
 
     def dumpDTO(self, dumpdir):
-        filename = ((self.name + ".json") if self.name != self.entityid else self.entityid + ".json")
+        #filename = ((self.name + ".json") if self.name == self.entityid else self.entityid + ".json")
+        filename = self.dto[self.name_attr] + ".json"
         # path = dumpdir + self.entityuri + "/" + filename + ".json"
         #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
         parts = self.apipath.split('/')[4:]
@@ -156,7 +157,8 @@ class ConfigEntity():
     # The default values are name and file
     # this can be overridden in a specific entities class
     def getConfigDefinition(self):
-        filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
+        #filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
+        filename = self.dto[self.name_attr] + ".json"
         definition = [{"id": self.entityid, "file": filename}]
 
         parts = self.apipath.split('/')[4:]
