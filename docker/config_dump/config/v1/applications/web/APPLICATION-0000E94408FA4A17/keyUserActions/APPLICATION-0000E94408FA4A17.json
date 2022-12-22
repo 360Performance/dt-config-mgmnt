@@ -1,0 +1,11 @@
+{
+    "keyUserActionList": [
+        {
+            "actionType": "Load",
+            "domain": "360performance.net",
+            "meIdentifier": "APPLICATION_METHOD-F01A57359BF0C067",
+            "name": "loading of \"Test1\" page"
+        }
+    ],
+    "identifier": "APPLICATION-0000E94408FA4A17"
+}

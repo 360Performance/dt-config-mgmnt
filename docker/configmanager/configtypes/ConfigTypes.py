@@ -120,7 +120,7 @@ class ConfigEntity():
         return dto
 
     def dumpDTO(self, dumpdir):
-        filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
+        filename = ((self.name + ".json") if self.name != self.entityid else self.entityid + ".json")
         # path = dumpdir + self.entityuri + "/" + filename + ".json"
         #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
         parts = self.apipath.split('/')[4:]
@@ -131,7 +131,7 @@ class ConfigEntity():
         if self.leafdir not in parts:
             parts.append(self.leafdir)
 
-        path = "/".join([dumpdir]+parts+[f'{filename}.json'])
+        path = "/".join([dumpdir]+parts+[f'{filename}'])
 
         logger.info("Dumping %s Entity to: %s", self.__class__.__name__, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
