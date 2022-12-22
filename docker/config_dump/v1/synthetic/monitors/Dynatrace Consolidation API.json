@@ -61,11 +61,6 @@
     "tags": [
         {
             "context": "CONTEXTLESS",
-            "key": "sslcheck",
-            "source": "USER"
-        },
-        {
-            "context": "CONTEXTLESS",
             "key": "SSLCheckExpire",
             "source": "USER",
             "value": "30"
@@ -75,6 +70,11 @@
             "key": "SSLCheckProxy",
             "source": "USER",
             "value": "proxy.local:3128"
+        },
+        {
+            "context": "CONTEXTLESS",
+            "key": "sslcheck",
+            "source": "USER"
         }
     ],
     "type": "HTTP"

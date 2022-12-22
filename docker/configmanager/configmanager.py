@@ -6,13 +6,8 @@ import copy
 import json
 import logging
 import traceback
-from textwrap import wrap
 from urllib.parse import urlencode
 import urllib3
-import dns.resolver
-from IPy import IP
-from fqdn import FQDN
-import tldextract
 import redis
 import yaml
 import requests
