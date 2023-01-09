@@ -34,7 +34,7 @@ pipeline {
                             sh label: 'GitHub CLI status', script: 'gh auth status'
                             sh label: 'Save docker images', script: 'docker save -o configmanager-${TAG}.tar ${DOCKER_REGISTRY}/configmanager:${TAG}'
                             sh label: 'Save docker images', script: 'docker save -o configcache-${TAG}.tar ${DOCKER_REGISTRY}/configcache:${TAG}'
-                            sh label: 'Create Release', script: 'gh release create ${TAG} configmanager-${TAG}.tar --generate-notes -t "Release ${TAG}"'
+                            sh label: 'Create Release', script: 'gh release create ${TAG} *-${TAG}.tar --generate-notes -t "Release ${TAG}"'
                         }
                     }
                 }
@@ -54,6 +54,10 @@ pipeline {
                         dir("${env.WORKSPACE}/docker/configmanager"){
                             sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:latest'
                             sh label: 'Push Configmanager', script: 'docker push -q ${DOCKER_REGISTRY}/configmanager:${TAG}'
+                        }
+                        dir("${env.WORKSPACE}/docker/configcache"){
+                            sh label: 'Push Configcache', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:latest'
+                            sh label: 'Push Configcache', script: 'docker push -q ${DOCKER_REGISTRY}/configcache:${TAG}'
                         }
                     }
                 }
