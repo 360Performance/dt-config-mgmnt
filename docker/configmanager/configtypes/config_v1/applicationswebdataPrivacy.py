@@ -1,6 +1,6 @@
 from ..ConfigTypes import TenantConfigV1Entity
+from ..ConfigTypes import EntityConfigException
 from .applicationsweb import applicationsweb
-from textwrap import wrap
 import logging
 
 logger = logging.getLogger("applicationswebdataPrivacy")
@@ -18,23 +18,20 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
-        logger.info("Creating %s", self.__class__.__name__)
-        self.entityuri = f'/applications/web/{self.dto["identifier"]}/dataPrivacy'
+        applicationid = kwargs.get("id")
+        if applicationid:
+            self.entityuri = f'/applications/web/{kwargs["id"]}/dataPrivacy'
+        else:
+            raise EntityConfigException("Configuration is missing mandatory property 'id'!")
+
         self.uri = TenantConfigV1Entity.uri + self.entityuri
         self.apipath = self.uri
 
     def __str__(self):
-        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
+        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def __repr__(self):
-        return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
-
-    def setName(self, name):
-        self.name = name
-        self.dto["name"] = self.name
-
-    def getName(self):
-        return self.name
+        return "{}: {} [definition: {}] [application id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
     def setID(self, entityid):
         if entityid.startswith('APPLICATION'):
@@ -54,7 +51,7 @@ class applicationswebdataPrivacy(TenantConfigV1Entity):
         if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
             return (len(idstr.split("-")[1]) == 16)
         else:
-            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            #logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
             return False
 
     '''

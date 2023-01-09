@@ -1,0 +1,39 @@
+{
+    "description": "Beschreibung",
+    "enabled": true,
+    "name": "Test",
+    "schedule": {
+        "end": "2021-11-29 23:59",
+        "recurrence": {
+            "dayOfMonth": null,
+            "dayOfWeek": "MONDAY",
+            "durationMinutes": 540,
+            "startTime": "19:00"
+        },
+        "recurrenceType": "WEEKLY",
+        "start": "2021-06-21 00:00",
+        "zoneId": "Europe/Berlin"
+    },
+    "scope": {
+        "entities": [],
+        "matches": [
+            {
+                "managementZoneId": null,
+                "mzId": null,
+                "tagCombination": "AND",
+                "tags": [
+                    {
+                        "context": "KUBERNETES",
+                        "key": "name",
+                        "value": "dynatrace-oneagent-operator"
+                    }
+                ],
+                "type": null
+            }
+        ]
+    },
+    "suppressSyntheticMonitorsExecution": false,
+    "suppression": "DONT_DETECT_PROBLEMS",
+    "type": "PLANNED",
+    "id": "93ad36b2-bb4f-4611-b87e-21f7787a1b2a"
+}

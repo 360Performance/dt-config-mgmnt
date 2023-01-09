@@ -1,0 +1,69 @@
+{
+    "anomalyDetection": {
+        "loadingTimeThresholds": {
+            "enabled": true,
+            "thresholds": []
+        },
+        "outageHandling": {
+            "globalOutage": true,
+            "globalOutagePolicy": {
+                "consecutiveRuns": 1
+            },
+            "localOutage": false,
+            "localOutagePolicy": {
+                "affectedLocations": null,
+                "consecutiveRuns": null
+            }
+        }
+    },
+    "automaticallyAssignedApps": [],
+    "createdFrom": "API",
+    "enabled": true,
+    "entityId": "HTTP_CHECK-ECB1169732E80FF4",
+    "frequencyMin": 1,
+    "locations": [
+        "GEOLOCATION-45AB48D9D6925ECC"
+    ],
+    "managementZones": [],
+    "manuallyAssignedApps": [],
+    "name": "Homeassistant",
+    "requests": [
+        {
+            "entityId": "HTTP_CHECK_STEP-ECB1169732E80FF4",
+            "name": "hass.dy.natrace.it",
+            "sequenceNumber": 1
+        }
+    ],
+    "script": {
+        "requests": [
+            {
+                "configuration": {
+                    "acceptAnyCertificate": true,
+                    "followRedirects": true,
+                    "shouldNotPersistSensitiveData": false
+                },
+                "description": "hass.dy.natrace.it",
+                "method": "GET",
+                "url": "https://hass.dy.natrace.it",
+                "validation": {
+                    "rules": [
+                        {
+                            "passIfFound": false,
+                            "type": "httpStatusesList",
+                            "value": ">=400"
+                        }
+                    ]
+                }
+            }
+        ],
+        "version": "1.0"
+    },
+    "tags": [
+        {
+            "context": "CONTEXTLESS",
+            "key": "sslcheck",
+            "source": "USER"
+        }
+    ],
+    "type": "HTTP"
+}

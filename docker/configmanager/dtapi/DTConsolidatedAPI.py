@@ -76,6 +76,13 @@ class dtAPI():
             if response.ok:
                 try:
                     result = response.json()
+                    # fixing onconsistency on Dynatrace application subsettings, where some return an identifier in the payload and some don'e :-(
+                    if not eType.has_id and eType.id_attr != "":
+                        log.warning(
+                            "FIXING Dynatrace inconsistency: Entitytype %s does not contain an identifier, injecting one so that definition is recognizable!",
+                            eType.__name__)
+                        for r in result:
+                            r[eType.id_attr] = eId
                 except:
                     if response.text == '':
                         result = {"headers": dict(response.headers)}
@@ -95,6 +102,8 @@ class dtAPI():
         if validateOnly:
             validate = "/validator"
             eId = f'/{entity.getID()}'
+            if eId in entity.uri:
+                eId = ""
         url = f'{self.host}/{(entity.uri).strip("/")}{eId}{validate}'
         log.info("POST%s %s: %s?%s", validate.upper(), entity, url, urllib.parse.urlencode(params))
 

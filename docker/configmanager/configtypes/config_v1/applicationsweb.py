@@ -1,6 +1,9 @@
 from ..ConfigTypes import TenantConfigV1Entity
 from textwrap import wrap
 import hashlib
+import logging
+
+logger = logging.getLogger("applicationsweb")
 
 
 class applicationsweb(TenantConfigV1Entity):
@@ -16,10 +19,11 @@ class applicationsweb(TenantConfigV1Entity):
 
     def __init__(self, **kwargs):
         TenantConfigV1Entity.__init__(self, **kwargs)
+        self.entityid = kwargs.get("id", "APPLICATION-0000")
         self.detectionrules = []
 
     def isManagedEntity(self):
-        return self.entityid.split("-")[1].startswith("0000")
+        return self.entityid.startswith("0000") or self.entityid.split("-")[1].startswith("0000")
 
     def generateID(self):
         m = hashlib.md5()
@@ -34,15 +38,8 @@ class applicationsweb(TenantConfigV1Entity):
     def __repr__(self):
         return "{}: {} [application: {}] [id: {}]".format(self.__class__.__base__.__name__, type(self).__name__, self.name, self.entityid)
 
-    def setName(self, name):
-        self.name = name
-        self.dto["name"] = self.name
-
-    def getName(self):
-        return self.name
-
     def setID(self, entityid):
-        if entityid.startswith('APPLICATION'):
+        if entityid.startswith('APPLICATION-'):
             self.entityid = entityid
         else:
             self.entityid = "APPLICATION-"+entityid
@@ -51,6 +48,14 @@ class applicationsweb(TenantConfigV1Entity):
 
     def getID(self):
         return self.dto["identifier"]
+
+    @classmethod
+    def isValidID(cls, idstr):
+        if idstr is not None and idstr.startswith("APPLICATION") and "-" in idstr:
+            return (len(idstr.split("-")[1]) == 16)
+        else:
+            logger.warning("%s is not a valid id for type %s", idstr, cls.__name__)
+            return False
 
     def addDetectionRule(self, rule):
         rule.dto["applicationIdentifier"] = self.entityid

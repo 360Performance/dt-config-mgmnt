@@ -1,0 +1,56 @@
+{
+    "description": null,
+    "entitySelectorBasedRules": [],
+    "name": "Reinhards",
+    "rules": [
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "TAG_KEY_EQUALS",
+                        "type": "TAG",
+                        "value": {
+                            "context": "CONTEXTLESS",
+                            "key": "Reinhards"
+                        }
+                    },
+                    "key": {
+                        "attribute": "HOST_TAGS",
+                        "type": "STATIC"
+                    }
+                }
+            ],
+            "enabled": true,
+            "normalization": "LEAVE_TEXT_AS_IS",
+            "propagationTypes": [],
+            "type": "SERVICE",
+            "valueFormat": null
+        },
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "caseSensitive": true,
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "STRING",
+                        "value": "reinhards-hosts"
+                    },
+                    "key": {
+                        "attribute": "HOST_GROUP_NAME",
+                        "type": "STATIC"
+                    }
+                }
+            ],
+            "enabled": true,
+            "normalization": "LEAVE_TEXT_AS_IS",
+            "propagationTypes": [
+                "HOST_TO_PROCESS_GROUP_INSTANCE"
+            ],
+            "type": "HOST",
+            "valueFormat": null
+        }
+    ],
+    "id": "0000aa6f-ffb2-2e9e-bcb4-8ba6eb5ebc67"
+}

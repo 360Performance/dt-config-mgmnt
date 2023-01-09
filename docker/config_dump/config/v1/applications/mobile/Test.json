@@ -1,0 +1,13 @@
+{
+    "apdexSettings": {
+        "frustratedOnError": true,
+        "frustratingThreshold": 12000,
+        "toleratedThreshold": 3000
+    },
+    "beaconEndpointType": "CLUSTER_ACTIVE_GATE",
+    "costControlUserSessionPercentage": 100,
+    "name": "Test",
+    "optInModeEnabled": true,
+    "sessionReplayEnabled": true,
+    "sessionReplayOnCrashEnabled": true
+}

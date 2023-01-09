@@ -22,15 +22,16 @@ class ConfigEntity():
     name_attr = "name"      # the attribute name used for the individual entity's NAME in a dedicaated entity response
 
     def __init__(self, **kwargs):
-        self.entityid = kwargs.get("id", "0000")
-        self.name = kwargs.get("name", kwargs.get("file"))
-        self.apipath = self.uri+"/"+self.entityid
-        self.parameters = {}
-        self.file = kwargs.get("file", self.name)
-        self.dto = kwargs.get("dto", None)
         basedir = kwargs.get("basedir", "")
+        self.dto = kwargs.get("dto", None)
+        self.file = kwargs.get("file")
+        self.leafdir = kwargs.get("leafdir", "")
+        self.entityid = kwargs.get("id", "0000")
+        self.apipath = self.uri+"/"+self.entityid
         if basedir != "":
-            self.dto = self.loadDTO(basedir)
+            self.dto = self.loadDTO(basedir=basedir)
+        self.name = kwargs.get("name", self.getName())
+        self.parameters = {}
 
         # in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
         self.dto = self.stripDTOMetaData(self.dto)
@@ -40,6 +41,12 @@ class ConfigEntity():
 
         if self.isManagedEntity():
             self.entityid = self.generateID()
+            if self.name:
+                self.setName(self.name)
+            else:
+                logger.info("No name specified, getting from DTO or fallback: %s", self.getName())
+                self.setName(self.getName())
+
         self.setID(self.entityid)
 
     def __str__(self):
@@ -53,23 +60,58 @@ class ConfigEntity():
 
     def generateID(self):
         m = hashlib.md5()
-        idstring = f'{self.__class__.__name__}-{self.name}'.lower()
+        idstring = f'{self.__class__.__name__}-{self.name}'
         m.update(idstring.encode('utf-8'))
         entityid = f'0000{str(uuid.UUID(m.hexdigest()))[4:]}'
         return entityid
 
+    def setName(self, name):
+        self.name = name
+        if isinstance(self.dto, dict):
+            self.dto[self.__class__.name_attr] = name
+
+    def getName(self):
+        # get from DTO
+        if isinstance(self.dto, dict):
+            return self.dto.get(self.__class__.name_attr, self.file)
+        return self.__class__.__name__
+
     def setID(self, entityid):
-        pass
+        self.entityid = entityid
+        if isinstance(self.dto, dict):
+            self.dto[self.__class__.id_attr] = entityid
 
     def getID(self):
         pass
 
-    def loadDTO(self, basedir):
-        parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
-        path = "/".join([basedir]+parts+[f'{self.file}.json'])
+    def loadDTO(self, basedir, leafdir=""):
+        #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]) or "0000" == parts[-1]:
+            parts = parts[:-1]
+
+        if (self.file).endswith(".json"):
+            filename = self.file
+        else:
+            filename = f'{self.file}.json'
+
+        # this allows to store entities in custom "leaf" directories under the class-name based directory
+        if self.leafdir not in parts and self.leafdir != self.__class__.__name__:
+            parts.append(self.leafdir)
+
+        # in case this is an entity with an API-Path containing the entity ID the leaf directory specified in the config should be the ID
+        try:
+            idx = parts.index("{id}")
+            parts[idx] = self.leafdir if self.__class__.isValidID(self.leafdir) else self.entityid
+        except ValueError:
+            pass
+
+        path = "/".join([basedir]+parts+[filename])
 
         dto = None
         try:
+            logger.info("Loading DTO from %s", path)
             with open(path, "r", encoding="utf-8") as dtofile:
                 dto = json.load(dtofile)
         except OSError as e:
@@ -78,17 +120,26 @@ class ConfigEntity():
         return dto
 
     def dumpDTO(self, dumpdir):
-        filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
+        #filename = ((self.name + ".json") if self.name == self.entityid else self.entityid + ".json")
+        filename = self.dto[self.name_attr] + ".json"
         # path = dumpdir + self.entityuri + "/" + filename + ".json"
-        parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
-        path = "/".join([dumpdir]+parts+[f'{filename}.json'])
+        #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]):
+            parts = parts[:-1]
+
+        # this allows to store entities in custom "leaf" directories under the class-name based directory
+        if self.leafdir not in parts:
+            parts.append(self.leafdir)
+
+        path = "/".join([dumpdir]+parts+[f'{filename}'])
 
         logger.info("Dumping %s Entity to: %s", self.__class__.__name__, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w', encoding="utf-8") as outfile:
             json.dump(self.dto, outfile, indent=4, separators=(',', ': '))
 
-        return {"name": self.name, "id": self.entityid, "file": filename}
+        # return {"name": self.name, "id": self.entityid, "file": filename}
 
     def stripDTOMetaData(self, dto):
         if dto is None:
@@ -102,10 +153,27 @@ class ConfigEntity():
                 newdto.pop(attr, None)
         return newdto
 
-    def setName(self, name):
-        self.name = name
+    # returns the attributes and values that are relevant for the configuration set definition (entities.yml)
+    # The default values are name and file
+    # this can be overridden in a specific entities class
+    def getConfigDefinition(self):
+        #filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
+        filename = self.dto[self.name_attr] + ".json"
+        definition = [{"id": self.entityid, "file": filename}]
+
+        parts = self.apipath.split('/')[4:]
+        if self.__class__.isValidID(parts[-1]):
+            parts = parts[:-1]
+
+        parts.reverse()
+
+        for p in parts:
+            definition = {p: definition}
+
+        return definition
 
     # helper function to allow comparison of dto representation of a config entity with another
+
     def ordered(self, obj):
         if isinstance(obj, dict):
             # some dtos have randomly generated IDs these are not relevant for functional comparison, so remove them
@@ -308,3 +376,7 @@ class ClusterConfigEntity(ConfigEntity):
         super().__init__(**kwargs)
         self.name = kwargs.get("name")
         self.apipath = self.uri + "/TENANTID"
+
+
+class EntityConfigException(Exception):
+    pass

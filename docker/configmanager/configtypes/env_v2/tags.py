@@ -1,5 +1,6 @@
 ''' Dynatrace Settings V2 API Support '''
 from ..ConfigTypes import TenantEnvironmentV2Entity
+from ..ConfigTypes import EntityConfigException
 
 
 class tags(TenantEnvironmentV2Entity):
@@ -12,7 +13,11 @@ class tags(TenantEnvironmentV2Entity):
     def __init__(self, **kwargs):
         TenantEnvironmentV2Entity.__init__(self, **kwargs)
         self.apipath = self.uri
-        self.parameters = {"from": "now-1y", "entitySelector": kwargs.get("id", "type(host)")}
+        entitySelector = kwargs.get("entitySelector")
+        if entitySelector:
+            self.parameters = {"from": "now-1y", "entitySelector": kwargs["entitySelector"]}
+        else:
+            raise EntityConfigException("Configuration is missing mandatory property 'entitySelector'!")
 
     def __str__(self):
         return f'{self.__class__.__base__.__name__}: {type(self).__name__} [name: {self.name}] [entitySelector: {self.parameters["entitySelector"]}]'

@@ -1,5 +1,5 @@
 config/**
-config_dump/**
 **/*.pyc
 *.zip
 .env
+.DS_Store

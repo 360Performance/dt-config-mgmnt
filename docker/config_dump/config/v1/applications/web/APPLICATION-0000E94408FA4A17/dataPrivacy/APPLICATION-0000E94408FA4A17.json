@@ -1,0 +1,21 @@
+{
+    "dataCaptureOptInEnabled": true,
+    "doNotTrackBehaviour": "CAPTURE_ANONYMIZED",
+    "identifier": "APPLICATION-0000E94408FA4A17",
+    "persistentCookieForUserTracking": false,
+    "sessionReplayDataPrivacy": {
+        "contentMaskingSettings": {
+            "playbackMaskingSettings": {
+                "maskingPreset": "MASK_ALL",
+                "maskingRules": []
+            },
+            "recordingMaskingSettings": {
+                "maskingPreset": "MASK_ALL",
+                "maskingRules": []
+            },
+            "recordingMaskingSettingsVersion": 2
+        },
+        "optInModeEnabled": true,
+        "urlExclusionRules": []
+    }
+}
