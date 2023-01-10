@@ -18,7 +18,8 @@ config_schema = Schema({
                     {"file": str, Optional("name"): str, Optional("id"): str},
                     {
                         Optional(lambda fp: fp.startswith("MOBILE_APPLICATION-")): {
-                            Optional("keyUserActions"): [{"file": str, Optional("id"): str}]
+                            Optional("keyUserActions"): [{"file": str, Optional("id"): str}],
+                            Optional("userActionAndSessionProperties"): [{"file": str, Optional("id"): str}],
                         }
                     }
                 ],
@@ -63,7 +64,36 @@ config_schema = Schema({
             Optional("alertingProfiles"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("kubernetes"): {
                 "credentials": [{"file": str, Optional("name"): str, Optional("id"): str}]
-            }
+            },
+            Optional("dashboards"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("allowedBeaconOriginsForCors"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("applicationDetectionRuleshostDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
+            Optional("aws"): {
+                Optional("credentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("iamExternalId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("privateLink"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            },
+
+            Optional("azurecredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("cloudFoundry"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("contentResources"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("geographicRegionsipAddressMappings"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("geographicRegionsipDetectionHeaders"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("hostgroupsautoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
+            Optional("hosts"): {
+                Optional(lambda fp: fp.startswith("HOST-")): {
+                    Optional("autoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                }
+            },
+            Optional("hostsId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("hostsIdmonitoring"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("kubernetescredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("notifications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("remoteEnvironments"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("reports"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         }
     },
     Optional("v1"): {
@@ -107,79 +137,6 @@ config_schema = Schema({
         ]
     },
     Optional("config_v1"): {
-
-        Optional("allowedBeaconOriginsForCors"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("applicationDetectionRuleshostDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("applicationsmobileAppIduserActionAndSessionProperties"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("awscredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("awsiamExternalId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("awsprivateLink"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("azurecredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-
-
-
-        Optional("cloudFoundry"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-
-        Optional("contentResources"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-
-        Optional("dashboards"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("geographicRegionsipAddressMappings"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("geographicRegionsipDetectionHeaders"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("hostgroupsautoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("hostsId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("hostsIdautoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("hostsIdmonitoring"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("hostsautoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("kubernetescredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-
-
-        Optional("notifications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("remoteEnvironments"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-        Optional("reports"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-
-        Optional("applicationswebdataPrivacy"): [
-            {
-                "file": str,
-                "id": lambda fp: fp.startswith("APPLICATION-")
-            },
-            {
-                Optional(lambda fp: fp.startswith("APPLICATION-")): [
-                    {
-                        "file": str,
-                        "id": lambda fp: fp.startswith("APPLICATION-")
-                    }
-                ]
-            }
-        ],
-        Optional("applicationsweberrorRules"): [
-            {
-                Optional(lambda fp: fp.startswith("APPLICATION-")): [
-                    {
-                        "file": str,
-                        "id": lambda fp: fp.startswith("APPLICATION-")
-                    }
-                ]
-            },
-            {
-                "file": str,
-                "id": lambda fp: fp.startswith("APPLICATION-")
-            }
-        ],
-        Optional("applicationswebkeyUserActions"): [
-            {
-                Optional(lambda fp: fp.startswith("APPLICATION-")): [
-                    {
-                        "file": str,
-                        "id": lambda fp: fp.startswith("APPLICATION-")
-                    }
-                ]
-            },
-            Optional({
-                "file": str,
-                "id": lambda fp: fp.startswith("APPLICATION-")
-            })
-        ],
         Optional("setting"): {
             Optional("dataPrivacy"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("anomalyDetectionapplications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
