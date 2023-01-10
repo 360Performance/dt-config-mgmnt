@@ -61,14 +61,14 @@
     "tags": [
         {
             "context": "CONTEXTLESS",
-            "key": "SSLCheckExpire",
-            "source": "USER",
-            "value": "10"
+            "key": "sslcheck",
+            "source": "USER"
         },
         {
             "context": "CONTEXTLESS",
-            "key": "sslcheck",
-            "source": "USER"
+            "key": "SSLCheckExpire",
+            "source": "USER",
+            "value": "10"
         }
     ],
     "type": "HTTP"

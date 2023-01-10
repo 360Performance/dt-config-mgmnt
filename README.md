@@ -46,22 +46,30 @@ The ```entities.yml``` file has the following structure, which follows the API p
 
 entities.yml:
 ```
-service: 
-  customServices:
-    java: 
-      - name: "CronJobs"
-        id: "bbbb0001-0a0a-0b0b-0c0c-000000000001"
-      - name: "TaskEngine"
-        id: "bbbb0001-0a0a-0b0b-0c0c-000000000002"
-      - name: "ImpExImportJob"
-        id: "bbbb0001-0a0a-0b0b-0c0c-000000000003"
+config:
+  v1:
+    applications:
+      web:
+      mobile:
+    service:
+      customServices:
+        java: 
+          - file: mycustomservice.json
+            name: "My Custom Service"       (optional: can be defined in the json file)
+            id: "0000-uuid-..."             (optional: will be generated automatically to be consistent)
+    autoTags:
+      - file: myautotag.json
+      - file: myotherautotag.json
 ```
+[Example entities.yml (created from config dump)](docker/config_dump/entities.yml)
+
 The  structure of the ```config``` directory follows the the structure of the ```entities.yml``` file. E.g. for the above definition the config directory structure will look like this:
 ```
-service/customServices/java
-    CronJobs.json
-    TaskEngine.json
-    ImpExImportJob.json
+config/v1/service/customServices/java/mycustomservice.json
+config/v1/autoTags/myautotag.json
+config/v1/autoTags/myotherautotag.json
+
+[Example config directory](docker/config_dump/)
 ```
 Every configurable (available via the Dynatrace API) enity is supported. The config directory structure also follows the respective API URI of the Dynatrace API. For example JSON files for service metrics (API URI = ../calculatedMetrics/service) will reside in a subdirectory ./calculatedMetrics/service.
 When exporting configuration from a tenant also this directory structure is generated and also a respective ```entities.yml``` file is created.
@@ -112,15 +120,16 @@ The configmanager is the core component to control configuration operations. The
 
 
 ### Execution of Configuration Actions
-The configmanager understands these commands (Parameters are keys in redis that are used to further parameterize the commands):
+To execute specific actions in ```configmanager``` one must publish a command with parameters to the ```configcontrol``` redis channel.
+These commands are basically a set op options structured in a json format sent to the channel. They contain all settings needed for the configmanager to perform it's work.
+This includes:
+1. which command to execute (PUSH, PULL, RESET, ...)
 
 | Command       | Parameters     | Function  |
 | ------------- |:----------------------- | :-----|
-| PUSH_CONFIG   | config, parameters      | pushes the config entities that have been enabled in ```config``` of the standard configuration set to the tenants defined in ```paremeters``` |
-| VERIFY_CONFIG | parameters              | verifies the config settings of the tenant(s) defined in ```parameters``` with the current standard configuration |
-| PULL_CONFIG   | source                  | fetches all supported configuration settings of the tenant(s) defined in ```source``` and dumps them to a temporary directory ```config_dump``` |
-| COPY_CONFIG   | config, source, target  | first pulls all supported configuration settings from the tenant(s) defined in ```source``` (PULL_CONFIG) and then pushes these config settings to the tenants defined in ```target``` (only those config entities defined in ```config``` will be pusehd) |
-| RESET         |                         | resets the standard configuration to the initial config set (e.g. after a PULL_CONFIG) |
+| PUSH_CONFIG   | source, config      | pushes the config entities that have been enabled in ```config``` of the standard configuration set to the tenants defined in ```paremeters``` |
+| PULL_CONFIG   | target, config                  | fetches all supported configuration settings of the tenant(s) defined in ```source``` and dumps them to a temporary directory ```config_dump``` |
+| RESET         |                         | resets the standard configuration to the initial config set, loading from the config directory (e.g. after a PULL_CONFIG) |
 
 Furthermore the configmanager confirms the processing of a command by also publishing a ```FINISHED_CONFIG``` message to the ```configcontrol``` communication channel. 
 
@@ -129,81 +138,109 @@ The following parameters control which configuration entities are pusehd or to/f
 
 | Parameter | Description | Example |
 | --------- |:----------- |:------- |
-| config    | a list of flags which configtypes should be considered when pushing configuration settings | please see ```test/config.json``` |
-| parameters | a list of properties that are applied for filtering or selecting tenants. These parameters are passed as http parameters to the consolidation API, which then takes care of only sending requests to the filtered tenants | ```{"tenantid":"tenant-p1", "stage":"production", "clusterid":"clusterid", "dryrun": false}``` |
-| source | a list of properties to select tenants according to filters. Same as the ```parameters``` parameter | ```{"stage":"staging", "clusterid":"clusterid"``` e.g. to get all config entities from all staging tenants on cluster with the id "clusterid" | 
-| target | a list of properties to select tenants according to filters. Same as the ```parameters``` parameter | ```{"stage":"production", "clusterid":"clusterid"``` e.g. to push the current standard config to all production tenants on cluster with the id "clusterid" | 
+| config    | a list of flags which configtypes should be considered when pushing configuration settings | please see [push_command.json](docker/test/push_command.json) |
+| source, target | parameters used for the consolidateion API to select the right tenant(s)/dynatrace setups when executing commands | please see [push_command.json](docker/test/push_command.json) |
 
 
 ### Examples
 
-To trigger a configuration push to one or multiple/all tenants we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel. This can be done directly via the configcache redis client or with any automation integration tool that publishes the control messages to redis.
+To trigger a configuration push to one or multiple/all tenants (connected via the consolidateion API) we need to let the configmanager know to which tenants the configurations should be pushed. This can be done by publishing a message to the configcache "configcontrol" channel. This can be done directly via the configcache redis client or with any automation integration tool that publishes the control messages to redis.
 
-Launch all config services:
+Launch the configcache and the configmanager services:
 ```
-CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS              PORTS               NAMES
-ca2df050130b        hyperf/configmanager:1.0   "python configmanage…"   3 days ago          Up 3 days                               configmanager
-4f86e0815317        hyperf/configcache:1.0     "docker-entrypoint.s…"   3 days ago          Up 3 days           6379/tcp            configcache
-b6a7d5f7fb01        hyperf/pluginmanager:1.0   "python pluginmanage…"   4 days ago          Up 2 seconds                            pluginmanager
-```
-
-To manually change config settings, connect to the configcache redis-client:
-```
-docker exec -it configcache redis-cli
+CONTAINER ID   IMAGE                              COMMAND                  CREATED             STATUS             PORTS      NAMES
+e157b20ec920   360performance/configmanager:dev   "python configmanage…"   About an hour ago   Up About an hour              configmanager
+76d8c845fcab   360performance/configcache:dev     "docker-entrypoint.s…"   2 weeks ago         Up 24 hours        6379/tcp   configcache
 ```
 
-Control the config configuration to enable disable certain settings:
+Read a command from a file and push it to the configcontrol channel (examples located in ```docker/test```)
 ```
- 127.0.0.1:6379>  set config "{\"servicerequestAttributes\": true, \"servicerequestNaming\": true, \"autoTags\": true, \"conditionalNamingprocessGroup\": true, \"customServicesjava\": true, \"customServicesdotNet\": true, \"customServicesgo\": true, \"customServicesphp\": true, \"managementZones\": true, \"maintenanceWindows\": true, \"calculatedMetricsservice\": true, \"calculatedMetricslog\": true, \"calculatedMetricsrum\": true, \"servicedetectionRulesFullWebService\": true, \"servicedetectionRulesFullWebRequest\": true, \"servicedetectionRulesOpaqueAndExternalWebRequest\": true, \"reports\": true, \"remoteEnvironments\": true, \"applicationsweb\": true, \"applicationDetectionRules\": true, \"awsiamExternalId\": true, \"awscredentials\": true, \"azurecredentials\": true, \"cloudFoundry\": true, \"kubernetescredentials\": true, \"alertingProfiles\": true, \"notifications\": false, \"dashboards\": true, \"anomalyDetectionapplications\": true, \"anomalyDetectionservices\": true, \"anomalyDetectionhosts\": true, \"anomalyDetectiondatabaseServices\": true, \"anomalyDetectiondiskEvents\": true, \"anomalyDetectionaws\": true, \"anomalyDetectionvmware\": true, \"anomalyDetectionmetricEvents\": true, \"frequentIssueDetection\": true, \"dataPrivacy\", true}"
-```
-
-Alternatively you can also import these settings from json files (examples located in ```docker/test```)
-```
-docker exec -i configcache redis-cli -x set config < test/config.json
+docker exec -i configcache redis-cli -x publish configcontrol < test/pull_command.json
 ```
 
-All the below examples assume you have connected to the ```configcache``` redis via redis-cli. For example:
+This will then trigger a config pull and dump from the tenenat specified in the command file:
 ```
-docker exec -i configcache redis-cli
-```
-
-Set the configuration parameters for applying the configuration:
-e.g. to push the configuration to tenant tenant-p1 on cluster ```clusterid``` (note that the ```clusterid``` is the ID parameter of the cluster configuraed in the consolidateion API) set:
-```
-127.0.0.1:6379> set parameters "{\"tenantid\":\"tenant-p1\", \"clusterid\":\"clusterid\", \"dryrun\": false}"
+docker logs -f configmanager
 ```
 
-To push the config to all develoment tenants you could use (note that the ```stage``` parameter has to be supported by the consolidateion API):
 ```
-127.0.0.1:6379> set parameters "{\"stage\":\"development\", \"dryrun\": false}"
+2023-01-10 15:28:59,635:ALWAYS: Received Command: PULL_CONFIG
+2023-01-10 15:28:59,635:ALWAYS: ========== STARTING CONFIG PULL ==========
+2023-01-10 15:28:59,635:INFO: Source: 
+{
+  "mode": "saas",
+  "clusterid": "360perf",
+  "dryrun": true
+}
+2023-01-10 15:28:59,640:INFO: Config: 
+{
+  "configtypes.config_v1.alertingProfiles.alertingProfiles": true,
+  "configtypes.config_v1.allowedBeaconOriginsForCors.allowedBeaconOriginsForCors": true,
+  "configtypes.config_v1.applicationDetectionRules.applicationDetectionRules": true,
+  "configtypes.config_v1.applicationDetectionRuleshostDetection.applicationDetectionRuleshostDetection": true,
+  "configtypes.config_v1.applicationsmobile.applicationsmobile": true,
+  "configtypes.config_v1.applicationsmobileAppIduserActionAndSessionProperties.applicationsmobileAppIduserActionAndSessionProperties": true,
+  "configtypes.config_v1.applicationsmobilekeyUserActions.applicationsmobilekeyUserActions": true,
+  "configtypes.config_v1.applicationsweb.applicationsweb": true,
+  "configtypes.config_v1.applicationswebdataPrivacy.applicationswebdataPrivacy": true,
+  "configtypes.config_v1.applicationsweberrorRules.applicationsweberrorRules": true,
+  "configtypes.config_v1.applicationswebkeyUserActions.applicationswebkeyUserActions": true,
+  "configtypes.config_v1.autoTags.autoTags": true,
+  ...
+}
+
+... lots of dump actions here ...
+
+2023-01-10 15:29:10,550:ALWAYS: ========== FINISHED CONFIG PULL ==========
+2023-01-10 15:29:10,551:ALWAYS: Processed Command: PULL_CONFIG
 ```
 
-To start the configuration push publish the "START_CONFIG" message to the "configcontrol" channel
+After the command has finished you will find your configuration set in the ```config_dump``` directory and the duped configuration will be loaded as standard set for further commands.
+
+#### Example: clone a configuration set from one Dynatrace tenant to another
+
+You can transfer/clone all configurations of one Dynatrace tenant to another by performing a dump on one tenant and then push the config to another one. To achieve this you first need to "connect" both tenants to the dynatrace consolidation API, so that the configmanager can easily access both tenants.
+Then all you need to do is first execute a PULL command and then a PUSH command with different source/target parameters:
+
+First pull the config (only autotags in this case) with a command file (pull_command.json) like this:
+
 ```
-127.0.0.1:6379> publish configcontrol PUSH_CONFIG
+{
+    "command": "PULL_CONFIG",
+    "source": {
+        "mode": "saas",
+        "clusterid": "360perf-dev"
+    },
+    "config": {
+        "config_v1.alertingProfiles": true,
+        "config_v1.autoTags": true
+    }
+}
 ```
 
-To start a plugin deployment publish the "START_PLUGIN_CONFIG" message to the "configcontrol" channel
 ```
-127.0.0.1:6379> publish configcontrol START_PLUGIN_CONFIG
-```
-
-To pull the configuration from tenant "tenant-s1" and make it the current standard config set:
-```
-127.0.0.1:6379> set source "{\"tenantid\":\"tenant-s1\", \"clusterid\":\"clusterid\", \"dryrun\": false}"
-127.0.0.1:6379> publish configcontrol PULL_CONFIG
+docker exec -i configcache redis-cli -x publish configcontrol < pull_command.json
 ```
 
-Then you can push this new standard configuration set to another tenant "tenant-p1" and make it the current standard config set:
+Now the configmanager has dumped all autoTag and alertingProfile configurations to the dump directory and has loaded this config set into it's cache.
+To push this configuration (or parts of it) you can now issue another command (push_command.json):
+
 ```
-127.0.0.1:6379> set target "{\"tenantid\":\"tenant-p1\", \"clusterid\":\"clusterid\", \"dryrun\": false}"
-127.0.0.1:6379> publish configcontrol PULL_CONFIG
+{
+    "command": "PUSH_CONFIG",
+    "target": {
+        "mode": "saas",
+        "clusterid": "360perf-prod"
+    },
+    "config": {
+        "config_v1.alertingProfiles": false,
+        "config_v1.autoTags": true
+    }
+}
 ```
 
-To verify the configuration of tenant "tenant-s1" against the current standard configuration set:
 ```
-127.0.0.1:6379> publish configcontrol VERIFY_CONFIG
+docker exec -i configcache redis-cli -x publish configcontrol < push_command.json
 ```
 
-
-## Controlling or Pushing Plugins
+And voila you will have replicated all your autoTags from one tenant to another (note the 'false' setting for alertingProfiles, hence they are skipped)
