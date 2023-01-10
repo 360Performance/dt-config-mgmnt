@@ -42,7 +42,7 @@ The configuration service consists of multiple service components and uses a sep
 This service is responsible to pushing the standard configs to all tenants. The standard configs are defined in entites which are defined on the standard Dynatrace JSON configuration files (DTOs). The configuration files are located in the ```config``` subdirectory. This is the source of your standard configuration set that will be maintained as code.
 The configuration set itself is defined in a yaml file ```entities.yml``` located in this directory. This file defines which configuration entities from the source ```config``` directory the config manager will consider when maintaining the configuration of tenants. The ```entities.yml``` file alse defines metadata of config entities (e.g. their custom predefined ID or names)  
 
-The ```entities.yml``` file has the following structure, which follows the API path of the respective configuration entity:
+The ```entities.yml``` file has the following structure (see details in the [schema definition](docker/configmanager/configset/ConfigSchema.py)), which follows the API path of the respective configuration entity:
 
 entities.yml:
 ```
