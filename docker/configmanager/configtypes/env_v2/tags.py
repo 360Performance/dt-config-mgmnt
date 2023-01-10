@@ -8,6 +8,7 @@ class tags(TenantEnvironmentV2Entity):
     has_id = False
     httpmethod = "POST"
     entityuri = "/tags"
+    id_attr = ""
     uri = TenantEnvironmentV2Entity.uri + entityuri
 
     def __init__(self, **kwargs):
@@ -28,9 +29,25 @@ class tags(TenantEnvironmentV2Entity):
     def setID(self, entityid):
         self.parameters = {"entitySelector": entityid}
 
+    def getID(self):
+        return ""
+
     def list(self, dtapi, parameters={}):
         result = self.__class__.get(dtapi, eId=None, parameters=self.parameters | parameters)
         return result
+
+    def post(self, dtapi, parameters={}):
+        # default behavior: first delete all manually applied tags from the entity before posting new ones
+        # first get all tags of the entity
+        result = dtapi.get(tags, parameters=self.parameters | parameters)
+        if result and len(result) > 0:
+            for tenant in result:
+                if "tags" in tenant:
+                    for tag in tenant["tags"]:
+                        key = tag["key"]
+                        dtapi.delete(self, parameters=self.parameters | parameters | {"key": key, "deleteAllWithKey": "true"})
+
+        return TenantEnvironmentV2Entity.post(self, dtapi, parameters=self.parameters | parameters)
 
     def getHttpMethod(self):
         return self.httpmethod

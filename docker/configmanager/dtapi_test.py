@@ -136,7 +136,7 @@ class Test_03_Put(unittest.TestCase):
             self.assertTrue(len(result) == 1)
             self.assertTrue("id" in result[0])
             # this would be the generated entityId
-            entityId = "000015e3-9241-0676-8225-e8aabc325227"
+            entityId = "000011d4-2d39-bb5c-4bf6-610d13ade2f5"
             self.assertEqual(result[0]["id"], entityId)
 
 
@@ -176,7 +176,7 @@ class Test_05_CustomTag(unittest.TestCase):
 
     def test_Post(self):
         with DTConsolidatedAPI.dtAPI(host="https://dtapi.dy.natrace.it", auth=(apiuser, apipwd), parameters={"clusterid": "360perf"}) as api:
-            tag = tags(name="customtag", entitySelector="entityId(APPLICATION-0000E94408FA4A17)", dto={"tags": [{"key": "solution", "value": 42}]})
+            tag = tags(name="customtag", entitySelector="entityId(APPLICATION-0000E94408FA4A17)", dto={"tags": [{"key": "solution", "value": 43}]})
             result = tag.post(api)
             self.assertTrue(len(result) == 1)
             self.assertTrue("matchedEntitiesCount" in result[0])
