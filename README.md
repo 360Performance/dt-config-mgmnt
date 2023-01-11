@@ -61,6 +61,7 @@ config:
       - file: myautotag.json
       - file: myotherautotag.json
 ```
+
 [Example entities.yml (created from config dump)](docker/config_dump/entities.yml)
 
 The  structure of the ```config``` directory follows the the structure of the ```entities.yml``` file. E.g. for the above definition the config directory structure will look like this:
