@@ -69,9 +69,10 @@ The  structure of the ```config``` directory follows the the structure of the ``
 config/v1/service/customServices/java/mycustomservice.json
 config/v1/autoTags/myautotag.json
 config/v1/autoTags/myotherautotag.json
+```
 
 [Example config directory](docker/config_dump/)
-```
+
 Every configurable (available via the Dynatrace API) enity is supported. The config directory structure also follows the respective API URI of the Dynatrace API. For example JSON files for service metrics (API URI = ../calculatedMetrics/service) will reside in a subdirectory ./calculatedMetrics/service.
 When exporting configuration from a tenant also this directory structure is generated and also a respective ```entities.yml``` file is created.
 
