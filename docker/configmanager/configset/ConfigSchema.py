@@ -24,7 +24,12 @@ config_schema = Schema({
                     }
                 ],
             },
-            Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("applicationDetectionRules"): [
+                {"file": str, Optional("name"): str, Optional("id"): str},
+                {
+                    Optional("hostDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}]
+                }
+            ],
             Optional("autoTags"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("calculatedMetrics"): {
                 Optional("log"): [{"file": str, Optional("id"): str}],
@@ -47,10 +52,12 @@ config_schema = Schema({
                 },
                 Optional("requestAttributes"): [{"file": str, Optional("name"): str, Optional("id"): str}],
                 Optional("requestNaming"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-                Optional("detectionRulesFullWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-                Optional("detectionRulesFullWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-                Optional("detectionRulesOpaqueAndExternalWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-                Optional("detectionRulesOpaqueAndExternalWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("detectionRules"): {
+                    Optional("FullWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                    Optional("FullWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                    Optional("OpaqueAndExternalWebRequest"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                    Optional("OpaqueAndExternalWebService"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                },
                 Optional("failureDetection"): {
                     "parameterSelection": {
                         Optional("parameterSets"): [{"file": str, Optional("id"): str}],
@@ -67,33 +74,42 @@ config_schema = Schema({
             },
             Optional("dashboards"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("allowedBeaconOriginsForCors"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("applicationDetectionRules"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("applicationDetectionRuleshostDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-
             Optional("aws"): {
                 Optional("credentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
                 Optional("iamExternalId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
                 Optional("privateLink"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             },
-
             Optional("azurecredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("cloudFoundry"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("contentResources"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("geographicRegionsipAddressMappings"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("geographicRegionsipDetectionHeaders"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("geographicRegions"): {
+                Optional("ipAddressMappings"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("ipDetectionHeaders"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            },
             Optional("hostgroupsautoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
 
-            Optional("hosts"): {
+            Optional("hosts"): [{
                 Optional(lambda fp: fp.startswith("HOST-")): {
                     Optional("autoupdate"): [{"file": str, Optional("name"): str, Optional("id"): str}],
                 }
-            },
+            }],
             Optional("hostsId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("hostsIdmonitoring"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("kubernetescredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("notifications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("remoteEnvironments"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("reports"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("anomalyDetection"): {
+                Optional("applications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("aws"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("databaseServices"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("diskEvents"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("hosts"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("metricEvents"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("processGroups"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("services"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+                Optional("vmware"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            }
         }
     },
     Optional("v1"): {
@@ -139,15 +155,7 @@ config_schema = Schema({
     Optional("config_v1"): {
         Optional("setting"): {
             Optional("dataPrivacy"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectionapplications"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectionaws"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectiondatabaseServices"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectiondiskEvents"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectionhosts"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectionmetricEvents"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectionprocessGroups"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectionservices"): [{"file": str, Optional("name"): str, Optional("id"): str}],
-            Optional("anomalyDetectionvmware"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+
             Optional("frequentIssueDetection"): [{"file": str, Optional("name"): str, Optional("id"): str}],
         }
     }
