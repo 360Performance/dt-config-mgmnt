@@ -1,0 +1,22 @@
+{
+    "aggregation": "FIRST",
+    "confidential": false,
+    "dataSources": [
+        {
+            "capturingAndStorageLocation": "CAPTURE_AND_STORE_ON_BOTH",
+            "enabled": true,
+            "parameterName": "symbol",
+            "source": "QUERY_PARAMETER",
+            "valueProcessing": {
+                "splitAt": "",
+                "trim": false
+            }
+        }
+    ],
+    "dataType": "STRING",
+    "enabled": true,
+    "name": "symbol",
+    "normalization": "ORIGINAL",
+    "skipPersonalDataMasking": false,
+    "id": "000082b2-75f0-c997-3ecd-a57cb8c2929a"
+}

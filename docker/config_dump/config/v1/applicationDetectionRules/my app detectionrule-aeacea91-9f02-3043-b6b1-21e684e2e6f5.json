@@ -1,0 +1,10 @@
+{
+    "applicationIdentifier": "APPLICATION-CEA5BA88774C5EA5",
+    "filterConfig": {
+        "applicationMatchTarget": "DOMAIN",
+        "applicationMatchType": "MATCHES",
+        "pattern": "cloud.360performance.net"
+    },
+    "name": "my app detectionrule",
+    "id": "aeacea91-9f02-3043-b6b1-21e684e2e6f5"
+}

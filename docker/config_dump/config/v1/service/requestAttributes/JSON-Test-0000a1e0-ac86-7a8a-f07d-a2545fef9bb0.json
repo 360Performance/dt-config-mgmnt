@@ -1,0 +1,21 @@
+{
+    "aggregation": "FIRST",
+    "confidential": false,
+    "dataSources": [
+        {
+            "enabled": false,
+            "parameterName": "status",
+            "source": "POST_PARAMETER",
+            "valueProcessing": {
+                "splitAt": "",
+                "trim": false
+            }
+        }
+    ],
+    "dataType": "STRING",
+    "enabled": true,
+    "name": "JSON-Test",
+    "normalization": "ORIGINAL",
+    "skipPersonalDataMasking": false,
+    "id": "0000a1e0-ac86-7a8a-f07d-a2545fef9bb0"
+}

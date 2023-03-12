@@ -1,0 +1,22 @@
+{
+    "aggregation": "FIRST",
+    "confidential": false,
+    "dataSources": [
+        {
+            "capturingAndStorageLocation": "CAPTURE_AND_STORE_ON_SERVER",
+            "enabled": true,
+            "parameterName": "x-dynatrace",
+            "source": "REQUEST_HEADER",
+            "valueProcessing": {
+                "splitAt": "",
+                "trim": false
+            }
+        }
+    ],
+    "dataType": "STRING",
+    "enabled": true,
+    "name": "x-dynatrace",
+    "normalization": "ORIGINAL",
+    "skipPersonalDataMasking": false,
+    "id": "0000abf4-843f-c152-1a7d-de9539887cbc"
+}

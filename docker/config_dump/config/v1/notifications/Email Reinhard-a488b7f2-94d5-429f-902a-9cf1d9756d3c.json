@@ -1,0 +1,14 @@
+{
+    "active": false,
+    "alertingProfile": "07005edc-5b89-498e-a6eb-76ce27362958",
+    "bccReceivers": [],
+    "body": "{ProblemDetailsHTML}",
+    "ccReceivers": [],
+    "name": "Email Reinhard",
+    "receivers": [
+        "r.weber@360performance.net"
+    ],
+    "subject": "{State} Problem {ProblemID}: {ImpactedEntity}",
+    "type": "EMAIL",
+    "id": "a488b7f2-94d5-429f-902a-9cf1d9756d3c"
+}

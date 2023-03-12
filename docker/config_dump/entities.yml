@@ -1,30 +1,32 @@
 config:
   v1:
     alertingProfiles:
-    - file: Reinhard.json
+    - file: Reinhard-07005edc-5b89-498e-a6eb-76ce27362958
       id: 07005edc-5b89-498e-a6eb-76ce27362958
-    - file: Torsten.json
+    - file: Torsten-e3de4a00-1a13-4bc6-ba59-b4ae1b4038bd
       id: e3de4a00-1a13-4bc6-ba59-b4ae1b4038bd
-    - file: Default.json
+    - file: Default-c21f969b-5f03-333d-83e0-4f8f136e7682
       id: c21f969b-5f03-333d-83e0-4f8f136e7682
-    - file: Default for ActiveGate Token Expiry.json
+    - file: Default for ActiveGate Token Expiry-409a4f28-f496-3a84-9cb7-4e44ed1a6c36
       id: 409a4f28-f496-3a84-9cb7-4e44ed1a6c36
     applicationDetectionRules:
-    - file: a2112967-340b-3264-a010-dfdb2f5e070f.json
+    - file: a2112967-340b-3264-a010-dfdb2f5e070f
       id: a2112967-340b-3264-a010-dfdb2f5e070f
+    - file: test-bf7e2da8-ad18-3804-a44c-0c22df2abcbd
+      id: bf7e2da8-ad18-3804-a44c-0c22df2abcbd
     applications:
       mobile:
-      - file: Test.json
+      - file: Test-MOBILE_APPLICATION-F3B4801432B74FF5
         id: MOBILE_APPLICATION-F3B4801432B74FF5
-      - file: IOS Hybrid App.json
+      - file: IOS Hybrid App-MOBILE_APPLICATION-0BD5F491242948D1
         id: MOBILE_APPLICATION-0BD5F491242948D1
       - MOBILE_APPLICATION-F3B4801432B74FF5:
           keyUserActions:
-          - file: MOBILE_APPLICATION-F3B4801432B74FF5.json
+          - file: MOBILE_APPLICATION-F3B4801432B74FF5
             id: MOBILE_APPLICATION-F3B4801432B74FF5
       - MOBILE_APPLICATION-0BD5F491242948D1:
           keyUserActions:
-          - file: MOBILE_APPLICATION-0BD5F491242948D1.json
+          - file: MOBILE_APPLICATION-0BD5F491242948D1
             id: MOBILE_APPLICATION-0BD5F491242948D1
       web:
       - file: Test3.json
@@ -35,96 +37,100 @@ config:
         id: APPLICATION-3E956B12847F4099
       - APPLICATION-CEA5BA88774C5EA5:
           dataPrivacy:
-          - file: APPLICATION-CEA5BA88774C5EA5.json
+          - file: APPLICATION-CEA5BA88774C5EA5
             id: APPLICATION-CEA5BA88774C5EA5
           errorRules:
-          - file: APPLICATION-CEA5BA88774C5EA5.json
+          - file: APPLICATION-CEA5BA88774C5EA5
             id: APPLICATION-CEA5BA88774C5EA5
-          keyUserActions: []
-      - APPLICATION-3E956B12847F4099:
-          dataPrivacy:
-          - file: APPLICATION-3E956B12847F4099.json
-            id: APPLICATION-3E956B12847F4099
-          errorRules:
-          - file: APPLICATION-3E956B12847F4099.json
-            id: APPLICATION-3E956B12847F4099
           keyUserActions: []
       - APPLICATION-0000E94408FA4A17:
           dataPrivacy:
-          - file: APPLICATION-0000E94408FA4A17.json
+          - file: APPLICATION-0000E94408FA4A17
             id: APPLICATION-0000E94408FA4A17
           errorRules:
-          - file: APPLICATION-0000E94408FA4A17.json
+          - file: APPLICATION-0000E94408FA4A17
             id: APPLICATION-0000E94408FA4A17
           keyUserActions:
-          - file: APPLICATION_METHOD-F01A57359BF0C067.json
+          - file: APPLICATION_METHOD-F01A57359BF0C067
             id: APPLICATION-0000E94408FA4A17
-          - file: APPLICATION_METHOD-C84A13316CEA5020.json
+          - file: APPLICATION_METHOD-C84A13316CEA5020
             id: APPLICATION-0000E94408FA4A17
-          - file: APPLICATION_METHOD-2AF4235B11312042.json
+          - file: APPLICATION_METHOD-2AF4235B11312042
             id: APPLICATION-0000E94408FA4A17
-          - file: APPLICATION_METHOD-006D3EE51216CDBC.json
+          - file: APPLICATION_METHOD-006D3EE51216CDBC
             id: APPLICATION-0000E94408FA4A17
+      - APPLICATION-3E956B12847F4099:
+          dataPrivacy:
+          - file: APPLICATION-3E956B12847F4099
+            id: APPLICATION-3E956B12847F4099
+          errorRules:
+          - file: APPLICATION-3E956B12847F4099
+            id: APPLICATION-3E956B12847F4099
+          keyUserActions: []
     autoTags:
-    - file: Reinhards.json
+    - file: Reinhards-0000aa6f-ffb2-2e9e-bcb4-8ba6eb5ebc67
       id: 0000aa6f-ffb2-2e9e-bcb4-8ba6eb5ebc67
-    - file: K8sAnnotation.json
+    - file: K8sAnnotation-0a8ea071-dd45-40f2-8b5f-609374234482
       id: 0a8ea071-dd45-40f2-8b5f-609374234482
-    - file: Torstens.json
+    - file: Torstens-398c9957-aa65-42e0-8a90-b70215187960
       id: 398c9957-aa65-42e0-8a90-b70215187960
-    - file: testdouble.json
+    - file: testdouble-de1a5e17-087f-4aa3-a8f1-6275f327dbee
       id: de1a5e17-087f-4aa3-a8f1-6275f327dbee
     conditionalNaming:
       processGroup:
-      - file: PHP on speicher.json
+      - file: PHP on speicher-40a5985f-2142-4d1e-8fc5-b29a43ac195a
         id: 40a5985f-2142-4d1e-8fc5-b29a43ac195a
-      - file: Nextcloud on speicher.json
+      - file: Nextcloud on speicher-de795895-fcd9-4b3f-988e-b01032003df9
         id: de795895-fcd9-4b3f-988e-b01032003df9
       service:
-      - file: Nginx services on speicher.json
+      - file: Nginx services on speicher-1d72a7c4-86ed-4f00-ad73-3f9e75bb1e41
         id: 1d72a7c4-86ed-4f00-ad73-3f9e75bb1e41
     kubernetes:
       credentials:
-      - file: new playground.json
+      - file: new playground-KUBERNETES_CLUSTER-A144BA0078A19146
         id: KUBERNETES_CLUSTER-A144BA0078A19146
-      - file: reinhards-k8s.json
+      - file: reinhards-k8s-KUBERNETES_CLUSTER-EB4F71E522ACAFE6
         id: KUBERNETES_CLUSTER-EB4F71E522ACAFE6
-      - file: playground.json
+      - file: playground-KUBERNETES_CLUSTER-896EC4D42B9ED7FA
         id: KUBERNETES_CLUSTER-896EC4D42B9ED7FA
     maintenanceWindows:
-    - file: Test.json
+    - file: Test-93ad36b2-bb4f-4611-b87e-21f7787a1b2a
       id: 93ad36b2-bb4f-4611-b87e-21f7787a1b2a
     managementZones:
-    - file: Reinhards Test MZ.json
+    - file: Reinhards Test MZ-123456
       id: '123456'
-    - file: Reinhards MZ.json
+    - file: Reinhards MZ--5366880198180984653
       id: '-5366880198180984653'
-    - file: Torstens MZ.json
+    - file: Patrick's MZ--3792288552116864206
+      id: '-3792288552116864206'
+    - file: Torstens MZ--4931876102623980599
       id: '-4931876102623980599'
+    - file: Patrick's MZ - DEV--156939275741744466
+      id: '-156939275741744466'
     notifications:
-    - file: Email Torsten.json
+    - file: Email Torsten-95433737-a7b4-45ba-a7de-071f71c692cd
       id: 95433737-a7b4-45ba-a7de-071f71c692cd
-    - file: Email Reinhard.json
+    - file: Email Reinhard-a488b7f2-94d5-429f-902a-9cf1d9756d3c
       id: a488b7f2-94d5-429f-902a-9cf1d9756d3c
     service:
       customServices:
         go:
-        - file: ProcessMetricData.json
+        - file: ProcessMetricData-56a09315-c119-4a4b-9da2-cb249666ba90
           id: 56a09315-c119-4a4b-9da2-cb249666ba90
-        - file: GetDataPoints.json
+        - file: GetDataPoints-868eca74-1aca-4335-883b-50a91e39b6f4
           id: 868eca74-1aca-4335-883b-50a91e39b6f4
-        - file: ProcessMetricResult.json
+        - file: ProcessMetricResult-40c8c289-1787-4a81-ad4c-567237e4a8d9
           id: 40c8c289-1787-4a81-ad4c-567237e4a8d9
       failureDetection:
         parameterSelection:
           parameterSets:
-          - file: All Exceptions.json
+          - file: All Exceptions-49945c4e-90da-3bb8-9837-6ad7192fea36
             id: 49945c4e-90da-3bb8-9837-6ad7192fea36
           rules:
-          - file: Alle SYS-Watch Services.json
+          - file: Alle SYS-Watch Services-a919a665-a38e-3e72-a866-6ff0d863186a
             id: a919a665-a38e-3e72-a866-6ff0d863186a
       requestAttributes:
-      - file: JSON-Test.json
+      - file: JSON-Test-0000a1e0-ac86-7a8a-f07d-a2545fef9bb0
         id: 0000a1e0-ac86-7a8a-f07d-a2545fef9bb0
       - file: symbol.json
         id: 000082b2-75f0-c997-3ecd-a57cb8c2929a
@@ -135,11 +141,11 @@ config:
 v1:
   synthetic:
     monitors:
-    - file: Statuspage.json
+    - file: Statuspage-SYNTHETIC_TEST-3FDDA763D233CFFB
       id: SYNTHETIC_TEST-3FDDA763D233CFFB
     - file: Mail SPC.json
       id: HTTP_CHECK-6B4F93E2E306B208
-    - file: www.google.com.json
+    - file: www.google.com-HTTP_CHECK-C42DA6B2A54E0EF1
       id: HTTP_CHECK-C42DA6B2A54E0EF1
     - file: Dynatrace Consolidation API.json
       id: HTTP_CHECK-7506D0BAAB202595

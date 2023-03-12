@@ -1,0 +1,57 @@
+{
+    "displayName": "Reinhard",
+    "eventTypeFilters": [],
+    "managementZoneId": -5366880198180985000,
+    "mzId": "-5366880198180984653",
+    "rules": [
+        {
+            "delayInMinutes": 0,
+            "severityLevel": "ERROR",
+            "tagFilter": {
+                "includeMode": "NONE",
+                "tagFilters": []
+            }
+        },
+        {
+            "delayInMinutes": 0,
+            "severityLevel": "MONITORING_UNAVAILABLE",
+            "tagFilter": {
+                "includeMode": "NONE",
+                "tagFilters": []
+            }
+        },
+        {
+            "delayInMinutes": 0,
+            "severityLevel": "CUSTOM_ALERT",
+            "tagFilter": {
+                "includeMode": "NONE",
+                "tagFilters": []
+            }
+        },
+        {
+            "delayInMinutes": 0,
+            "severityLevel": "AVAILABILITY",
+            "tagFilter": {
+                "includeMode": "NONE",
+                "tagFilters": []
+            }
+        },
+        {
+            "delayInMinutes": 30,
+            "severityLevel": "RESOURCE_CONTENTION",
+            "tagFilter": {
+                "includeMode": "NONE",
+                "tagFilters": []
+            }
+        },
+        {
+            "delayInMinutes": 30,
+            "severityLevel": "PERFORMANCE",
+            "tagFilter": {
+                "includeMode": "NONE",
+                "tagFilters": []
+            }
+        }
+    ],
+    "id": "07005edc-5b89-498e-a6eb-76ce27362958"
+}

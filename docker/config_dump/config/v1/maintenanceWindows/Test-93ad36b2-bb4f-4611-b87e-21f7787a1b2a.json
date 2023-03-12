@@ -1,0 +1,33 @@
+{
+    "description": "Beschreibung",
+    "enabled": true,
+    "name": "Test",
+    "schedule": {
+        "end": "2023-03-09 12:16",
+        "recurrenceType": "ONCE",
+        "start": "2023-03-09 11:16",
+        "zoneId": "UTC"
+    },
+    "scope": {
+        "entities": [],
+        "matches": [
+            {
+                "managementZoneId": null,
+                "mzId": null,
+                "tagCombination": "AND",
+                "tags": [
+                    {
+                        "context": "KUBERNETES",
+                        "key": "name",
+                        "value": "dynatrace-oneagent-operator"
+                    }
+                ],
+                "type": null
+            }
+        ]
+    },
+    "suppressSyntheticMonitorsExecution": false,
+    "suppression": "DONT_DETECT_PROBLEMS",
+    "type": "PLANNED",
+    "id": "93ad36b2-bb4f-4611-b87e-21f7787a1b2a"
+}

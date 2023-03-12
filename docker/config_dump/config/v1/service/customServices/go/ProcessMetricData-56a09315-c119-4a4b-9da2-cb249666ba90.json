@@ -1,0 +1,40 @@
+{
+    "enabled": true,
+    "name": "ProcessMetricData",
+    "processGroups": [],
+    "queueEntryPoint": false,
+    "queueEntryPointType": null,
+    "rules": [
+        {
+            "annotations": [],
+            "className": "360performance/metricprocessor/metric.(*Metric)",
+            "enabled": true,
+            "fileName": "",
+            "id": "74652790-5539-4f01-9985-b66b55d62b68",
+            "matcher": "EQUALS",
+            "methodRules": [
+                {
+                    "argumentTypes": [],
+                    "id": "32a166d4-bdf8-4a22-aa3b-fa186e5c33c9",
+                    "methodName": "360performance/metricprocessor/metric.(*Metric).ProcessMetricData",
+                    "modifiers": [
+                        "NATIVE"
+                    ],
+                    "returnType": "",
+                    "visibility": "PUBLIC"
+                },
+                {
+                    "argumentTypes": [],
+                    "id": "886ca5c2-95a5-4756-8a95-5f5cb820110d",
+                    "methodName": "360performance/metricprocessor/metric.(*Metric).ProcessMetricData",
+                    "modifiers": [
+                        "NATIVE"
+                    ],
+                    "returnType": "",
+                    "visibility": "PUBLIC"
+                }
+            ]
+        }
+    ],
+    "id": "56a09315-c119-4a4b-9da2-cb249666ba90"
+}
