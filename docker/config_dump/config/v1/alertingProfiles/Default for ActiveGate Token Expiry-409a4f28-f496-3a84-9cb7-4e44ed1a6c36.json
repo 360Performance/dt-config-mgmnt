@@ -1,0 +1,29 @@
+{
+    "displayName": "Default for ActiveGate Token Expiry",
+    "eventTypeFilters": [
+        {
+            "customEventFilter": {
+                "customTitleFilter": {
+                    "caseInsensitive": false,
+                    "enabled": true,
+                    "negate": false,
+                    "operator": "EQUALS",
+                    "value": "ActiveGate Token(s) will expire soon"
+                }
+            }
+        }
+    ],
+    "managementZoneId": null,
+    "mzId": null,
+    "rules": [
+        {
+            "delayInMinutes": 0,
+            "severityLevel": "CUSTOM_ALERT",
+            "tagFilter": {
+                "includeMode": "NONE",
+                "tagFilters": []
+            }
+        }
+    ],
+    "id": "409a4f28-f496-3a84-9cb7-4e44ed1a6c36"
+}

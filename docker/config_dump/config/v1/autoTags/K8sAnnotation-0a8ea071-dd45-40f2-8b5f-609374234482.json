@@ -1,0 +1,36 @@
+{
+    "description": null,
+    "entitySelectorBasedRules": [],
+    "name": "K8sAnnotation",
+    "rules": [
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "caseSensitive": null,
+                        "negate": false,
+                        "operator": "EXISTS",
+                        "type": "STRING",
+                        "value": null
+                    },
+                    "key": {
+                        "attribute": "PROCESS_GROUP_CUSTOM_METADATA",
+                        "dynamicKey": {
+                            "key": "360performance.net/service",
+                            "source": "KUBERNETES"
+                        },
+                        "type": "PROCESS_CUSTOM_METADATA_KEY"
+                    }
+                }
+            ],
+            "enabled": true,
+            "normalization": "LEAVE_TEXT_AS_IS",
+            "propagationTypes": [
+                "SERVICE_TO_PROCESS_GROUP_LIKE"
+            ],
+            "type": "SERVICE",
+            "valueFormat": "{ProcessGroup:Kubernetes:360performance.net//service}"
+        }
+    ],
+    "id": "0a8ea071-dd45-40f2-8b5f-609374234482"
+}

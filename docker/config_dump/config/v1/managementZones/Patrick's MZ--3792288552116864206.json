@@ -1,0 +1,129 @@
+{
+    "description": null,
+    "dimensionalRules": [],
+    "entitySelectorBasedRules": [],
+    "name": "Patrick's MZ",
+    "rules": [
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "TAG",
+                        "value": {
+                            "context": "CONTEXTLESS",
+                            "key": "stage",
+                            "value": "prod"
+                        }
+                    },
+                    "key": {
+                        "attribute": "BROWSER_MONITOR_TAGS",
+                        "type": "STATIC"
+                    }
+                },
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "TAG",
+                        "value": {
+                            "context": "CONTEXTLESS",
+                            "key": "user",
+                            "value": "patrick"
+                        }
+                    },
+                    "key": {
+                        "attribute": "BROWSER_MONITOR_TAGS",
+                        "type": "STATIC"
+                    }
+                }
+            ],
+            "enabled": true,
+            "propagationTypes": [],
+            "type": "BROWSER_MONITOR"
+        },
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "TAG",
+                        "value": {
+                            "context": "CONTEXTLESS",
+                            "key": "stage",
+                            "value": "prod"
+                        }
+                    },
+                    "key": {
+                        "attribute": "WEB_APPLICATION_TAGS",
+                        "type": "STATIC"
+                    }
+                },
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "TAG",
+                        "value": {
+                            "context": "CONTEXTLESS",
+                            "key": "user",
+                            "value": "patrick"
+                        }
+                    },
+                    "key": {
+                        "attribute": "WEB_APPLICATION_TAGS",
+                        "type": "STATIC"
+                    }
+                }
+            ],
+            "enabled": true,
+            "propagationTypes": [],
+            "type": "WEB_APPLICATION"
+        },
+        {
+            "conditions": [
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "TAG",
+                        "value": {
+                            "context": "CONTEXTLESS",
+                            "key": "stage",
+                            "value": "prod"
+                        }
+                    },
+                    "key": {
+                        "attribute": "HOST_TAGS",
+                        "type": "STATIC"
+                    }
+                },
+                {
+                    "comparisonInfo": {
+                        "negate": false,
+                        "operator": "EQUALS",
+                        "type": "TAG",
+                        "value": {
+                            "context": "CONTEXTLESS",
+                            "key": "user",
+                            "value": "patrick"
+                        }
+                    },
+                    "key": {
+                        "attribute": "HOST_TAGS",
+                        "type": "STATIC"
+                    }
+                }
+            ],
+            "enabled": true,
+            "propagationTypes": [
+                "PROCESS_GROUP_TO_HOST",
+                "PROCESS_GROUP_TO_SERVICE"
+            ],
+            "type": "PROCESS_GROUP"
+        }
+    ],
+    "id": "-3792288552116864206"
+}

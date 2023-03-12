@@ -1,0 +1,10 @@
+{
+    "applicationIdentifier": "APPLICATION-CEA5BA88774C5EA5",
+    "filterConfig": {
+        "applicationMatchTarget": "DOMAIN",
+        "applicationMatchType": "MATCHES",
+        "pattern": "test.360performance.net"
+    },
+    "name": "test",
+    "id": "bf7e2da8-ad18-3804-a44c-0c22df2abcbd"
+}

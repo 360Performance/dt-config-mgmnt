@@ -1,0 +1,69 @@
+{
+    "anomalyDetection": {
+        "loadingTimeThresholds": {
+            "enabled": true,
+            "thresholds": []
+        },
+        "outageHandling": {
+            "globalOutage": true,
+            "globalOutagePolicy": {
+                "consecutiveRuns": 1
+            },
+            "localOutage": false,
+            "localOutagePolicy": {
+                "affectedLocations": null,
+                "consecutiveRuns": null
+            }
+        }
+    },
+    "automaticallyAssignedApps": [],
+    "createdFrom": "API",
+    "enabled": false,
+    "entityId": "HTTP_CHECK-3555FACA77672CF3",
+    "frequencyMin": 1,
+    "locations": [
+        "GEOLOCATION-45AB48D9D6925ECC"
+    ],
+    "managementZones": [],
+    "manuallyAssignedApps": [],
+    "name": "dataportal.xxxlgroup.com",
+    "requests": [
+        {
+            "entityId": "HTTP_CHECK_STEP-3555FACA77672CF3",
+            "name": "dataportal.xxxlgroup.com",
+            "sequenceNumber": 1
+        }
+    ],
+    "script": {
+        "requests": [
+            {
+                "configuration": {
+                    "acceptAnyCertificate": true,
+                    "followRedirects": true,
+                    "shouldNotPersistSensitiveData": false
+                },
+                "description": "dataportal.xxxlgroup.com",
+                "method": "GET",
+                "url": "https://dataportal.xxxlgroup.com/prod",
+                "validation": {
+                    "rules": [
+                        {
+                            "passIfFound": false,
+                            "type": "httpStatusesList",
+                            "value": ">=400"
+                        }
+                    ]
+                }
+            }
+        ],
+        "version": "1.0"
+    },
+    "tags": [
+        {
+            "context": "CONTEXTLESS",
+            "key": "sslcheck",
+            "source": "USER"
+        }
+    ],
+    "type": "HTTP"
+}
