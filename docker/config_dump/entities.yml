@@ -29,12 +29,12 @@ config:
           - file: MOBILE_APPLICATION-0BD5F491242948D1
             id: MOBILE_APPLICATION-0BD5F491242948D1
       web:
-      - file: IOS Hybrid App Web-APPLICATION-3E956B12847F4099
-        id: APPLICATION-3E956B12847F4099
-      - file: cloud.360performance.net-APPLICATION-CEA5BA88774C5EA5
-        id: APPLICATION-CEA5BA88774C5EA5
-      - file: Test3-APPLICATION-0000E94408FA4A17
+      - file: Test3.json
         id: APPLICATION-0000E94408FA4A17
+      - file: cloud.360performance.net.json
+        id: APPLICATION-CEA5BA88774C5EA5
+      - file: IOS Hybrid App Web.json
+        id: APPLICATION-3E956B12847F4099
       - APPLICATION-CEA5BA88774C5EA5:
           dataPrivacy:
           - file: APPLICATION-CEA5BA88774C5EA5
@@ -132,26 +132,24 @@ config:
       requestAttributes:
       - file: JSON-Test-0000a1e0-ac86-7a8a-f07d-a2545fef9bb0
         id: 0000a1e0-ac86-7a8a-f07d-a2545fef9bb0
-      - file: UserIP-00009b29-595d-de94-4de5-dda6b1f63a8f
-        id: 00009b29-595d-de94-4de5-dda6b1f63a8f
-      - file: symbol-000082b2-75f0-c997-3ecd-a57cb8c2929a
+      - file: symbol.json
         id: 000082b2-75f0-c997-3ecd-a57cb8c2929a
-      - file: x-dynatrace-0000abf4-843f-c152-1a7d-de9539887cbc
+      - file: UserIP.json
+        id: 00009b29-595d-de94-4de5-dda6b1f63a8f
+      - file: x-dynatrace.json
         id: 0000abf4-843f-c152-1a7d-de9539887cbc
 v1:
   synthetic:
     monitors:
     - file: Statuspage-SYNTHETIC_TEST-3FDDA763D233CFFB
       id: SYNTHETIC_TEST-3FDDA763D233CFFB
-    - file: Dynatrace Consolidation API-HTTP_CHECK-7506D0BAAB202595
-      id: HTTP_CHECK-7506D0BAAB202595
-    - file: Homeassistant-HTTP_CHECK-ECB1169732E80FF4
-      id: HTTP_CHECK-ECB1169732E80FF4
-    - file: dataportal.xxxlgroup.com-HTTP_CHECK-3555FACA77672CF3
-      id: HTTP_CHECK-3555FACA77672CF3
-    - file: Mail SPC-HTTP_CHECK-6B4F93E2E306B208
+    - file: Mail SPC.json
       id: HTTP_CHECK-6B4F93E2E306B208
     - file: www.google.com-HTTP_CHECK-C42DA6B2A54E0EF1
       id: HTTP_CHECK-C42DA6B2A54E0EF1
-    - file: NextCloud@Torsten-HTTP_CHECK-59DF2182B984D636
+    - file: Dynatrace Consolidation API.json
+      id: HTTP_CHECK-7506D0BAAB202595
+    - file: Homeassistant.json
+      id: HTTP_CHECK-ECB1169732E80FF4
+    - file: NextCloud@Torsten.json
       id: HTTP_CHECK-59DF2182B984D636

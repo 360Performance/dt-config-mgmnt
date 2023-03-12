@@ -69,6 +69,8 @@ The  structure of the ```config``` directory follows the the structure of the ``
 config/v1/service/customServices/java/mycustomservice.json
 config/v1/autoTags/myautotag.json
 config/v1/autoTags/myotherautotag.json
+
+[Example config directory](docker/config_dump/)
 ```
 
 [Example config directory](docker/config_dump/)
