@@ -27,6 +27,8 @@ pipeline {
                     if (env.BRANCH_NAME == 'master') {
                         dir("${env.WORKSPACE}/docker/configmanager"){
                             sh label: 'Build Configmanager', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configmanager:${TAG} -t ${DOCKER_REGISTRY}/configmanager:latest .'
+                        }
+                        dir("${env.WORKSPACE}/docker/configcache"){
                             sh label: 'Build Configcache', script: 'docker -H ${DOCKER_HOST} build -t ${DOCKER_REGISTRY}/configcache:${TAG} -t ${DOCKER_REGISTRY}/configcache:latest .'
                         }
                         dir("${env.WORKSPACE}/imageexport") {
