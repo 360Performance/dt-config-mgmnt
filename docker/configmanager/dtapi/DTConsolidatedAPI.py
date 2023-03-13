@@ -101,10 +101,7 @@ class dtAPI():
         validate = eId = ""
         if validateOnly:
             validate = "/validator"
-            eId = f'/{entity.getID()}'
-            if eId in entity.uri:
-                eId = ""
-        url = f'{self.host}/{(entity.uri).strip("/")}{eId}{validate}'
+        url = f'{self.host}/{entity.apipath}{validate}'
         log.info("POST%s %s: %s?%s", validate.upper(), entity, url, urllib.parse.urlencode(params))
 
         result = self.request("POST", url, entity=entity, parameters=params, payload=entity.dto)
@@ -113,9 +110,7 @@ class dtAPI():
     def put(self, entity, eId="", parameters={}):
         params = self.parameters | parameters
         result = None
-        if eId == "":
-            eId = entity.getID()
-        url = f'{self.host}/{(entity.uri).strip("/")}/{eId}'
+        url = f'{self.host}/{entity.apipath}'
         log.info("PUT %s: %s", entity, url)
 
         result = self.request("PUT", url, entity=entity, parameters=params, payload=entity.dto)
