@@ -5,6 +5,7 @@ Collection of convenience classes and functions to access the 360Performance Dyn
 import os
 import sys
 import logging
+import json
 import inspect
 import requests
 from requests.adapters import HTTPAdapter
@@ -143,7 +144,7 @@ class dtAPI():
             log.error("%s %s: %s", method, entity, url)
             log.exception(e)
 
-        log.debug("%s [%s] %s: %s", method, response.status_code, entity, url)
+        log.debug("%s [%s] %s: %s\n%s", method, response.status_code, entity, url,json.dumps(payload, indent=2, separators=(",", ": ")))
         log.debug(payload)
         return result
 
