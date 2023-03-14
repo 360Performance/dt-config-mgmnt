@@ -101,7 +101,7 @@ class dtAPI():
         validate = eId = ""
         if validateOnly:
             validate = "/validator"
-        url = f'{self.host}/{entity.apipath}{validate}'
+        url = f'{self.host}{entity.apipath}{validate}'
         log.info("POST%s %s: %s?%s", validate.upper(), entity, url, urllib.parse.urlencode(params))
 
         result = self.request("POST", url, entity=entity, parameters=params, payload=entity.dto)
@@ -110,7 +110,7 @@ class dtAPI():
     def put(self, entity, eId="", parameters={}):
         params = self.parameters | parameters
         result = None
-        url = f'{self.host}/{entity.apipath}'
+        url = f'{self.host}{entity.apipath}'
         log.info("PUT %s: %s", entity, url)
 
         result = self.request("PUT", url, entity=entity, parameters=params, payload=entity.dto)
@@ -119,9 +119,7 @@ class dtAPI():
     def delete(self, entity, eId="", parameters={}):
         params = self.parameters | parameters
         result = None
-        if eId == "":
-            eId = entity.getID()
-        url = f'{self.host}/{(entity.uri).strip("/")}/{eId}'
+        url = f'{self.host}{entity.apipath}'
         log.info("DELETE %s: %s?%s", entity, url, urllib.parse.urlencode(params))
 
         result = self.request("DELETE", url, entity=entity, parameters=params)
@@ -144,6 +142,9 @@ class dtAPI():
         except Exception as e:
             log.error("%s %s: %s", method, entity, url)
             log.exception(e)
+
+        log.debug("%s [%s] %s: %s", method, response.status_code, entity, url)
+        log.debug(payload)
         return result
 
 
