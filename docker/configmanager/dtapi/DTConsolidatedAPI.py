@@ -145,6 +145,7 @@ class dtAPI():
             log.exception(e)
 
         log.debug("%s [%s] %s: %s\n%s", method, response.status_code, entity, url,json.dumps(payload, indent=2, separators=(",", ": ")))
+        log.debug(payload)
         return result
 
 
