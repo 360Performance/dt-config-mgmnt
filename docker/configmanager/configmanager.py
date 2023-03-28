@@ -179,7 +179,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
             # we used get "all", so we received an array of responses
             for r in result:
                 # the individual entities of this type
-                for entity in r:
+                for entity in (r or []):
                     c_id = entity["clusterid"]
                     t_id = entity["tenantid"]
 
