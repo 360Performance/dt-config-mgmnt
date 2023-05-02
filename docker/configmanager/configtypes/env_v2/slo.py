@@ -15,6 +15,10 @@ class slo(TenantEnvironmentV2Entity):
         TenantEnvironmentV2Entity.__init__(self, **kwargs)
         self.apipath = self.uri
 
+    def setID(self, entityid):
+        self.entityid = entityid
+        self.apipath = self.uri+"/"+self.entityid
+
     def getHttpMethod(self):
         return "POST" if self.entityid.startswith("0000") else "PUT"
 
