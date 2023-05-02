@@ -136,7 +136,8 @@ config_schema = Schema({
                     ]
                 },
                 Optional({
-                    Or("file", "name"): str
+                    Or("file", "name"): str,
+                    Optional("id"): str
                 }),
             ]
         },
