@@ -136,14 +136,14 @@ config_schema = Schema({
                     ]
                 },
                 Optional({
-                    Or("file", "name"): str,
-                    Optional("id"): str
+                    Or("file", "name"): str
                 }),
             ]
         },
         Optional("slo"): [
             {
-                Or("file", "name"): str
+                Or("file", "name"): str,
+                Optional("id"): str
             }
         ],
         Optional("tags"): [
