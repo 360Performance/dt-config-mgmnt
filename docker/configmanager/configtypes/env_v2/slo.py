@@ -7,6 +7,7 @@ class slo(TenantEnvironmentV2Entity):
     ''' Dynatrace Settings V2 API'''
 
     entityuri = "/slo"
+    list_attr = "slo"
     uri = TenantEnvironmentV2Entity.uri + entityuri
 
     def __init__(self, **kwargs):
