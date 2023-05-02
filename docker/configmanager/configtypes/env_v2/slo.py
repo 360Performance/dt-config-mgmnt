@@ -16,7 +16,7 @@ class slo(TenantEnvironmentV2Entity):
         self.apipath = self.uri
 
     def getHttpMethod(self):
-        return "PUT" if self.entityid != "" else "POST"
+        return "POST" if self.entityid.startswith("0000") else "PUT"
 
     def getAll(self, session):
         pass
