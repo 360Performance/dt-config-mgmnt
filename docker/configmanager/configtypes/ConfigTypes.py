@@ -132,7 +132,7 @@ class ConfigEntity():
         if self.leafdir not in parts:
             parts.append(self.leafdir)
 
-        path = "/".join([dumpdir]+parts+[f'{filename}'])
+        path = "/".join([dumpdir]+parts+[f'{filename}']).replace("//","/")
 
         logger.info("Dumping %s Entity to: %s", self.__class__.__name__, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)

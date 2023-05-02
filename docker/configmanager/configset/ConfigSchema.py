@@ -142,7 +142,8 @@ config_schema = Schema({
         },
         Optional("slo"): [
             {
-                Or("file", "name"): str
+                Or("file", "name"): str,
+                Optional("id"): str
             }
         ],
         Optional("tags"): [
