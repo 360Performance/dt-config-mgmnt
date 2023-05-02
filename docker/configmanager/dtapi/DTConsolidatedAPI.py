@@ -55,7 +55,7 @@ class dtAPI():
             - if an ID is not specified (or None) and the Dynatrace API provides a global setting (independent of ID) it will return
               the global configuration (e.g. applicationswebdataPrivacy exists on global and application level)
         '''
-        params = self.parameters | parameters
+        params = self.parameters | parameters | {pageSize: 10000}  # some GET Apis have paging implemented some don't so adding a default PageSize parameter
         result = None
         if eId is None:
             uri = eType.uri.replace("/{id}/", "/")
