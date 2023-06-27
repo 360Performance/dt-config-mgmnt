@@ -138,7 +138,7 @@ config_schema = Schema({
                 },
                 Optional({
                     Or("file", "name"): str,
-                    "schema": (lambda fp: fp.startswith("builtin:")),
+                    "schemaId": (lambda fp: fp.startswith("builtin:")),
                     Optional("pre-post-hook"): str
                 }),
             ]

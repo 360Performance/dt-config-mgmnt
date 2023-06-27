@@ -4,6 +4,7 @@ import os
 import json
 import hashlib
 import uuid
+import importlib
 
 
 # LOG CONFIGURATION
@@ -33,8 +34,8 @@ class ConfigEntity():
         self.name = kwargs.get("name", self.getName())
 
         # get optional hooks
-        self.prePostHook = kwargs.get("pre-post-hook",None)
-        self.prePutHook = kwargs.get("pre-put-hook",None)
+        self.prePostHook = importlib.import_module("hooks."+kwargs.get("pre-post-hook",None))
+        #self.prePutHook =  importlib.import_module("hooks."+kwargs.get("pre-put-hook",None))
         
         self.parameters = {}
 
@@ -251,6 +252,7 @@ class ConfigEntity():
 
     def post(self, dtapi, parameters={}):
         # execute optional pre-post hook
+        self.prePostHook.prePOST(self,dtapi)
         savedto = self.dto.copy()
         self.dto = self.stripDTOMetaData(self.dto)
         logger.info("POST %s", self)

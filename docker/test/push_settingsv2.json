@@ -1,0 +1,11 @@
+{
+    "command": "PUSH_CONFIG",
+    "target": {
+        "mode": "saas",
+        "clusterid": "360perf",
+        "dryrun": false
+    },
+    "config": {
+        "env_v2.settings.objects": true
+    }
+}

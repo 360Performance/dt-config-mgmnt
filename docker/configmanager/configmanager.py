@@ -74,11 +74,24 @@ def getClass(kls):
 
 # Quick and Dirty during migration
 
-
+'''
 def fixClasspath(classpath):
     parts = classpath.split(".")
     post = parts[1:]
     classpath = ".".join(parts[:1]) + "." + "".join(post)
+    return classpath
+'''
+
+def fixClasspath(classpath):
+    classpath = classpath.replace("..", ".")
+    classpath = classpath.replace(".config.v1.", ".config_v1.")
+    classpath = classpath.replace(".v1.", ".env_v1.")
+    classpath = classpath.replace(".v2.", ".env_v2.")
+    if "settings" not in classpath:
+        parts = classpath.split(".")
+        parts = [x for x in parts if "-" not in x and x != "0000"]
+        post = parts[2:]
+        classpath = ".".join(parts[:2]) + "." + "".join(post)
     return classpath
 
 # helper function to recursively merge two dicts
@@ -163,6 +176,7 @@ clusterid::tenantid::entitytype::entityname => id | missing
 
 
 def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
+    
     config = getControlSettings(entityconfig)
     dumpentities = {}
 
@@ -424,12 +438,15 @@ def postConfigEntities(entities, parameters, validateonly):
 
 def getControlSettings(cmdsettings):
     supportedEntities = getConfigEntities()
+    #logger.debug(f'supported entities: {supportedEntities}')
+    #logger.debug(f'cmd settings: {cmdsettings}')
 
     result = {}
     for entity, enabled in cmdsettings.items():
         if enabled:
             for definition in supportedEntities:
                 entity = fixClasspath(entity)
+                #logger.debug(f'entity: {entity} definition: {definition}')
                 if entity in definition:
                     result.update({definition: True})
 
