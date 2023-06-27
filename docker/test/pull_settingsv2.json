@@ -1,0 +1,11 @@
+{
+    "command": "PULL_CONFIG",
+    "source": {
+        "mode": "saas",
+        "clusterid": "360perf",
+        "dryrun": true
+    },
+    "config": {
+        "env_v2.settings.objects": true
+    }
+}

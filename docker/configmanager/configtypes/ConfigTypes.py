@@ -31,6 +31,11 @@ class ConfigEntity():
         if basedir != "":
             self.dto = self.loadDTO(basedir=basedir)
         self.name = kwargs.get("name", self.getName())
+
+        # get optional hooks
+        self.prePostHook = kwargs.get("pre-post-hook",None)
+        self.prePutHook = kwargs.get("pre-put-hook",None)
+        
         self.parameters = {}
 
         # in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
@@ -245,6 +250,7 @@ class ConfigEntity():
         return result
 
     def post(self, dtapi, parameters={}):
+        # execute optional pre-post hook
         savedto = self.dto.copy()
         self.dto = self.stripDTOMetaData(self.dto)
         logger.info("POST %s", self)
