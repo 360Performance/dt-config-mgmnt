@@ -34,7 +34,9 @@ class ConfigEntity():
         self.name = kwargs.get("name", self.getName())
 
         # get optional hooks
-        self.prePostHook = importlib.import_module("hooks."+kwargs.get("pre-post-hook",None))
+        self.prePostHooks = []
+        hooks = kwargs.get("pre-post-hooks",None)
+        self.prePostHooks = [importlib.import_module("hooks."+h) for h in hooks]
         #self.prePutHook =  importlib.import_module("hooks."+kwargs.get("pre-put-hook",None))
         
         self.parameters = {}
@@ -252,7 +254,12 @@ class ConfigEntity():
 
     def post(self, dtapi, parameters={}):
         # execute optional pre-post hook
-        self.prePostHook.prePOST(self,dtapi)
+        for h in self.prePostHooks:
+            success = h.prePOST(self,dtapi)
+            if not success:
+                logger.error(f'prePOST hook {h.__name__} failed, not proceeding with POST')
+                return {"error": "prePOST hook failed"}
+
         savedto = self.dto.copy()
         self.dto = self.stripDTOMetaData(self.dto)
         logger.info("POST %s", self)

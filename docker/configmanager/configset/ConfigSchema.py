@@ -132,14 +132,14 @@ config_schema = Schema({
                     Optional(lambda fp: fp.startswith("builtin:")): [
                         {
                             Or("file", "name"): str,
-                            Optional("pre-post-hook"): str
+                            Optional("pre-post-hooks"): [str]
                         }
                     ]
                 },
                 Optional({
                     Or("file", "name"): str,
                     "schemaId": (lambda fp: fp.startswith("builtin:")),
-                    Optional("pre-post-hook"): str
+                    Optional("pre-post-hooks"): [str]
                 }),
             ]
         },
