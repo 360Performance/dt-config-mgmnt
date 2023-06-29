@@ -5,3 +5,6 @@ from .env_v1 import *
 from .env_v2 import *
 
 from .cluster_control import *
+import sys
+sys.path.append("..hooks")
+from hooks import *

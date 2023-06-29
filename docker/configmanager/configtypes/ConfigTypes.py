@@ -4,6 +4,7 @@ import os
 import json
 import hashlib
 import uuid
+import importlib
 
 
 # LOG CONFIGURATION
@@ -31,6 +32,13 @@ class ConfigEntity():
         if basedir != "":
             self.dto = self.loadDTO(basedir=basedir)
         self.name = kwargs.get("name", self.getName())
+
+        # get optional hooks
+        self.prePostHooks = []
+        hooks = kwargs.get("pre-post-hooks",None)
+        self.prePostHooks = [importlib.import_module("hooks."+h) for h in hooks]
+        #self.prePutHook =  importlib.import_module("hooks."+kwargs.get("pre-put-hook",None))
+        
         self.parameters = {}
 
         # in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
@@ -245,6 +253,13 @@ class ConfigEntity():
         return result
 
     def post(self, dtapi, parameters={}):
+        # execute optional pre-post hook
+        for h in self.prePostHooks:
+            success = h.prePOST(self,dtapi)
+            if not success:
+                logger.error(f'prePOST hook {h.__name__} failed, not proceeding with POST')
+                return {"error": "prePOST hook failed"}
+
         savedto = self.dto.copy()
         self.dto = self.stripDTOMetaData(self.dto)
         logger.info("POST %s", self)
