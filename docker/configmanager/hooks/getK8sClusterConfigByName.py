@@ -26,21 +26,22 @@ def prePOST(entity,api):
             max_ts = 0
             newest_cl = None
             for cl in result[0]["items"]:
-                if cl["created"] > max_ts and cl['value']['label'] == label:
+                if  cl['value']['label'] == label and cl["created"] > max_ts:
                     newest_cl = cl
                     max_ts = cl["created"]
 
             scope = newest_cl['scope']
-            ext_id = newest_cl['externalId']
-            clusterId = newest_cl['value']['clusterId']
-
-            entity.dto[0]['value']['clusterId'] = clusterId
-            entity.dto[0]['scope'] = scope
+            #ext_id = newest_cl['externalId']
+            if newest_cl['value'].get("clusterIdEnabled",False):
+                entity.dto[0]['value']['clusterId'] = newest_cl['value']['clusterId']
+                entity.dto[0]['scope'] = newest_cl['scope']
+                #entity.dto[0]['exernalId'] = newest_cl['externalId']
         
         logger.debug("Result cluster setting: \n%s", json.dumps(entity.dto, indent=2, separators=(",", ": ")))
-    except:
+    except Exception as e:
+        logger.exception(e)
         return False
-        
+
     return True
 
 def postPOST():
