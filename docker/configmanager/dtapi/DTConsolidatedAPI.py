@@ -57,6 +57,7 @@ class dtAPI():
         '''
 
         params = self.parameters | parameters | {"pageSize": parameters.get("pageSize",500)}  # some GET Apis have paging implemented some don't so adding a default PageSize parameter
+
         result = None
         if eId is None:
             uri = eType.uri.replace("/{id}/", "/")
