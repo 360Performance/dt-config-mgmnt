@@ -60,10 +60,12 @@ class ConfigSet:
         classpath = classpath.replace(".config.v1.", ".config_v1.")
         classpath = classpath.replace(".v1.", ".env_v1.")
         classpath = classpath.replace(".v2.", ".env_v2.")
-        parts = classpath.split(".")
-        parts = [x for x in parts if "-" not in x and x != "0000"]
-        post = parts[2:]
-        classpath = ".".join(parts[:2]) + "." + "".join(post)
+        logger.debug(f'Classpath is: {classpath}')
+        if "settings" not in classpath:
+            parts = classpath.split(".")
+            parts = [x for x in parts if "-" not in x and x != "0000"]
+            post = parts[2:]
+            classpath = ".".join(parts[:2]) + "." + "".join(post)
         return classpath
 
     def load(self, config, pscope, cscope):
@@ -88,7 +90,7 @@ class ConfigSet:
                                 classpath = ".".join([s for s in [pscope, cscope if cscope else None] if s])
                                 entities = entities + self.load(entity, self.fixClasspath(classpath), k)
                             else:
-                                logger.debug("The leaf directory is: %s", k)
+                                logger.debug(f'Base dir is: {self.configbasedir}, class is: {classpath}, leaf directory is: {k}')
                                 configEntity = class_(basedir=self.configbasedir, leafdir=k, **entity)
                                 entities.append(configEntity)
                         except Exception as e:

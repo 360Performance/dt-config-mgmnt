@@ -21,5 +21,5 @@ class objects(TenantEnvironmentV2Setting):
     def setName(self, name):
         pass
 
-    def setID(self, entityid):
-        pass
+    #def setID(self, entityid):
+    #    pass
