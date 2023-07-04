@@ -38,7 +38,7 @@ class ConfigEntity():
         hooks = kwargs.get("pre-post-hooks", [])
         self.prePostHooks = [importlib.import_module("hooks."+h) for h in hooks]
         #self.prePutHook =  importlib.import_module("hooks."+kwargs.get("pre-put-hook",None))
-        
+
         self.parameters = {}
 
         # in case the DTO has been provided with metadata (e.g. by DT get config entity), ensure it's cleaned up
