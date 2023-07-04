@@ -35,7 +35,7 @@ class ConfigEntity():
 
         # get optional hooks
         self.prePostHooks = []
-        hooks = kwargs.get("pre-post-hooks",None)
+        hooks = kwargs.get("pre-post-hooks", [])
         self.prePostHooks = [importlib.import_module("hooks."+h) for h in hooks]
         #self.prePutHook =  importlib.import_module("hooks."+kwargs.get("pre-put-hook",None))
         
@@ -140,7 +140,7 @@ class ConfigEntity():
         if self.leafdir not in parts:
             parts.append(self.leafdir)
 
-        path = "/".join([dumpdir]+parts+[f'{filename}']).replace("//","/")
+        path = "/".join([dumpdir]+parts+[f'{filename}']).replace("//", "/")
 
         logger.info("Dumping %s Entity to: %s", self.__class__.__name__, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -255,7 +255,7 @@ class ConfigEntity():
     def post(self, dtapi, parameters={}):
         # execute optional pre-post hook
         for h in self.prePostHooks:
-            success = h.prePOST(self,dtapi)
+            success = h.prePOST(self, dtapi)
             if not success:
                 logger.error(f'prePOST hook {h.__name__} failed, not proceeding with POST')
                 return {"error": "prePOST hook failed"}
