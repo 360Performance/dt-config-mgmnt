@@ -1,1 +1,12 @@
-{}
+config:
+  v1:
+    service:
+      requestAttributes:
+      - file: symbol.json
+        id: 000082b2-75f0-c997-3ecd-a57cb8c2929a
+      - file: JSON-Test.json
+        id: 0000a1e0-ac86-7a8a-f07d-a2545fef9bb0
+      - file: UserIP.json
+        id: 00009b29-595d-de94-4de5-dda6b1f63a8f
+      - file: x-dynatrace.json
+        id: 0000abf4-843f-c152-1a7d-de9539887cbc
