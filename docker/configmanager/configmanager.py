@@ -83,6 +83,7 @@ def fixClasspath(classpath):
 '''
 
 def fixClasspath(classpath):
+    #logger.debug(f'Fixing classpath: {classpath}')
     classpath = classpath.replace("..", ".")
     classpath = classpath.replace(".config.v1.", ".config_v1.")
     classpath = classpath.replace(".v1.", ".env_v1.")
@@ -90,8 +91,9 @@ def fixClasspath(classpath):
     if "settings" not in classpath:
         parts = classpath.split(".")
         parts = [x for x in parts if "-" not in x and x != "0000"]
-        post = parts[2:]
-        classpath = ".".join(parts[:2]) + "." + "".join(post)
+        post = parts[1:]
+        classpath = ".".join(parts[:1]) + "." + "".join(post)
+    #logger.debug(f'Fixed classpath: {classpath}')
     return classpath
 
 # helper function to recursively merge two dicts
