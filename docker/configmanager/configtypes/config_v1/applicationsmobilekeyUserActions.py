@@ -46,6 +46,9 @@ class applicationsmobilekeyUserActions(TenantConfigV1Entity):
     def getID(self):
         return self.dto[self.id_attr]
 
+    def getHttpMethod(self):
+        return "POST"
+
     @classmethod
     def isValidID(cls, idstr):
         if idstr is not None and idstr.startswith("MOBILE_APPLICATION") and "-" in idstr:
