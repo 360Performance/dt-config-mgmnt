@@ -55,9 +55,6 @@ class applicationsmobile(TenantConfigV1Entity):
         return self.entityid
         return self.dto["identifier"]
 
-    def getHttpMethod(self):
-        return "POST"
-
     # Dumping applicationsmobile data from a tenant contains readonly fields that must not be present when pushing the definition,
     # so we remove them
     def stripDTOMetaData(self, dto):
