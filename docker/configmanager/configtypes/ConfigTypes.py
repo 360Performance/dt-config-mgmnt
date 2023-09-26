@@ -5,7 +5,8 @@ import json
 import hashlib
 import uuid
 import importlib
-from ..utils import deep_get
+from ...utils import deep_get
+
 
 
 # LOG CONFIGURATION
