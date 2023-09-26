@@ -15,7 +15,7 @@ from functools import reduce
 from configtypes import ConfigTypes
 from configset import ConfigSet
 from dtapi import DTConsolidatedAPI
-from utils import utils.deep_get
+from utils import deep_get
 
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
