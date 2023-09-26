@@ -11,6 +11,7 @@ import urllib3
 import redis
 import yaml
 import requests
+from functools import reduce
 from configtypes import ConfigTypes
 from configset import ConfigSet
 from dtapi import DTConsolidatedAPI
@@ -62,6 +63,9 @@ if not apipwd:
 stdConfig = ConfigSet.ConfigSet(config_dir)
 internaldomains = []
 
+
+def deep_get(dictionary, keys, default=None):
+    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
 def getClass(kls):
     parts = kls.split('.')
@@ -200,7 +204,7 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                     t_id = entity["tenantid"]
 
                     try:
-                        centity = eType(id=entity[eType.id_attr], name=entity[eType.name_attr], dto=entity)
+                        centity = eType(id=deep_get(entity,eType.id_attr), name=deep_get(entity,eType.name_attr), dto=entity)
                     except:
                         logger.error("Failed to create an %s entity object with the provided DTO", eType.__name__)
                         logger.debug(json.dumps(entity, indent=2, separators=(",", ": ")))
