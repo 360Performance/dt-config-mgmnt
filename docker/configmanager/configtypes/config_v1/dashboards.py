@@ -4,6 +4,7 @@ from ..ConfigTypes import TenantConfigV1Entity
 class dashboards(TenantConfigV1Entity):
     entityuri = "/dashboards"
     uri = TenantConfigV1Entity.uri + entityuri
+    list_attr = "dashboards"
 
     def __str__(self):
         if self.dto:
