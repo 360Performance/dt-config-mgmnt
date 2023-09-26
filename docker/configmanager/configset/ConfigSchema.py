@@ -35,11 +35,11 @@ config_schema = Schema({
                 Optional("log"): [{"file": str, Optional("id"): str}],
                 Optional("rum"): [{"file": str, Optional("id"): str}],
                 Optional("mobile"): [{"file": str, Optional("id"): str}],
-                Optional("service"): [{
+                Optional("service"): [
                      Optional(lambda fp: fp.startswith("calc:service")): {
                         [{"file": str, Optional("id"): str}]
                      }
-                }],
+                ],
                 Optional("synthetic"): [{"file": str, Optional("id"): str}]
             },
             Optional("conditionalNaming"): {
