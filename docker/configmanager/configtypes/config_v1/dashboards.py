@@ -5,6 +5,8 @@ class dashboards(TenantConfigV1Entity):
     entityuri = "/dashboards"
     uri = TenantConfigV1Entity.uri + entityuri
     list_attr = "dashboards"
+    name_attr = "dashboardMetadata.name"
+    id_attr = "id"
 
     def __str__(self):
         if self.dto:
