@@ -5,6 +5,8 @@ import json
 import hashlib
 import uuid
 import importlib
+import sys
+sys.path.append("..")
 from ..utils import deep_get
 
 
