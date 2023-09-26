@@ -15,6 +15,7 @@ from functools import reduce
 from configtypes import ConfigTypes
 from configset import ConfigSet
 from dtapi import DTConsolidatedAPI
+from utils import utils.deep_get
 
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
@@ -62,10 +63,6 @@ if not apipwd:
 # load the standard config from config directory
 stdConfig = ConfigSet.ConfigSet(config_dir)
 internaldomains = []
-
-
-def deep_get(dictionary, keys, default=None):
-    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
 def getClass(kls):
     parts = kls.split('.')
