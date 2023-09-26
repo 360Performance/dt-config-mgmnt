@@ -11,12 +11,10 @@ import urllib3
 import redis
 import yaml
 import requests
-from functools import reduce
 from configtypes import ConfigTypes
 from configset import ConfigSet
 from dtapi import DTConsolidatedAPI
-from utils import deep_get
-
+from functools import reduce
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
 
@@ -24,6 +22,10 @@ loglevel = os.environ.get("LOG_LEVEL", "info").upper()
 
 logging.ALWAYS = 25
 logging.addLevelName(logging.ALWAYS, "ALWAYS")
+
+
+def deep_get(dictionary, keys, default=None):
+    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
 
 def always(self, message, *args, **kws):
