@@ -31,11 +31,22 @@ config_schema = Schema({
                 }
             ],
             Optional("autoTags"): [{"file": str, Optional("name"): str, Optional("id"): str}],
+            Optional("azure"): {
+                Optional("credentials"): {
+                    Optional(lambda fp: fp.startswith("AZURE_CREDENTIALS")): [
+                        {"file": str, Optional("id"): str}
+                    ]
+                }
+            },
             Optional("calculatedMetrics"): {
                 Optional("log"): [{"file": str, Optional("id"): str}],
                 Optional("rum"): [{"file": str, Optional("id"): str}],
                 Optional("mobile"): [{"file": str, Optional("id"): str}],
-                Optional("service"): [{"file": str, Optional("id"): str}],
+                Optional("service"): {
+                     Optional(lambda fp: fp.startswith("calc:service")): [
+                        {"file": str, Optional("id"): str}
+                    ]
+                },
                 Optional("synthetic"): [{"file": str, Optional("id"): str}]
             },
             Optional("conditionalNaming"): {
@@ -79,7 +90,6 @@ config_schema = Schema({
                 Optional("iamExternalId"): [{"file": str, Optional("name"): str, Optional("id"): str}],
                 Optional("privateLink"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             },
-            Optional("azurecredentials"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("cloudFoundry"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("contentResources"): [{"file": str, Optional("name"): str, Optional("id"): str}],
             Optional("geographicRegions"): {

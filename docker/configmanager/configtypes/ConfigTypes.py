@@ -5,6 +5,10 @@ import json
 import hashlib
 import uuid
 import importlib
+from functools import reduce
+
+def deep_get(dictionary, keys, default=None):
+    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
 
 # LOG CONFIGURATION
@@ -81,7 +85,8 @@ class ConfigEntity():
     def getName(self):
         # get from DTO
         if isinstance(self.dto, dict):
-            return self.dto.get(self.__class__.name_attr, self.file)
+            return deep_get(self.dto,self.__class__.name_attr,self.file)
+            #return self.dto.get(self.__class__.name_attr, self.file)
         return self.__class__.__name__
 
     def setID(self, entityid):
@@ -129,7 +134,8 @@ class ConfigEntity():
 
     def dumpDTO(self, dumpdir):
         #filename = ((self.name + ".json") if self.name == self.entityid else self.entityid + ".json")
-        filename = self.dto[self.name_attr] + ".json"
+        filename = deep_get(self.dto, self.name_attr) + ".json"
+        #filename = self.dto[self.name_attr] + ".json"
         # path = dumpdir + self.entityuri + "/" + filename + ".json"
         #parts = f'{self.__module__}.{self.__class__.__qualname__}'.split(".")[1:-1]
         parts = self.apipath.split('/')[4:]
@@ -166,7 +172,8 @@ class ConfigEntity():
     # this can be overridden in a specific entities class
     def getConfigDefinition(self):
         #filename = ((self.name + "-" + self.entityid) if self.name != self.entityid else self.name)
-        filename = self.dto[self.name_attr] + ".json"
+        filename = deep_get(self.dto, self.name_attr) + ".json"
+        #filename = self.dto[self.name_attr] + ".json"
         definition = [{"id": self.entityid, "file": filename}]
 
         parts = self.apipath.split('/')[4:]

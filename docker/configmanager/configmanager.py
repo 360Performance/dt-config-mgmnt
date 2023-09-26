@@ -14,7 +14,7 @@ import requests
 from configtypes import ConfigTypes
 from configset import ConfigSet
 from dtapi import DTConsolidatedAPI
-
+from functools import reduce
 
 loglevel = os.environ.get("LOG_LEVEL", "info").upper()
 
@@ -22,6 +22,10 @@ loglevel = os.environ.get("LOG_LEVEL", "info").upper()
 
 logging.ALWAYS = 25
 logging.addLevelName(logging.ALWAYS, "ALWAYS")
+
+
+def deep_get(dictionary, keys, default=None):
+    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
 
 def always(self, message, *args, **kws):
@@ -61,7 +65,6 @@ if not apipwd:
 # load the standard config from config directory
 stdConfig = ConfigSet.ConfigSet(config_dir)
 internaldomains = []
-
 
 def getClass(kls):
     parts = kls.split('.')
@@ -200,13 +203,13 @@ def getConfigSettings(entitytypes, entityconfig, parameters, dumpconfig):
                     t_id = entity["tenantid"]
 
                     try:
-                        centity = eType(id=entity[eType.id_attr], name=entity[eType.name_attr], dto=entity)
+                        centity = eType(id=deep_get(entity,eType.id_attr), name=deep_get(entity,eType.name_attr), dto=entity)
                     except:
                         logger.error("Failed to create an %s entity object with the provided DTO", eType.__name__)
                         logger.debug(json.dumps(entity, indent=2, separators=(",", ": ")))
                         logger.error(traceback.print_exc())
                     logger.debug(
-                        f'{eType.__name__} {entity[eType.id_attr]} ({entity[eType.name_attr]}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
+                        f'{eType.__name__} {deep_get(entity,eType.id_attr)} ({deep_get(entity,eType.name_attr)}) of {c_id}::{t_id}:\n{json.dumps(entity, indent=2, separators=(",", ": "))}')
                     if dumpconfig:
                         centity.dumpDTO(config_dump_dir)
                         entity_definition = centity.getConfigDefinition()
